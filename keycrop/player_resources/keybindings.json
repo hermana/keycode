@@ -1,0 +1,49 @@
+// Place your key bindings in this file to override the defaults
+[
+    {
+        "key": "ctrl+shift+p",
+        "command": "runCommands",
+        "args": {
+            "commands": [
+                "workbench.action.showCommands",
+                "keycrop.helloWorld"
+            ]
+        }
+    },
+    {
+        "key": "ctrl+shift+space",
+        "command": "runCommands",
+        "args": {
+            "commands": [
+                {
+                    "command": "editor.action.triggerParameterHints",
+                    "when": "editorHasSignatureHelpProvider && editorTextFocus"
+                },
+                "keycrop.helloWorld"
+            ]
+        }
+    },
+    {
+        "key": "ctrl+\\",
+        "command": "runCommands",
+        "args": {
+            "commands": [
+                "workbench.action.splitEditor",
+                "keycrop.helloWorld"
+            ]
+        }
+    },
+    {
+        "key": "ctrl+/",
+        "command": "runCommands",
+        "args": {
+            "commands": [
+                {
+                    "command": "editor.action.commentLine",
+                    "when": "editorTextFocus && !editorReadonly"
+                },
+                "keycrop.helloWorld"
+            ]
+        }
+    }
+]
