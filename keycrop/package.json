@@ -17,7 +17,17 @@
         "command": "keycrop.helloWorld",
         "title": "Hello World"
       }
-    ]
+    ],
+    "views": {
+      "explorer": [
+        {
+          "id": "keycrop",
+          "name": "keycrop",
+          "contextualTitle": "Use hotkeys to grow your crop!",
+          "type": "webview"
+        }
+      ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "yarn run package",
