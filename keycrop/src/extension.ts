@@ -1,26 +1,141 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
-import * as vscode from 'vscode';
+import * as vscode from 'vscode'
+//import { WebViewProvider} from './providers/webviewprovider';
 
-// This method is called when your extension is activated
-// Your extension is activated the very first time the command is executed
+let webview: WebViewProvider;
+let config = vscode.workspace.getConfiguration('keycrop');
+
+
 export function activate(context: vscode.ExtensionContext) {
 
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "keycrop" is now active!');
+
+	webview = new WebViewProvider(context);
+	context.subscriptions.push(vscode.window.registerWebviewViewProvider(WebViewProvider.viewType, webview));
+  
+	vscode.workspace.onDidChangeConfiguration(event => {
+		  
+	  console.log("configuration change registered!");
+	  //Update config
+	  config = vscode.workspace.getConfiguration('keycrop');
+
+
+
+	  //Background changed
+	  if (event.affectsConfiguration("keycrop.background")) {
+		webview.postMessage({
+		  type: 'background',
+		  value: config.get('background')
+		})
+	  }
+  
+	  //Scale changed
+	//   if (event.affectsConfiguration("keycrop-view.scale")) {
+	// 	webview.postMessage({
+	// 	  type: 'scale',
+	// 	  value: config.get('scale')
+	// 	})
+	//  }
+})
 
 	// The command has been defined in the package.json file
 	// Now provide the implementation of the command with registerCommand
 	// The commandId parameter must match the command field in package.json
 	const disposable = vscode.commands.registerCommand('keycrop.helloWorld', () => {
-		// The code you place here will be executed every time your command is executed
-		// Display a message box to the user
 		vscode.window.showInformationMessage('Hello World from keycrop!');
 	});
-
 	context.subscriptions.push(disposable);
+
 }
 
 // This method is called when your extension is deactivated
 export function deactivate() {}
+
+
+export class WebViewProvider implements vscode.WebviewViewProvider {
+
+    public static readonly viewType = 'keycrop'; //TODO: may be able to switch views later
+  
+    private view ?: vscode.WebviewView;
+  
+    constructor(private readonly context: vscode.ExtensionContext) {}
+  
+    public postMessage(message: any) {
+      this.view?.webview.postMessage(message);
+    }
+  
+    public resolveWebviewView(webviewView: vscode.WebviewView, context: vscode.WebviewViewResolveContext, _token: vscode.CancellationToken) {
+      this.view = webviewView; //Needed so we can use it in postMessageToWebview
+  
+      const webview = webviewView.webview;
+  
+      //Allow scripts in the webview
+      webview.options = {
+        enableScripts: true 
+      };
+  
+      //Set the HTML content for the webview
+      webview.html = this.getHtmlContent(
+        webviewView.webview,
+      );
+  
+      //Handle messages
+      webview.onDidReceiveMessage((message) => {
+        switch (message.type) {
+          //Error message
+          case 'error':
+            vscode.window.showErrorMessage(message.text);
+            break;
+  
+          //Info message
+          case 'info':
+            vscode.window.showInformationMessage(message.text);
+            break;
+  
+          //Init pets
+          case 'init':
+            //Send background
+            webview.postMessage({
+              type: 'background',
+              value: config.get('background')
+            })
+  
+            //Send scale
+            // webview.postMessage({
+            //   type: 'scale',
+            //   value: config.get('scale')
+            // })
+  
+            //Load plants eventually
+            // plant.forEach(plant => { loadPet(plant); });
+            break;
+        }
+      });
+    }
+  
+    private getHtmlContent(webview: vscode.Webview): string {
+      //You can reference local files (like CSS or JS) via vscode-resource URIs
+	  const style = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'src/media', 'style.css'));
+    //   const utilJS = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'media', 'util.js'));
+    //   const petsJS = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'media', 'pets.js'));
+    //   const mainJS = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'media', 'main.js'));
+ 		//   <meta http-equiv="Content-Security-Policy" content="default-src 'none';"> 
+      //HTML
+      return ` 
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <link href="${style}" rel="stylesheet">
+          <title>KeyCrop</title>
+        </head>
+        <body>
+          <div id="keycrop" background="${config.get('background')}">
+            <div id="ball"></div>
+          </div>
+          <div id="mouse"></div>
+        </body>
+        </html>
+      `;
+    }
+  }

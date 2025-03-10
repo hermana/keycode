@@ -9,7 +9,8 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+  ],
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [
@@ -27,6 +28,19 @@
           "type": "webview"
         }
       ]
+    },
+    "configuration": {
+      "title": "keycrop",
+      "properties": {
+        "keycrop.background": {
+          "type": "string",
+          "default": "Dirt",
+          "enum": [
+            "Dirt"
+          ],
+          "description": "The view background"
+        }
+      }
     }
   },
   "scripts": {

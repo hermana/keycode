@@ -1,0 +1,7 @@
+#keycrop {
+    background: url(./backgrounds/dirt.png);
+    width: calc(100% / var(--scale));
+    height: calc(100% / var(--scale));
+    position: absolute;
+  }
+  
