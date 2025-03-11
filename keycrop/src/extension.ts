@@ -27,13 +27,12 @@ export function activate(context: vscode.ExtensionContext) {
 		})
 	  }
   
-	  //Scale changed
-	//   if (event.affectsConfiguration("keycrop-view.scale")) {
-	// 	webview.postMessage({
-	// 	  type: 'scale',
-	// 	  value: config.get('scale')
-	// 	})
-	//  }
+    if (event.affectsConfiguration("keycrop-view.scale")) {
+      webview.postMessage({
+        type: 'scale',
+        value: config.get('scale')
+      })
+    }
 })
 
 	// The command has been defined in the package.json file
@@ -90,7 +89,6 @@ export class WebViewProvider implements vscode.WebviewViewProvider {
             vscode.window.showInformationMessage(message.text);
             break;
   
-          //Init pets
           case 'init':
             //Send background
             webview.postMessage({
@@ -114,26 +112,23 @@ export class WebViewProvider implements vscode.WebviewViewProvider {
     private getHtmlContent(webview: vscode.Webview): string {
       //You can reference local files (like CSS or JS) via vscode-resource URIs
 	  const style = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'src/media', 'style.css'));
-    //   const utilJS = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'media', 'util.js'));
-    //   const petsJS = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'media', 'pets.js'));
-    //   const mainJS = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'media', 'main.js'));
- 		//   <meta http-equiv="Content-Security-Policy" content="default-src 'none';"> 
-      //HTML
+    const mainJS = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'media', 'main.js'));
+ 		//   I may add this content policy back: <meta http-equiv="Content-Security-Policy" content="default-src 'none';"> 
+
       return ` 
         <!DOCTYPE html>
         <html lang="en">
         <head>
           <meta charset="UTF-8">
-
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
           <link href="${style}" rel="stylesheet">
+
           <title>KeyCrop</title>
         </head>
         <body>
           <div id="keycrop" background="${config.get('background')}">
-            <div id="ball"></div>
           </div>
-          <div id="mouse"></div>
+          <script src="${mainJS}"></script>
         </body>
         </html>
       `;
