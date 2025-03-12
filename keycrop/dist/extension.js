@@ -36,25 +36,70 @@ __export(extension_exports, {
 });
 module.exports = __toCommonJS(extension_exports);
 var vscode = __toESM(require("vscode"));
+var fs = __toESM(require("fs"));
+var path = __toESM(require("path"));
 var webview;
 var config = vscode.workspace.getConfiguration("keycrop");
+var extensionStorageFolder = "";
+var plantsPath;
+function loadPlantsFile() {
+  if (!fs.existsSync(extensionStorageFolder)) fs.mkdirSync(extensionStorageFolder, { recursive: true });
+  if (fs.existsSync(plantsPath)) {
+    try {
+      plants = JSON.parse(fs.readFileSync(plantsPath, "utf8"));
+      if (!Array.isArray(plants)) plants = new Array();
+    } catch (e) {
+      plants = new Array();
+    }
+  } else {
+    savePlants();
+  }
+}
+function savePlants() {
+  fs.writeFileSync(plantsPath, JSON.stringify(plants, null, 2));
+}
+var plants = new Array();
+function loadPlant(plant) {
+  console.log("ADD A NEW PLANT");
+  webview.postMessage({
+    action: "add",
+    type: plant.type
+  });
+}
+function addPlant(plant) {
+  plants.push(plant);
+  savePlants();
+  loadPlant(plant);
+}
 function activate(context) {
+  extensionStorageFolder = context.globalStorageUri.path.substring(1);
+  plantsPath = path.join(extensionStorageFolder, "plants.json");
   webview = new WebViewProvider(context);
   context.subscriptions.push(vscode.window.registerWebviewViewProvider(WebViewProvider.viewType, webview));
+  loadPlantsFile();
   vscode.workspace.onDidChangeConfiguration((event) => {
     console.log("configuration change registered!");
     config = vscode.workspace.getConfiguration("keycrop");
     if (event.affectsConfiguration("keycrop.background")) {
       webview.postMessage({
-        type: "background",
+        action: "background",
         value: config.get("background")
       });
     }
+    if (event.affectsConfiguration("keycrop-view.scale")) {
+      webview.postMessage({
+        action: "scale",
+        value: config.get("scale")
+      });
+    }
   });
-  const disposable = vscode.commands.registerCommand("keycrop.helloWorld", () => {
-    vscode.window.showInformationMessage("Hello World from keycrop!");
+  const addPlantToGreenhouse = vscode.commands.registerCommand("keycrop.helloWorld", () => {
+    vscode.window.showInformationMessage(`A new plant has sprouted in the greenhouse!`);
+    addPlant({
+      type: "basil"
+    });
   });
-  context.subscriptions.push(disposable);
+  context.subscriptions.push(addPlantToGreenhouse);
 }
 function deactivate() {
 }
@@ -78,7 +123,7 @@ var WebViewProvider = class {
       webviewView.webview
     );
     webview2.onDidReceiveMessage((message) => {
-      switch (message.type) {
+      switch (message.action) {
         //Error message
         case "error":
           vscode.window.showErrorMessage(message.text);
@@ -87,11 +132,13 @@ var WebViewProvider = class {
         case "info":
           vscode.window.showInformationMessage(message.text);
           break;
-        //Init pets
         case "init":
           webview2.postMessage({
-            type: "background",
+            action: "background",
             value: config.get("background")
+          });
+          plants.forEach((plant) => {
+            loadPlant(plant);
           });
           break;
       }
@@ -99,21 +146,23 @@ var WebViewProvider = class {
   }
   getHtmlContent(webview2) {
     const style = webview2.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, "src/media", "style.css"));
+    const mainJS = webview2.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, "src/media", "main.js"));
+    const plantsJS = webview2.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, "src/media", "plants.js"));
     return ` 
         <!DOCTYPE html>
         <html lang="en">
         <head>
           <meta charset="UTF-8">
-
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
           <link href="${style}" rel="stylesheet">
+
           <title>KeyCrop</title>
         </head>
         <body>
           <div id="keycrop" background="${config.get("background")}">
-            <div id="ball"></div>
           </div>
-          <div id="mouse"></div>
+          <script src="${mainJS}"></script>
+          <script src="${plantsJS}"></script>
         </body>
         </html>
       `;

@@ -1,16 +1,76 @@
 import * as vscode from 'vscode'
+import * as fs from 'fs';
+import * as path from 'path';
 //import { WebViewProvider} from './providers/webviewprovider';
 
 let webview: WebViewProvider;
 let config = vscode.workspace.getConfiguration('keycrop');
+let extensionStorageFolder: string = '';
+let plantsPath: string;
 
+
+//FIXME: move this? and all plant stuff
+type Plant = { 
+  //There will be different plant types in the future
+  type: string; 
+}
+
+function loadPlantsFile() {
+  //Storage folder does not exist
+  if (!fs.existsSync(extensionStorageFolder)) fs.mkdirSync(extensionStorageFolder, { recursive: true });
+
+  //Read plants file
+  if (fs.existsSync(plantsPath)) {
+    //Read plants from pets.json
+    try {
+      //Try to read plants file
+      plants = JSON.parse(fs.readFileSync(plantsPath, 'utf8'));
+      if (!Array.isArray(plants)) plants = new Array<Plant>();
+    } catch (e) {
+      //Failed -> Reset pets
+      plants = new Array<Plant>();
+    }
+  } else {
+    //Create plants.json file
+    savePlants();
+  }
+}
+
+function savePlants() {
+  fs.writeFileSync(plantsPath, JSON.stringify(plants, null, 2));
+}
+
+let plants = new Array<Plant>();
+
+function loadPlant(plant: Plant) {
+  console.log("ADD A NEW PLANT")
+  //Sends a plant to the webview
+  webview.postMessage({
+    action: 'add',
+    type: plant.type
+  })
+}
+
+function addPlant(plant: Plant) {
+  //Add to list & save json
+  plants.push(plant);
+  savePlants();
+
+  //load pet in webview
+  loadPlant(plant);
+}
 
 export function activate(context: vscode.ExtensionContext) {
 
+  extensionStorageFolder = context.globalStorageUri.path.substring(1);
+  plantsPath = path.join(extensionStorageFolder, 'plants.json');
 
 	webview = new WebViewProvider(context);
 	context.subscriptions.push(vscode.window.registerWebviewViewProvider(WebViewProvider.viewType, webview));
-  
+    
+  //Load existing plants array
+  loadPlantsFile();
+
 	vscode.workspace.onDidChangeConfiguration(event => {
 		  
 	  console.log("configuration change registered!");
@@ -22,14 +82,14 @@ export function activate(context: vscode.ExtensionContext) {
 	  //Background changed
 	  if (event.affectsConfiguration("keycrop.background")) {
 		webview.postMessage({
-		  type: 'background',
+		  action: 'background',
 		  value: config.get('background')
 		})
 	  }
   
     if (event.affectsConfiguration("keycrop-view.scale")) {
       webview.postMessage({
-        type: 'scale',
+        action: 'scale',
         value: config.get('scale')
       })
     }
@@ -38,10 +98,13 @@ export function activate(context: vscode.ExtensionContext) {
 	// The command has been defined in the package.json file
 	// Now provide the implementation of the command with registerCommand
 	// The commandId parameter must match the command field in package.json
-	const disposable = vscode.commands.registerCommand('keycrop.helloWorld', () => {
-		vscode.window.showInformationMessage('Hello World from keycrop!');
+	const addPlantToGreenhouse = vscode.commands.registerCommand('keycrop.helloWorld', () => {
+    vscode.window.showInformationMessage(`A new plant has sprouted in the greenhouse!`);
+      addPlant({
+        type: "basil",
+      });
 	});
-	context.subscriptions.push(disposable);
+	context.subscriptions.push(addPlantToGreenhouse);
 
 }
 
@@ -78,7 +141,7 @@ export class WebViewProvider implements vscode.WebviewViewProvider {
   
       //Handle messages
       webview.onDidReceiveMessage((message) => {
-        switch (message.type) {
+        switch (message.action) {
           //Error message
           case 'error':
             vscode.window.showErrorMessage(message.text);
@@ -92,7 +155,7 @@ export class WebViewProvider implements vscode.WebviewViewProvider {
           case 'init':
             //Send background
             webview.postMessage({
-              type: 'background',
+              action: 'background',
               value: config.get('background')
             })
   
@@ -102,8 +165,7 @@ export class WebViewProvider implements vscode.WebviewViewProvider {
             //   value: config.get('scale')
             // })
   
-            //Load plants eventually
-            // plant.forEach(plant => { loadPet(plant); });
+            plants.forEach(plant => { loadPlant(plant); });
             break;
         }
       });
@@ -112,7 +174,8 @@ export class WebViewProvider implements vscode.WebviewViewProvider {
     private getHtmlContent(webview: vscode.Webview): string {
       //You can reference local files (like CSS or JS) via vscode-resource URIs
 	  const style = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'src/media', 'style.css'));
-    const mainJS = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'media', 'main.js'));
+    const mainJS = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'src/media', 'main.js'));
+    const plantsJS = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'src/media', 'plants.js'));
  		//   I may add this content policy back: <meta http-equiv="Content-Security-Policy" content="default-src 'none';"> 
 
       return ` 
@@ -129,6 +192,7 @@ export class WebViewProvider implements vscode.WebviewViewProvider {
           <div id="keycrop" background="${config.get('background')}">
           </div>
           <script src="${mainJS}"></script>
+          <script src="${plantsJS}"></script>
         </body>
         </html>
       `;

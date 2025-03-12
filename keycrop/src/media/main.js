@@ -22,15 +22,24 @@ const game = {
 window.addEventListener('message', event => {
   //The JSON data sent by the extension
   const message = event.data; 
-
+  console.log("MESSAGE RECEIVE");
+  console.log(message.action)
   //Check message type
-  switch (message.type.toLowerCase()) {
+  switch (message.action.toLowerCase()) {
     //Update background
     case 'background':
       game.div.setAttribute('background', message.value.toLowerCase());
       break;
-
-    //Update scale
+    case 'add':
+      console.log("MADE IT TO THE ADD FCUNTION")
+      console.log(message.type)
+      switch (message.type) {
+        case 'basil':
+          console.log("WE ARE ADDING THE BASIL PLANT")
+          new Basil();
+          break;
+      }
+    //Update scale - take this out?
     case 'scale':
       switch (message.value.toLowerCase()) {
         case 'small':
@@ -82,4 +91,5 @@ function update() {
 const timer = setInterval(update, 1000 / game.fps)
 
 //Tell vscode game loaded
+//TODO: type or action here?
 vscode.postMessage({ type: 'init' })
