@@ -60,16 +60,20 @@ function savePlants() {
 }
 var plants = new Array();
 function loadPlant(plant) {
-  console.log("ADD A NEW PLANT");
   webview.postMessage({
     action: "add",
     type: plant.type
   });
 }
-function addPlant(plant) {
-  plants.push(plant);
-  savePlants();
-  loadPlant(plant);
+function growPlant(plant) {
+  if (plants.some((p) => p.type === plant.type)) {
+    console.log("THIS PLANT ALREADY EXISTS");
+  } else {
+    vscode.window.showInformationMessage(`A new plant has sprouted in the greenhouse!`);
+    plants.push(plant);
+    savePlants();
+    loadPlant(plant);
+  }
 }
 function activate(context) {
   extensionStorageFolder = context.globalStorageUri.path.substring(1);
@@ -93,13 +97,15 @@ function activate(context) {
       });
     }
   });
-  const addPlantToGreenhouse = vscode.commands.registerCommand("keycrop.helloWorld", () => {
-    vscode.window.showInformationMessage(`A new plant has sprouted in the greenhouse!`);
-    addPlant({
+  const helloWorld = vscode.commands.registerCommand("keycrop.helloWorld", () => {
+    vscode.window.showInformationMessage(`Hello world from keycrop!`);
+  });
+  const growBasil = vscode.commands.registerCommand("keycrop.growBasil", () => {
+    growPlant({
       type: "basil"
     });
   });
-  context.subscriptions.push(addPlantToGreenhouse);
+  context.subscriptions.push(growBasil, helloWorld);
 }
 function deactivate() {
 }

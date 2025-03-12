@@ -6,7 +6,7 @@
         "args": {
             "commands": [
                 "workbench.action.showCommands",
-                "keycrop.helloWorld"
+                "keycrop.growBasil"
             ]
         }
     },

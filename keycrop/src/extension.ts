@@ -43,7 +43,6 @@ function savePlants() {
 let plants = new Array<Plant>();
 
 function loadPlant(plant: Plant) {
-  console.log("ADD A NEW PLANT")
   //Sends a plant to the webview
   webview.postMessage({
     action: 'add',
@@ -51,13 +50,17 @@ function loadPlant(plant: Plant) {
   })
 }
 
-function addPlant(plant: Plant) {
-  //Add to list & save json
-  plants.push(plant);
-  savePlants();
+function growPlant(plant: Plant) {
+  if(plants.some(p => p.type === plant.type)){
+    console.log("THIS PLANT ALREADY EXISTS");
+  }else{
+    vscode.window.showInformationMessage(`A new plant has sprouted in the greenhouse!`);
+    plants.push(plant);
+    savePlants();
+    //load pet in webview
+    loadPlant(plant);
+  }
 
-  //load pet in webview
-  loadPlant(plant);
 }
 
 export function activate(context: vscode.ExtensionContext) {
@@ -95,16 +98,19 @@ export function activate(context: vscode.ExtensionContext) {
     }
 })
 
+  const helloWorld = vscode.commands.registerCommand('keycrop.helloWorld', () => {
+    vscode.window.showInformationMessage(`Hello world from keycrop!`);
+  });
+
 	// The command has been defined in the package.json file
 	// Now provide the implementation of the command with registerCommand
 	// The commandId parameter must match the command field in package.json
-	const addPlantToGreenhouse = vscode.commands.registerCommand('keycrop.helloWorld', () => {
-    vscode.window.showInformationMessage(`A new plant has sprouted in the greenhouse!`);
-      addPlant({
+	const growBasil = vscode.commands.registerCommand('keycrop.growBasil', () => {
+      growPlant({
         type: "basil",
       });
 	});
-	context.subscriptions.push(addPlantToGreenhouse);
+	context.subscriptions.push(growBasil, helloWorld);
 
 }
 
