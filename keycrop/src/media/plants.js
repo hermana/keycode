@@ -23,14 +23,17 @@ class Plant{
       this.#type = type;
   
       //Create plant element
-      console.log("CREATE THE DIV")
       const element = document.createElement('div');
+      //const element = document.createElement('img');
+      // element.src = "./plants/size_16/basil_small.png"
+      //element.src = "plants/size_16/basil_small.pngs"
       game.div.appendChild(element);
       this.#html_element = element;
   
       //Add classes & move to random point
       element.classList.add('plant');
       element.classList.add(this.type);
+      element.classList.add('small')
   
       //Add plant to game plants list
       game.plants.push(this);

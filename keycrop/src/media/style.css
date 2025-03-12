@@ -5,10 +5,36 @@
     position: absolute;
   }
   
-  .basil {
-    width: 32px;
-    height: 32px;
-    background: url(./plants/size_32/basil_small.png);
-    /* position: relative;  */
+.plant {
     float: left;
   }
+
+.plant.small{
+  width:16px;
+  height:16px;
+  margin-top: 16px;
+}
+
+.plant.medium{
+  width:24px;
+  height:24px;
+  margin-top: 8px;
+}
+
+.plant.large{
+  width:32px;
+  height:32px;
+}
+
+.basil.small {
+    background: url(./plants/size_16/basil_small.png);
+  }
+
+.basil.medium {
+    background: url(./plants/size_16/basil_small.png);
+}
+
+.basil.large {
+  background: url(./plants/size_32/basil_small.png);
+}
+

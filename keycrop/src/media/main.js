@@ -20,22 +20,15 @@ const game = {
 
 //Messages from VSCode
 window.addEventListener('message', event => {
-  //The JSON data sent by the extension
   const message = event.data; 
-  console.log("MESSAGE RECEIVE");
-  console.log(message.action)
-  //Check message type
+
   switch (message.action.toLowerCase()) {
-    //Update background
     case 'background':
       game.div.setAttribute('background', message.value.toLowerCase());
       break;
     case 'add':
-      console.log("MADE IT TO THE ADD FCUNTION")
-      console.log(message.type)
       switch (message.type) {
         case 'basil':
-          console.log("WE ARE ADDING THE BASIL PLANT")
           new Basil();
           break;
       }
