@@ -9,5 +9,6 @@
     width: 32px;
     height: 32px;
     background: url(./plants/size_32/basil_small.png);
-    position: relative; 
+    /* position: relative;  */
+    float: left;
   }
