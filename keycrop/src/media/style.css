@@ -16,8 +16,8 @@
 }
 
 .plant.medium{
-  width:24px;
-  height:24px;
+  width:16px;
+  height:16px;
   margin-top: 8px;
 }
 
@@ -31,10 +31,10 @@
   }
 
 .basil.medium {
-    background: url(./plants/size_16/basil_small.png);
+    background: url(./plants/size_16/basil_medium.png);
 }
 
 .basil.large {
-  background: url(./plants/size_32/basil_small.png);
+  background: url(./plants/size_32/basil_large.png);
 }
 

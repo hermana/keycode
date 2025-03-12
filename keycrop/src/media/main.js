@@ -29,7 +29,18 @@ window.addEventListener('message', event => {
     case 'add':
       switch (message.type) {
         case 'basil':
-          new Basil();
+          //FIXME: does it show up?
+          game.plants.push(new Basil());
+          break;
+      }
+    case 'grow':
+      switch(message.plant) {
+        case 'basil':
+          game.plants.forEach(plant => {
+            if(plant.type == 'basil'){
+              plant.grow();
+            }
+          });
           break;
       }
     //Update scale - take this out?

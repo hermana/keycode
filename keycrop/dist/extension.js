@@ -67,7 +67,15 @@ function loadPlant(plant) {
 }
 function growPlant(plant) {
   if (plants.some((p) => p.type === plant.type)) {
-    console.log("THIS PLANT ALREADY EXISTS");
+    let patch = plants.filter((p) => p.type === plant.type);
+    patch.forEach(
+      (p) => {
+        webview.postMessage({
+          action: "grow",
+          plant: "basil"
+        });
+      }
+    );
   } else {
     vscode.window.showInformationMessage(`A new plant has sprouted in the greenhouse!`);
     plants.push(plant);

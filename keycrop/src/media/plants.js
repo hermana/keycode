@@ -1,16 +1,13 @@
 class Plant{
 
-    //Pet info
     #init = false;
     #type = '';
     get type() { return this.#type; }
-    // #pos = new Vec2();
-    // get pos() { return this.#pos; }
     #html_element;
     get html_element() { return this.#html_element; } 
-    
+    #num_hotkey_uses =0;
+
     constructor() {
-       // this.#pos = position;
     }
   
     //Init
@@ -39,8 +36,16 @@ class Plant{
       game.plants.push(this);
     }
   
-    update() {
-        //TODO
+    grow() {
+        this.#num_hotkey_uses+=1;
+        //FIXME: abstract the levels somewhere + I shouldnt remove the class every time
+        if(this.#num_hotkey_uses>8){
+          this.#html_element.classList.remove("medium");
+          this.#html_element.classList.add("large");
+        }else if(this.#num_hotkey_uses>2){
+          this.#html_element.classList.remove("small");
+          this.#html_element.classList.add("medium");
+        }
     }
 
   }

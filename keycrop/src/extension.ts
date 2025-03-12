@@ -21,7 +21,6 @@ function loadPlantsFile() {
 
   //Read plants file
   if (fs.existsSync(plantsPath)) {
-    //Read plants from pets.json
     try {
       //Try to read plants file
       plants = JSON.parse(fs.readFileSync(plantsPath, 'utf8'));
@@ -52,7 +51,17 @@ function loadPlant(plant: Plant) {
 
 function growPlant(plant: Plant) {
   if(plants.some(p => p.type === plant.type)){
-    console.log("THIS PLANT ALREADY EXISTS");
+    //FIXME: am i doing multiple?
+    let patch = plants.filter(p =>p.type === plant.type);
+    patch.forEach( p => 
+    {
+      webview.postMessage({
+        action: 'grow',
+        plant: 'basil'
+      })
+      //loadPlant(p);
+    }
+    );
   }else{
     vscode.window.showInformationMessage(`A new plant has sprouted in the greenhouse!`);
     plants.push(plant);
