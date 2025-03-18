@@ -21,13 +21,12 @@ const game = {
 //Messages from VSCode
 window.addEventListener('message', event => {
   const message = event.data; 
-
-  switch (message.action.toLowerCase()) {
+  switch (message.action) {
     case 'background':
-      game.div.setAttribute('background', message.value.toLowerCase());
+      game.div.setAttribute('background', message.value);
       break;
     case 'add':
-      switch (message.type) {
+      switch (message.species) {
         case 'basil':
           game.plants.push(new Basil());
           break;
@@ -35,27 +34,25 @@ window.addEventListener('message', event => {
           game.plants.push(new Daisy());
           break;
       }
+      break;
     case 'grow':
-      console.log("The plant we are growing")
-      console.log(message.plant)
-      switch(message.plant) {
+      switch(message.species) {
         case 'basil':
           game.plants.forEach(plant => {
-            if(plant.type == 'basil'){
-              console.log("grow basil plant!")
+            if(plant.species == 'basil'){
               plant.grow();
             }
           });
           break;
           case 'daisy':
             game.plants.forEach(plant => {
-              if(plant.type == 'daisy'){
-                console.log("grow daisy plant!")
+              if(plant.species == 'daisy'){
                 plant.grow();
               }
             });
           break;
       }
+      break;
     //Update scale - take this out?
     case 'scale':
       switch (message.value.toLowerCase()) {

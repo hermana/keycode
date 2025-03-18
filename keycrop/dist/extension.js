@@ -59,36 +59,38 @@ function savePlants() {
   fs.writeFileSync(plantsPath, JSON.stringify(plants, null, 2));
 }
 var plants = new Array();
-function loadPlant(plant) {
+function addPlant(plant) {
+  console.log("WE ARE ADDING THE PLANT: from add function");
+  console.log(plant.species);
   webview.postMessage({
     action: "add",
-    type: plant.type
+    species: plant.species
   });
 }
 function growPlant(plant) {
-  if (plants.some((p) => p.type === plant.type)) {
-    let patch = plants.filter((p) => p.type === plant.type);
+  if (plants.some((p) => p.species === plant.species)) {
+    let patch = plants.filter((p) => p.species === plant.species);
     patch.forEach(
       (p) => {
         webview.postMessage({
           action: "grow",
-          plant: plant.type
+          species: plant.species
         });
       }
     );
   } else {
-    vscode.window.showInformationMessage("A new " + plant.type + " plant has sprouted in the greenhouse!");
+    vscode.window.showInformationMessage("A new " + plant.species + " plant has sprouted in the greenhouse!");
     plants.push(plant);
     savePlants();
-    loadPlant(plant);
+    addPlant(plant);
   }
 }
 function activate(context) {
   extensionStorageFolder = context.globalStorageUri.path.substring(1);
   plantsPath = path.join(extensionStorageFolder, "plants.json");
+  loadPlantsFile();
   webview = new WebViewProvider(context);
   context.subscriptions.push(vscode.window.registerWebviewViewProvider(WebViewProvider.viewType, webview));
-  loadPlantsFile();
   vscode.workspace.onDidChangeConfiguration((event) => {
     console.log("configuration change registered!");
     config = vscode.workspace.getConfiguration("keycrop");
@@ -110,12 +112,12 @@ function activate(context) {
   });
   const growBasil = vscode.commands.registerCommand("keycrop.growBasil", () => {
     growPlant({
-      type: "basil"
+      species: "basil"
     });
   });
   const growDaisy = vscode.commands.registerCommand("keycrop.growDaisy", () => {
     growPlant({
-      type: "daisy"
+      species: "daisy"
     });
   });
   context.subscriptions.push(growBasil, growDaisy, helloWorld);
@@ -142,7 +144,7 @@ var WebViewProvider = class {
       webviewView.webview
     );
     webview2.onDidReceiveMessage((message) => {
-      switch (message.action) {
+      switch (message.type) {
         //Error message
         case "error":
           vscode.window.showErrorMessage(message.text);
@@ -156,8 +158,9 @@ var WebViewProvider = class {
             action: "background",
             value: config.get("background")
           });
+          console.log("THE INIT FUNCTION IS CALLING ADDPLANT");
           plants.forEach((plant) => {
-            loadPlant(plant);
+            addPlant(plant);
           });
           break;
       }

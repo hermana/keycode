@@ -12,7 +12,7 @@ let plantsPath: string;
 //FIXME: move this? and all plant stuff
 type Plant = { 
   //There will be different plant types in the future
-  type: string; 
+  species: string; 
 }
 
 function loadPlantsFile() {
@@ -26,7 +26,7 @@ function loadPlantsFile() {
       plants = JSON.parse(fs.readFileSync(plantsPath, 'utf8'));
       if (!Array.isArray(plants)) plants = new Array<Plant>();
     } catch (e) {
-      //Failed -> Reset pets
+      //Failed -> Reset plants
       plants = new Array<Plant>();
     }
   } else {
@@ -41,33 +41,32 @@ function savePlants() {
 
 let plants = new Array<Plant>();
 
-function loadPlant(plant: Plant) {
-  //Sends a plant to the webview
+function addPlant(plant: Plant) {
   webview.postMessage({
     action: 'add',
-    type: plant.type
+    species: plant.species
   })
 }
 
 function growPlant(plant: Plant) {
-  if(plants.some(p => p.type === plant.type)){
+  if(plants.some(p => p.species === plant.species)){
     //FIXME: am i doing multiple?
-    let patch = plants.filter(p =>p.type === plant.type);
+    let patch = plants.filter(p =>p.species === plant.species);
     patch.forEach( p => 
     {
       webview.postMessage({
         action: 'grow',
-        plant: plant.type
+        species: plant.species
       })
       //loadPlant(p);
     }
     );
   }else{
-    vscode.window.showInformationMessage("A new " +plant.type +" plant has sprouted in the greenhouse!");
+    vscode.window.showInformationMessage("A new " +plant.species +" plant has sprouted in the greenhouse!");
     plants.push(plant);
     savePlants();
     //load pet in webview
-    loadPlant(plant);
+    addPlant(plant);
   }
 
 }
@@ -77,26 +76,25 @@ export function activate(context: vscode.ExtensionContext) {
   extensionStorageFolder = context.globalStorageUri.path.substring(1);
   plantsPath = path.join(extensionStorageFolder, 'plants.json');
 
+    //Load existing plants array
+  loadPlantsFile();
+
 	webview = new WebViewProvider(context);
 	context.subscriptions.push(vscode.window.registerWebviewViewProvider(WebViewProvider.viewType, webview));
     
-  //Load existing plants array
-  loadPlantsFile();
+
 
 	vscode.workspace.onDidChangeConfiguration(event => {
-		  
-	  console.log("configuration change registered!");
+	
 	  //Update config
 	  config = vscode.workspace.getConfiguration('keycrop');
 
-
-
 	  //Background changed
 	  if (event.affectsConfiguration("keycrop.background")) {
-		webview.postMessage({
-		  action: 'background',
-		  value: config.get('background')
-		})
+      webview.postMessage({
+        action: 'background',
+        value: config.get('background')
+      })
 	  }
   
     if (event.affectsConfiguration("keycrop-view.scale")) {
@@ -115,15 +113,16 @@ export function activate(context: vscode.ExtensionContext) {
 	// The commandId parameter must match the command field in package.json
 	const growBasil = vscode.commands.registerCommand('keycrop.growBasil', () => {
       growPlant({
-        type: "basil",
+        species: "basil",
       });
 	});
 
   const growDaisy = vscode.commands.registerCommand('keycrop.growDaisy', () => {
     growPlant({
-      type: "daisy",
+      species: "daisy",
     });
-});
+  });
+
 	context.subscriptions.push(growBasil, growDaisy, helloWorld);
 
 }
@@ -161,7 +160,7 @@ export class WebViewProvider implements vscode.WebviewViewProvider {
   
       //Handle messages
       webview.onDidReceiveMessage((message) => {
-        switch (message.action) {
+        switch (message.type) {
           //Error message
           case 'error':
             vscode.window.showErrorMessage(message.text);
@@ -184,8 +183,7 @@ export class WebViewProvider implements vscode.WebviewViewProvider {
             //   type: 'scale',
             //   value: config.get('scale')
             // })
-  
-            plants.forEach(plant => { loadPlant(plant); });
+            plants.forEach(plant => { addPlant(plant); });
             break;
         }
       });
