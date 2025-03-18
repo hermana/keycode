@@ -19,7 +19,7 @@
                     "command": "editor.action.triggerParameterHints",
                     "when": "editorHasSignatureHelpProvider && editorTextFocus"
                 },
-                "keycrop.helloWorld"
+                "keycrop.growDaisy"
             ]
         }
     },

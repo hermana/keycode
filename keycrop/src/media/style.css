@@ -38,3 +38,15 @@
   background: url(./plants/size_32/basil_large.png);
 }
 
+
+.daisy.small {
+  background: url(./plants/size_16/daisy_small.png);
+}
+
+.daisy.medium {
+  background: url(./plants/size_16/daisy_medium.png);
+}
+
+.daisy.large {
+background: url(./plants/size_32/daisy_large.png);
+}

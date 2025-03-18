@@ -72,12 +72,12 @@ function growPlant(plant) {
       (p) => {
         webview.postMessage({
           action: "grow",
-          plant: "basil"
+          plant: plant.type
         });
       }
     );
   } else {
-    vscode.window.showInformationMessage(`A new plant has sprouted in the greenhouse!`);
+    vscode.window.showInformationMessage("A new " + plant.type + " plant has sprouted in the greenhouse!");
     plants.push(plant);
     savePlants();
     loadPlant(plant);
@@ -113,7 +113,12 @@ function activate(context) {
       type: "basil"
     });
   });
-  context.subscriptions.push(growBasil, helloWorld);
+  const growDaisy = vscode.commands.registerCommand("keycrop.growDaisy", () => {
+    growPlant({
+      type: "daisy"
+    });
+  });
+  context.subscriptions.push(growBasil, growDaisy, helloWorld);
 }
 function deactivate() {
 }

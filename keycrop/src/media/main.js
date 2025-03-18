@@ -29,18 +29,31 @@ window.addEventListener('message', event => {
     case 'add':
       switch (message.type) {
         case 'basil':
-          //FIXME: does it show up?
           game.plants.push(new Basil());
+          break;
+        case 'daisy':
+          game.plants.push(new Daisy());
           break;
       }
     case 'grow':
+      console.log("The plant we are growing")
+      console.log(message.plant)
       switch(message.plant) {
         case 'basil':
           game.plants.forEach(plant => {
             if(plant.type == 'basil'){
+              console.log("grow basil plant!")
               plant.grow();
             }
           });
+          break;
+          case 'daisy':
+            game.plants.forEach(plant => {
+              if(plant.type == 'daisy'){
+                console.log("grow daisy plant!")
+                plant.grow();
+              }
+            });
           break;
       }
     //Update scale - take this out?

@@ -57,3 +57,10 @@ class Basil extends Plant {
       this.init('basil');
     }
 }
+
+class Daisy extends Plant { 
+  constructor() {
+    super();
+    this.init('daisy');
+  }
+}
