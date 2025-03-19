@@ -20,9 +20,11 @@ const game = {
 
 //Messages from VSCode
 window.addEventListener('message', event => {
+  console.log("the event listener..");
   const message = event.data; 
   switch (message.action) {
     case 'background':
+      console.log("we are switching the background");
       game.div.setAttribute('background', message.value);
       break;
     case 'add':

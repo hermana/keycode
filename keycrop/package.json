@@ -34,9 +34,10 @@
       "properties": {
         "keycrop.background": {
           "type": "string",
-          "default": "Dirt",
+          "default": "dirt",
           "enum": [
-            "Dirt"
+            "dirt", 
+            "inventory"
           ],
           "description": "The view background"
         }

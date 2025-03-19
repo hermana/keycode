@@ -13,6 +13,7 @@ let plantsPath: string;
 type Plant = { 
   //There will be different plant types in the future
   species: string; 
+  size: string;
 }
 
 function loadPlantsFile() {
@@ -65,7 +66,7 @@ function growPlant(plant: Plant) {
     vscode.window.showInformationMessage("A new " +plant.species +" plant has sprouted in the greenhouse!");
     plants.push(plant);
     savePlants();
-    //load pet in webview
+    //load plant in webview
     addPlant(plant);
   }
 
@@ -88,6 +89,7 @@ export function activate(context: vscode.ExtensionContext) {
 	
 	  //Update config
 	  config = vscode.workspace.getConfiguration('keycrop');
+
 
 	  //Background changed
 	  if (event.affectsConfiguration("keycrop.background")) {
@@ -114,12 +116,14 @@ export function activate(context: vscode.ExtensionContext) {
 	const growBasil = vscode.commands.registerCommand('keycrop.growBasil', () => {
       growPlant({
         species: "basil",
+        size: "small" //FIXME: should this be here?
       });
 	});
 
   const growDaisy = vscode.commands.registerCommand('keycrop.growDaisy', () => {
     growPlant({
       species: "daisy",
+      size: "small"
     });
   });
 
@@ -175,7 +179,7 @@ export class WebViewProvider implements vscode.WebviewViewProvider {
             //Send background
             webview.postMessage({
               action: 'background',
-              value: config.get('background')
+              value: 'dirt'
             })
   
             //Send scale
@@ -189,6 +193,13 @@ export class WebViewProvider implements vscode.WebviewViewProvider {
       });
     }
   
+    showInventory = async function(){
+      await webview.postMessage({
+        action: 'background',
+        value: 'inventory'
+      })
+    }
+
     private getHtmlContent(webview: vscode.Webview): string {
       //You can reference local files (like CSS or JS) via vscode-resource URIs
 	  const style = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'src/media', 'style.css'));
@@ -208,6 +219,12 @@ export class WebViewProvider implements vscode.WebviewViewProvider {
         </head>
         <body>
           <div id="keycrop" background="${config.get('background')}">
+          <button class="btn"
+              onclick="${
+                //config.update('background', 'inventory')
+                this.showInventory
+              }"
+          >See Inventory</button>
           </div>
           <script src="${mainJS}"></script>
           <script src="${plantsJS}"></script>
@@ -216,3 +233,4 @@ export class WebViewProvider implements vscode.WebviewViewProvider {
       `;
     }
   }
+

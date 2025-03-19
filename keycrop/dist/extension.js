@@ -60,8 +60,6 @@ function savePlants() {
 }
 var plants = new Array();
 function addPlant(plant) {
-  console.log("WE ARE ADDING THE PLANT: from add function");
-  console.log(plant.species);
   webview.postMessage({
     action: "add",
     species: plant.species
@@ -92,7 +90,6 @@ function activate(context) {
   webview = new WebViewProvider(context);
   context.subscriptions.push(vscode.window.registerWebviewViewProvider(WebViewProvider.viewType, webview));
   vscode.workspace.onDidChangeConfiguration((event) => {
-    console.log("configuration change registered!");
     config = vscode.workspace.getConfiguration("keycrop");
     if (event.affectsConfiguration("keycrop.background")) {
       webview.postMessage({
@@ -112,12 +109,15 @@ function activate(context) {
   });
   const growBasil = vscode.commands.registerCommand("keycrop.growBasil", () => {
     growPlant({
-      species: "basil"
+      species: "basil",
+      size: "small"
+      //FIXME: should this be here?
     });
   });
   const growDaisy = vscode.commands.registerCommand("keycrop.growDaisy", () => {
     growPlant({
-      species: "daisy"
+      species: "daisy",
+      size: "small"
     });
   });
   context.subscriptions.push(growBasil, growDaisy, helloWorld);
@@ -156,9 +156,8 @@ var WebViewProvider = class {
         case "init":
           webview2.postMessage({
             action: "background",
-            value: config.get("background")
+            value: "dirt"
           });
-          console.log("THE INIT FUNCTION IS CALLING ADDPLANT");
           plants.forEach((plant) => {
             addPlant(plant);
           });
@@ -166,6 +165,12 @@ var WebViewProvider = class {
       }
     });
   }
+  showInventory = async function() {
+    await webview.postMessage({
+      action: "background",
+      value: "inventory"
+    });
+  };
   getHtmlContent(webview2) {
     const style = webview2.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, "src/media", "style.css"));
     const mainJS = webview2.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, "src/media", "main.js"));
@@ -182,6 +187,10 @@ var WebViewProvider = class {
         </head>
         <body>
           <div id="keycrop" background="${config.get("background")}">
+          <button class="btn"
+              onclick="${//config.update('background', 'inventory')
+    this.showInventory}"
+          >See Inventory</button>
           </div>
           <script src="${mainJS}"></script>
           <script src="${plantsJS}"></script>

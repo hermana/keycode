@@ -1,10 +1,28 @@
-#keycrop {
+#keycrop[background="dirt"]{
     background: url(./backgrounds/dirt.png) !important;
     width:100%;
     height:100%;
     position: absolute;
   }
   
+#keycrop[background="inventory"]{
+    background: url(./backgrounds/inventory.png) !important;
+    width:100%;
+    height:100%;
+    position: absolute;
+  }
+
+.btn{
+  position: absolute;
+  bottom: 0px;
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+
 .plant {
     float: left;
   }
