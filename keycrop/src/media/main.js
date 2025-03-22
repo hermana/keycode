@@ -17,10 +17,13 @@ const game = {
   plants: []
 }
 
+// Handle button clicks
+window.document.getElementById('inventory-button').addEventListener('click',() =>{
+  game.div.setAttribute('background', 'inventory');
+})
 
 //Messages from VSCode
 window.addEventListener('message', event => {
-  console.log("the event listener..");
   const message = event.data; 
   switch (message.action) {
     case 'background':

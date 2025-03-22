@@ -165,12 +165,6 @@ var WebViewProvider = class {
       }
     });
   }
-  showInventory = async function() {
-    await webview.postMessage({
-      action: "background",
-      value: "inventory"
-    });
-  };
   getHtmlContent(webview2) {
     const style = webview2.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, "src/media", "style.css"));
     const mainJS = webview2.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, "src/media", "main.js"));
@@ -187,10 +181,7 @@ var WebViewProvider = class {
         </head>
         <body>
           <div id="keycrop" background="${config.get("background")}">
-          <button class="btn"
-              onclick="${//config.update('background', 'inventory')
-    this.showInventory}"
-          >See Inventory</button>
+          <button class="btn" id="inventory-button">See Inventory</button>
           </div>
           <script src="${mainJS}"></script>
           <script src="${plantsJS}"></script>

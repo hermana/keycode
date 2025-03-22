@@ -192,13 +192,7 @@ export class WebViewProvider implements vscode.WebviewViewProvider {
         }
       });
     }
-  
-    showInventory = async function(){
-      await webview.postMessage({
-        action: 'background',
-        value: 'inventory'
-      })
-    }
+
 
     private getHtmlContent(webview: vscode.Webview): string {
       //You can reference local files (like CSS or JS) via vscode-resource URIs
@@ -214,17 +208,11 @@ export class WebViewProvider implements vscode.WebviewViewProvider {
           <meta charset="UTF-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
           <link href="${style}" rel="stylesheet">
-
           <title>KeyCrop</title>
         </head>
         <body>
           <div id="keycrop" background="${config.get('background')}">
-          <button class="btn"
-              onclick="${
-                //config.update('background', 'inventory')
-                this.showInventory
-              }"
-          >See Inventory</button>
+          <button class="btn" id="inventory-button">See Inventory</button>
           </div>
           <script src="${mainJS}"></script>
           <script src="${plantsJS}"></script>
