@@ -176,12 +176,12 @@ var WebViewProvider = class {
           <meta charset="UTF-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
           <link href="${style}" rel="stylesheet">
-
           <title>KeyCrop</title>
         </head>
         <body>
           <div id="keycrop" background="${config.get("background")}">
           <button class="btn" id="inventory-button">See Inventory</button>
+          <button class="btn" id="greenhouse-button" hidden="true">See Greenhouse</button>
           </div>
           <script src="${mainJS}"></script>
           <script src="${plantsJS}"></script>

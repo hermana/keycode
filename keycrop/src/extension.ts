@@ -213,6 +213,7 @@ export class WebViewProvider implements vscode.WebviewViewProvider {
         <body>
           <div id="keycrop" background="${config.get('background')}">
           <button class="btn" id="inventory-button">See Inventory</button>
+          <button class="btn" id="greenhouse-button" hidden="true">See Greenhouse</button>
           </div>
           <script src="${mainJS}"></script>
           <script src="${plantsJS}"></script>

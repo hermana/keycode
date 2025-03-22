@@ -20,6 +20,14 @@ const game = {
 // Handle button clicks
 window.document.getElementById('inventory-button').addEventListener('click',() =>{
   game.div.setAttribute('background', 'inventory');
+  document.getElementById("inventory-button").hidden = true;
+  document.getElementById("greenhouse-button").hidden = false;
+})
+
+window.document.getElementById('greenhouse-button').addEventListener('click',() =>{
+  game.div.setAttribute('background', 'dirt');
+  document.getElementById("inventory-button").hidden = false;
+  document.getElementById("greenhouse-button").hidden = true;
 })
 
 //Messages from VSCode
@@ -27,7 +35,6 @@ window.addEventListener('message', event => {
   const message = event.data; 
   switch (message.action) {
     case 'background':
-      console.log("we are switching the background");
       game.div.setAttribute('background', message.value);
       break;
     case 'add':
