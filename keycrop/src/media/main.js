@@ -22,12 +22,20 @@ window.document.getElementById('inventory-button').addEventListener('click',() =
   game.div.setAttribute('background', 'inventory');
   document.getElementById("inventory-button").hidden = true;
   document.getElementById("greenhouse-button").hidden = false;
+  var greenhouse_plants = document.getElementsByClassName('plant');
+  for (var i = 0; i < greenhouse_plants.length; ++i) { 
+      greenhouse_plants[i].hidden = true;
+  }
 })
 
 window.document.getElementById('greenhouse-button').addEventListener('click',() =>{
   game.div.setAttribute('background', 'dirt');
   document.getElementById("inventory-button").hidden = false;
   document.getElementById("greenhouse-button").hidden = true;
+  var greenhouse_plants = document.getElementsByClassName('plant');
+  for (var i = 0; i < greenhouse_plants.length; ++i) { 
+      greenhouse_plants[i].hidden = false;
+  }
 })
 
 //Messages from VSCode

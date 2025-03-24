@@ -9,7 +9,6 @@ let plantsPath: string;
 
 
 type Plant = { 
-  //There will be different plant types in the future
   species: string; 
   size: string;
 }

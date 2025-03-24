@@ -30,32 +30,11 @@
     height:50px;
 }
 
-/* .plant.small{
-  /* width:16px;
-  height:16px; */
-  /* margin-top: 16px;
-  width:50px;
-  height:50px;
-} */ 
-
-/* .plant.medium{
-  margin-top: 8px;
-  width:50px;
-  height:50px;
-} */
-/* 
-.plant.large{
-  width:50px;
-  height:50px;
-} */
-
 .bean.start {
-  /* background: url(./plants/size_16/basil_small.png); */
   background: url(./vegetables/bean_start.png);
 }
 
 .bean.small {
-    /* background: url(./plants/size_16/basil_small.png); */
     background: url(./vegetables/bean_small.png);
   }
 
