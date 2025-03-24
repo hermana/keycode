@@ -20,7 +20,7 @@ class Plant{
       //No type
       if (species == '') return;
       this.#species = species;
-      this.#size = 'small';
+      this.#size = 'start';
   
       //Create plant element
       const element = document.createElement('div');
