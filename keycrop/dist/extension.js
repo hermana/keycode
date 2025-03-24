@@ -132,7 +132,13 @@ function activate(context) {
       size: "small"
     });
   });
-  context.subscriptions.push(growBean, growChili, growBroccoli, growLettuce, helloWorld);
+  const growTomato = vscode.commands.registerCommand("keycrop.growTomato", () => {
+    growPlant({
+      species: "tomato",
+      size: "small"
+    });
+  });
+  context.subscriptions.push(growBean, growChili, growBroccoli, growLettuce, growTomato, helloWorld);
 }
 function deactivate() {
 }

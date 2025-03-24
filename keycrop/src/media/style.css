@@ -99,3 +99,15 @@ background: url(./vegetables/broccoli_large.png);
 .lettuce.large {
 background: url(./vegetables/lettuce_large.png);
 }
+
+.tomato.small {
+  background: url(./vegetables/tomato_small.png);
+}
+
+.tomato.medium {
+  background: url(./vegetables/tomato_medium.png);
+}
+
+.tomato.large {
+background: url(./vegetables/tomato_large.png);
+}

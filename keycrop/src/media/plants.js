@@ -80,3 +80,10 @@ class Lettuce extends Plant {
     this.init('lettuce');
   }
 }
+
+class Tomato extends Plant {
+  constructor(){
+    super();
+    this.init('tomato');
+  }
+}

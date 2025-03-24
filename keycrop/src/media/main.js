@@ -50,6 +50,9 @@ window.addEventListener('message', event => {
           break;
         case 'lettuce':
           game.plants.push(new Lettuce());
+          break;
+        case 'tomato':
+          game.plants.push(new Tomato());
       }
       break;
     case 'grow':
@@ -80,6 +83,13 @@ window.addEventListener('message', event => {
               plant.grow();
             }
           })
+          break;
+        case 'tomato':
+            game.plants.forEach(plant => {
+              if(plant.species == 'tomato'){
+                plant.grow();
+              }
+            })
           break;
       }
       break;
