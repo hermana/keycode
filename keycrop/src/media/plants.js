@@ -39,13 +39,18 @@ class Plant{
     grow() {
         this.#num_hotkey_uses+=1;
         //FIXME: abstract the levels somewhere + I shouldnt remove the class every time
-        if(this.#num_hotkey_uses>8){
+        if(this.#num_hotkey_uses>6){
           this.#size = "large";
           this.#html_element.classList.remove("medium");
           this.#html_element.classList.add(this.#size);
-        }else if(this.#num_hotkey_uses>2){
+        }
+        else if(this.#num_hotkey_uses>4){
           this.#size = "medium";
           this.#html_element.classList.remove("small");
+          this.#html_element.classList.add(this.#size);
+        }else if(this.#num_hotkey_uses>2){
+          this.#size = "small";
+          this.#html_element.classList.remove("start");
           this.#html_element.classList.add(this.#size);
         }
     }
