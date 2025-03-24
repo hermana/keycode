@@ -1,7 +1,6 @@
 import * as vscode from 'vscode'
 import * as fs from 'fs';
 import * as path from 'path';
-//import { WebViewProvider} from './providers/webviewprovider';
 
 let webview: WebViewProvider;
 let config = vscode.workspace.getConfiguration('keycrop');
@@ -9,7 +8,6 @@ let extensionStorageFolder: string = '';
 let plantsPath: string;
 
 
-//FIXME: move this? and all plant stuff
 type Plant = { 
   //There will be different plant types in the future
   species: string; 
@@ -66,7 +64,6 @@ function growPlant(plant: Plant) {
     vscode.window.showInformationMessage("A new " +plant.species +" plant has sprouted in the greenhouse!");
     plants.push(plant);
     savePlants();
-    //load plant in webview
     addPlant(plant);
   }
 
@@ -113,21 +110,21 @@ export function activate(context: vscode.ExtensionContext) {
 
 
 	// The commandId parameter must match the command field in package.json
-	const growBasil = vscode.commands.registerCommand('keycrop.growBasil', () => {
+	const growBean = vscode.commands.registerCommand('keycrop.growBean', () => {
       growPlant({
-        species: "basil",
-        size: "small" //FIXME: should this be here?
+        species: "bean",
+        size: "start" //TODO: left off here
       });
 	});
 
-  const growDaisy = vscode.commands.registerCommand('keycrop.growDaisy', () => {
+  const growChili = vscode.commands.registerCommand('keycrop.growChili', () => {
     growPlant({
       species: "daisy",
       size: "small"
     });
   });
 
-	context.subscriptions.push(growBasil, growDaisy, helloWorld);
+	context.subscriptions.push(growBean, growChili, helloWorld);
 
 }
 

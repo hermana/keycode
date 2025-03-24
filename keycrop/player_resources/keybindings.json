@@ -6,7 +6,7 @@
         "args": {
             "commands": [
                 "workbench.action.showCommands",
-                "keycrop.growBasil"
+                "keycrop.growBean"
             ]
         }
     },
@@ -19,7 +19,7 @@
                     "command": "editor.action.triggerParameterHints",
                     "when": "editorHasSignatureHelpProvider && editorTextFocus"
                 },
-                "keycrop.growDaisy"
+                "keycrop.growChili"
             ]
         }
     },

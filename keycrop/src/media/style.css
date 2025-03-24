@@ -28,43 +28,50 @@
   }
 
 .plant.small{
-  width:16px;
-  height:16px;
+  /* width:16px;
+  height:16px; */
   margin-top: 16px;
+  width:50px;
+  height:50px;
 }
 
 .plant.medium{
-  width:16px;
-  height:16px;
+  /* width:16px;
+  height:16px; */
   margin-top: 8px;
+  width:50px;
+  height:50px;
 }
 
 .plant.large{
-  width:32px;
-  height:32px;
+  /* width:32px;
+  height:32px; */
+  width:50px;
+  height:50px;
 }
 
 .basil.small {
-    background: url(./plants/size_16/basil_small.png);
+    /* background: url(./plants/size_16/basil_small.png); */
+    background: url(./vegetables/bean_start.png);
   }
 
 .basil.medium {
-    background: url(./plants/size_16/basil_medium.png);
+    background: url(./vegetables/bean_medium.png);
 }
 
 .basil.large {
-  background: url(./plants/size_32/basil_large.png);
+  background: url(./vegetables/bean_large.png);
 }
 
 
 .daisy.small {
-  background: url(./plants/size_16/daisy_small.png);
+  background: url(./vegtables/chilli_start.png);
 }
 
 .daisy.medium {
-  background: url(./plants/size_16/daisy_medium.png);
+  background: url(./vegetables/chilli_medium.png);
 }
 
 .daisy.large {
-background: url(./plants/size_32/daisy_large.png);
+background: url(./vegetables/chilli_large.png);
 }
