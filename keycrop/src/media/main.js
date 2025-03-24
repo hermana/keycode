@@ -39,26 +39,26 @@ window.addEventListener('message', event => {
       break;
     case 'add':
       switch (message.species) {
-        case 'basil':
-          game.plants.push(new Basil());
+        case 'bean':
+          game.plants.push(new Bean());
           break;
-        case 'daisy':
-          game.plants.push(new Daisy());
+        case 'chili':
+          game.plants.push(new Chili());
           break;
       }
       break;
     case 'grow':
       switch(message.species) {
-        case 'basil':
+        case 'bean':
           game.plants.forEach(plant => {
-            if(plant.species == 'basil'){
+            if(plant.species == 'bean'){
               plant.grow();
             }
           });
           break;
-          case 'daisy':
+          case 'chili':
             game.plants.forEach(plant => {
-              if(plant.species == 'daisy'){
+              if(plant.species == 'chili'){
                 plant.grow();
               }
             });

@@ -107,20 +107,20 @@ function activate(context) {
   const helloWorld = vscode.commands.registerCommand("keycrop.helloWorld", () => {
     vscode.window.showInformationMessage(`Hello world from keycrop!`);
   });
-  const growBasil = vscode.commands.registerCommand("keycrop.growBasil", () => {
+  const growBean = vscode.commands.registerCommand("keycrop.growBean", () => {
     growPlant({
-      species: "basil",
+      species: "bean",
       size: "small"
-      //FIXME: should this be here?
+      //TODO: left off here
     });
   });
-  const growDaisy = vscode.commands.registerCommand("keycrop.growDaisy", () => {
+  const growChili = vscode.commands.registerCommand("keycrop.growChili", () => {
     growPlant({
-      species: "daisy",
+      species: "chili",
       size: "small"
     });
   });
-  context.subscriptions.push(growBasil, growDaisy, helloWorld);
+  context.subscriptions.push(growBean, growChili, helloWorld);
 }
 function deactivate() {
 }

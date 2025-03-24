@@ -50,28 +50,28 @@
   height:50px;
 }
 
-.basil.small {
+.bean.small {
     /* background: url(./plants/size_16/basil_small.png); */
     background: url(./vegetables/bean_start.png);
   }
 
-.basil.medium {
+.bean.medium {
     background: url(./vegetables/bean_medium.png);
 }
 
-.basil.large {
+.bean.large {
   background: url(./vegetables/bean_large.png);
 }
 
 
-.daisy.small {
+.chili.small {
   background: url(./vegtables/chilli_start.png);
 }
 
-.daisy.medium {
+.chili.medium {
   background: url(./vegetables/chilli_medium.png);
 }
 
-.daisy.large {
+.chili.large {
 background: url(./vegetables/chilli_large.png);
 }

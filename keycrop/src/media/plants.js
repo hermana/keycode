@@ -53,16 +53,16 @@ class Plant{
   }
 
 
-class Basil extends Plant { 
+class Bean extends Plant { 
     constructor() {
       super();
-      this.init('basil');
+      this.init('bean');
     }
 }
 
-class Daisy extends Plant { 
+class Chili extends Plant { 
   constructor() {
     super();
-    this.init('daisy');
+    this.init('chili');
   }
 }

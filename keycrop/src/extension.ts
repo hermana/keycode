@@ -113,13 +113,13 @@ export function activate(context: vscode.ExtensionContext) {
 	const growBean = vscode.commands.registerCommand('keycrop.growBean', () => {
       growPlant({
         species: "bean",
-        size: "start" //TODO: left off here
+        size: "small" //TODO: left off here
       });
 	});
 
   const growChili = vscode.commands.registerCommand('keycrop.growChili', () => {
     growPlant({
-      species: "daisy",
+      species: "chili",
       size: "small"
     });
   });
