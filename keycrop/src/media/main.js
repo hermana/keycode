@@ -45,6 +45,11 @@ window.addEventListener('message', event => {
         case 'chili':
           game.plants.push(new Chili());
           break;
+        case 'broccoli':
+          game.plants.push(new Broccoli());
+          break;
+        case 'lettuce':
+          game.plants.push(new Lettuce());
       }
       break;
     case 'grow':
@@ -56,12 +61,25 @@ window.addEventListener('message', event => {
             }
           });
           break;
-          case 'chili':
+        case 'chili':
             game.plants.forEach(plant => {
               if(plant.species == 'chili'){
                 plant.grow();
               }
             });
+          break;
+        case 'broccoli':
+          game.plants.forEach(plant => {
+            if(plant.species == 'broccoli'){
+              plant.grow();
+            }
+          })
+        case 'lettuce':
+          game.plants.forEach(plant => {
+            if(plant.species == 'lettuce'){
+              plant.grow();
+            }
+          })
           break;
       }
       break;

@@ -109,7 +109,6 @@ export function activate(context: vscode.ExtensionContext) {
   });
 
 
-	// The commandId parameter must match the command field in package.json
 	const growBean = vscode.commands.registerCommand('keycrop.growBean', () => {
       growPlant({
         species: "bean",
@@ -124,7 +123,21 @@ export function activate(context: vscode.ExtensionContext) {
     });
   });
 
-	context.subscriptions.push(growBean, growChili, helloWorld);
+  const growBroccoli = vscode.commands.registerCommand('keycrop.growBroccoli', () => {
+    growPlant({
+      species: "broccoli",
+      size: "small"
+    });
+  })
+
+  const growLettuce = vscode.commands.registerCommand('keycrop.growLettuce', () => {
+    growPlant({
+      species: "lettuce",
+      size: "small"
+    });
+  })
+
+	context.subscriptions.push(growBean, growChili, growBroccoli, growLettuce, helloWorld);
 
 }
 

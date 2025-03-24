@@ -66,3 +66,17 @@ class Chili extends Plant {
     this.init('chili');
   }
 }
+
+class Broccoli extends Plant {
+  constructor(){
+    super();
+    this.init('broccoli');
+  }
+}
+
+class Lettuce extends Plant {
+  constructor(){
+    super();
+    this.init('lettuce');
+  }
+}

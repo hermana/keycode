@@ -120,7 +120,19 @@ function activate(context) {
       size: "small"
     });
   });
-  context.subscriptions.push(growBean, growChili, helloWorld);
+  const growBroccoli = vscode.commands.registerCommand("keycrop.growBroccoli", () => {
+    growPlant({
+      species: "broccoli",
+      size: "small"
+    });
+  });
+  const growLettuce = vscode.commands.registerCommand("keycrop.growLettuce", () => {
+    growPlant({
+      species: "lettuce",
+      size: "small"
+    });
+  });
+  context.subscriptions.push(growBean, growChili, growBroccoli, growLettuce, helloWorld);
 }
 function deactivate() {
 }

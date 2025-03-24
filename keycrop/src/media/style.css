@@ -75,3 +75,27 @@
 .chili.large {
 background: url(./vegetables/chilli_large.png);
 }
+
+.broccoli.small {
+  background: url(./vegetables/broccoli_small.png);
+}
+
+.broccoli.medium {
+  background: url(./vegetables/broccoli_medium.png);
+}
+
+.broccoli.large {
+background: url(./vegetables/broccoli_large.png);
+}
+
+.lettuce.small {
+  background: url(./vegetables/lettuce_small.png);
+}
+
+.lettuce.medium {
+  background: url(./vegetables/lettuce_medium.png);
+}
+
+.lettuce.large {
+background: url(./vegetables/lettuce_large.png);
+}
