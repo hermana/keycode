@@ -180,8 +180,10 @@ var WebViewProvider = class {
             addPlant(plant);
           });
           break;
+        case "harvested":
+          vscode.window.showInformationMessage("Your " + message.text + " plant has been harvested!");
+          break;
         case "level_one":
-          console.log("LEVEL ONE ACHEIVED");
           vscode.window.showInformationMessage("Congratulations! You have finished the game!");
           break;
       }

@@ -199,17 +199,12 @@ export class WebViewProvider implements vscode.WebviewViewProvider {
             })
             plants.forEach(plant => { addPlant(plant); });
             break;
+          case 'harvested':
+            vscode.window.showInformationMessage("Your "+message.text+" plant has been harvested!");
+            break;
           case 'level_one':
-            console.log("LEVEL ONE ACHEIVED");
             vscode.window.showInformationMessage("Congratulations! You have finished the game!");
             break;
-  
-            //Send scale
-            // webview.postMessage({
-            //   type: 'scale',
-            //   value: config.get('scale')
-            // })
-
         }
       });
     }

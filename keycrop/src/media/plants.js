@@ -1,3 +1,4 @@
+
 class Plant{
 
     #init = false;
@@ -42,6 +43,7 @@ class Plant{
           this.#html_element.classList.remove("plant");
           this.#html_element.classList.add("harvested-plant");
           this.#html_element.hidden = true;
+          vscode.postMessage({ type: 'harvested', text: this.species })
         }
         else if(this.#num_hotkey_uses>6){
           this.#size = "large";
