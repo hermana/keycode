@@ -197,25 +197,31 @@ export class WebViewProvider implements vscode.WebviewViewProvider {
               action: 'background',
               value: 'dirt'
             })
+            plants.forEach(plant => { addPlant(plant); });
+            break;
+          case 'level_one':
+            console.log("LEVEL ONE ACHEIVED");
+            vscode.window.showInformationMessage("Congratulations! You have finished the game!");
+            break;
   
             //Send scale
             // webview.postMessage({
             //   type: 'scale',
             //   value: config.get('scale')
             // })
-            plants.forEach(plant => { addPlant(plant); });
-            break;
+
         }
       });
     }
 
 
     private getHtmlContent(webview: vscode.Webview): string {
-      //You can reference local files (like CSS or JS) via vscode-resource URIs
-	  const style = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'src/media', 'style.css'));
-    const mainJS = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'src/media', 'main.js'));
-    const plantsJS = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'src/media', 'plants.js'));
- 		//   I may add this content policy back: <meta http-equiv="Content-Security-Policy" content="default-src 'none';"> 
+
+      const style = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'src/media', 'style.css'));
+      const mainJS = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'src/media', 'main.js'));
+      const plantsJS = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'src/media', 'plants.js'));
+      const levelsJS = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'src/media', 'levels.js'));
+
 
       return ` 
         <!DOCTYPE html>
@@ -233,6 +239,7 @@ export class WebViewProvider implements vscode.WebviewViewProvider {
           </div>
           <script src="${mainJS}"></script>
           <script src="${plantsJS}"></script>
+          <script src="${levelsJS}"></script>
         </body>
         </html>
       `;

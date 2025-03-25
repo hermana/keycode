@@ -26,6 +26,10 @@ window.document.getElementById('inventory-button').addEventListener('click',() =
   for (var i = 0; i < greenhouse_plants.length; ++i) { 
       greenhouse_plants[i].hidden = true;
   }
+  var harvested_plants = document.getElementsByClassName('harvested-plant');
+  for (var i = 0; i < harvested_plants.length; ++i) { 
+      harvested_plants[i].hidden = false;
+  }
 })
 
 window.document.getElementById('greenhouse-button').addEventListener('click',() =>{
@@ -35,6 +39,10 @@ window.document.getElementById('greenhouse-button').addEventListener('click',() 
   var greenhouse_plants = document.getElementsByClassName('plant');
   for (var i = 0; i < greenhouse_plants.length; ++i) { 
       greenhouse_plants[i].hidden = false;
+  }
+  var harvested_plants = document.getElementsByClassName('harvested-plant');
+  for (var i = 0; i < harvested_plants.length; ++i) { 
+      harvested_plants[i].hidden = true;
   }
 })
 
@@ -57,10 +65,12 @@ window.addEventListener('message', event => {
           game.plants.push(new Broccoli());
           break;
         case 'lettuce':
+          console.log('ADD NEW LETTUCE TO PLANT ARRAY');
           game.plants.push(new Lettuce());
           break;
         case 'tomato':
           game.plants.push(new Tomato());
+          break;
       }
       break;
     case 'grow':
@@ -71,13 +81,15 @@ window.addEventListener('message', event => {
               plant.grow();
             }
           });
+          checkAcheivements();
           break;
         case 'chili':
-            game.plants.forEach(plant => {
-              if(plant.species == 'chili'){
-                plant.grow();
-              }
-            });
+          game.plants.forEach(plant => {
+            if(plant.species == 'chili'){
+              plant.grow();
+            }
+          });
+          checkAcheivements();
           break;
         case 'broccoli':
           game.plants.forEach(plant => {
@@ -85,12 +97,15 @@ window.addEventListener('message', event => {
               plant.grow();
             }
           })
+          checkAcheivements();
+          break;
         case 'lettuce':
           game.plants.forEach(plant => {
             if(plant.species == 'lettuce'){
               plant.grow();
             }
           })
+          checkAcheivements();
           break;
         case 'tomato':
             game.plants.forEach(plant => {
@@ -98,6 +113,7 @@ window.addEventListener('message', event => {
                 plant.grow();
               }
             })
+          checkAcheivements();
           break;
       }
       break;
@@ -122,30 +138,37 @@ window.addEventListener('message', event => {
 });
 
 
+function checkAcheivements(){
+  //check that there is one of each of the "level one"
+  let levelOneChecklist = 0;
+  //FIXME: I'm not sure why there were duplicates in the list. 
+  currentPlants = [...new Set(game.plants)];
+  currentPlants.forEach(plant => {
+    if(plant.html_element.classList.contains('harvested-plant')){
+        if(LEVEL_ONE.includes(plant.species)){
+          levelOneChecklist+=1;
+        }
+    }          
+  })
+  console.log('the length of the list');
+  console.log(levelOneChecklist); 
+  if(LEVEL_ONE.length == levelOneChecklist){
+    vscode.postMessage({type: 'level_one'});
+  }
+}
 
-
-//Resize window
+//TODO: do I need a resize at all
 function onResize() {
-  //Update game window size
   game.width = window.innerWidth;
   game.height = window.innerHeight;
-
-  //will need to update all the plants
-  //game.plants.forEach((plant) => plant.moveTo(plant.pos))
 }
 
 
 
 
 function update() {
-  //Window size changed
   if (game.width != window.innerWidth || game.height != window.innerHeight) onResize()
-
-  //Next frame
   game.frames++
-
-  //Update plants
-  //game.plants.forEach((plant) => plant.update())
 }
 
 

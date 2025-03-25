@@ -30,6 +30,13 @@
     height:50px;
 }
 
+.harvested-plant {
+  float: left;
+  margin-top:30vh;
+  width:50px;
+  height:50px;
+}
+
 .bean.start {
   background: url(./vegetables/bean_start.png);
 }
@@ -44,6 +51,10 @@
 
 .bean.large {
   background: url(./vegetables/bean_large.png);
+}
+
+.bean.harvested-plant {
+  background: url(./vegetables/bean_harvested.png);
 }
 
 .chili.start {
@@ -62,6 +73,10 @@
 background: url(./vegetables/chilli_large.png);
 }
 
+.chili.harvested-plant {
+  background: url(./vegetables/chilli_harvested.png);
+  }
+
 .broccoli.start {
   background: url(./vegetables/broccoli_start.png);
 }
@@ -77,6 +92,10 @@ background: url(./vegetables/chilli_large.png);
 .broccoli.large {
 background: url(./vegetables/broccoli_large.png);
 }
+
+.broccoli.harvested-plant {
+  background: url(./vegetables/broccoli_harvested.png);
+  }  
 
 .lettuce.start {
   background: url(./vegetables/lettuce_start.png);
@@ -94,6 +113,10 @@ background: url(./vegetables/broccoli_large.png);
 background: url(./vegetables/lettuce_large.png);
 }
 
+.lettuce.harvested-plant {
+  background: url(./vegetables/lettuce_harvested.png);
+  }
+
 .tomato.start {
   background: url(./vegetables/tomato_start.png);
 }
@@ -109,3 +132,7 @@ background: url(./vegetables/lettuce_large.png);
 .tomato.large {
 background: url(./vegetables/tomato_large.png);
 }
+
+.tomato.harvested-plant {
+  background: url(./vegetables/tomato_harvested.png);
+  }

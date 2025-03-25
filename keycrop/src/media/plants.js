@@ -38,9 +38,10 @@ class Plant{
   
     grow() {
         this.#num_hotkey_uses+=1;
-        
         if(this.#num_hotkey_uses>8){
-          console.log('this plant should be harvested.');
+          this.#html_element.classList.remove("plant");
+          this.#html_element.classList.add("harvested-plant");
+          this.#html_element.hidden = true;
         }
         else if(this.#num_hotkey_uses>6){
           this.#size = "large";

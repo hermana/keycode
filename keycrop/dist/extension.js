@@ -180,6 +180,10 @@ var WebViewProvider = class {
             addPlant(plant);
           });
           break;
+        case "level_one":
+          console.log("LEVEL ONE ACHEIVED");
+          vscode.window.showInformationMessage("Congratulations! You have finished the game!");
+          break;
       }
     });
   }
@@ -187,6 +191,7 @@ var WebViewProvider = class {
     const style = webview2.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, "src/media", "style.css"));
     const mainJS = webview2.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, "src/media", "main.js"));
     const plantsJS = webview2.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, "src/media", "plants.js"));
+    const levelsJS = webview2.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, "src/media", "levels.js"));
     return ` 
         <!DOCTYPE html>
         <html lang="en">
@@ -203,6 +208,7 @@ var WebViewProvider = class {
           </div>
           <script src="${mainJS}"></script>
           <script src="${plantsJS}"></script>
+          <script src="${levelsJS}"></script>
         </body>
         </html>
       `;
