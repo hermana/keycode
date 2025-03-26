@@ -54,6 +54,7 @@ function loadPlantsFile() {
           size: p[1].size,
           harvested: p[1].harvested
         });
+        plants.push({ species: p[1].species, size: p[1].size, harvested: p[1].harvested });
       });
     } catch (e) {
       console.error("Saved plants could not be loaded");
