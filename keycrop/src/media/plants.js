@@ -74,9 +74,11 @@ class Plant{
       if(h){
         this.#html_element.classList.remove("plant");
         this.#html_element.classList.add('harvested-plant');
+        this.#html_element.hidden = game.div.getAttribute('background') == 'inventory' ? false : true;
       }else{
         this.#html_element.classList.remove("harvested-plant");
         this.#html_element.classList.add('plant');
+        this.#html_element.hidden = game.div.getAttribute('background') == 'inventory' ? true : false;
       }
     }
     

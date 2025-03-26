@@ -56,8 +56,8 @@ function loadPlantsFile() {
         });
       });
     } catch (e) {
-      console.log("PLANTS COULD NOT BE LOADED");
-      console.log(e);
+      console.error("Saved plants could not be loaded");
+      console.error(e);
       plants = new Array();
     }
   } else {
@@ -165,8 +165,6 @@ var WebViewProvider = class {
   //TODO: may be able to switch views later
   view;
   postMessage(message) {
-    console.log("TRYING TO POST");
-    console.log(message.action);
     this.view?.webview.postMessage(message);
   }
   resolveWebviewView(webviewView, context, _token) {
@@ -196,7 +194,6 @@ var WebViewProvider = class {
           loadPlantsFile();
           break;
         case "save_plants":
-          console.log("THE SAVE FUNCTION IS CALLED");
           fs.writeFileSync(plantsPath, JSON.stringify(message.content));
           break;
         case "harvested":
