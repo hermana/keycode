@@ -9,6 +9,7 @@ class Plant{
     #html_element;
     get html_element() { return this.#html_element; } 
     #num_hotkey_uses =0;
+    get num_hotkey_uses() {return this.#num_hotkey_uses;}
 
     constructor() {
     }
@@ -80,6 +81,10 @@ class Plant{
         this.#html_element.classList.add('plant');
         this.#html_element.hidden = game.div.getAttribute('background') == 'inventory' ? true : false;
       }
+    }
+
+    setHotKeyUses(n){
+      this.#num_hotkey_uses=n;
     }
     
   }

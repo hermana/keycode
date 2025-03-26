@@ -125,30 +125,35 @@ window.addEventListener('message', event => {
           let bean = new Bean();
           bean.setSize(message.size);
           bean.setIsHarvested(message.harvested);
+          bean.setHotKeyUses(message.hotkey_uses);
           game.plants.push(bean);
           break;
         case 'chili':
           let chili = new Chili();
           chili.setSize(message.size);
           chili.setIsHarvested(message.harvested);
+          chili.setHotKeyUses(message.hotkey_uses);
           game.plants.push(chili);
           break;
         case 'broccoli':
           let broccoli = new Broccoli();
           broccoli.setSize(message.size);
           broccoli.setIsHarvested(message.harvested);
+          broccoli.setHotKeyUses(message.hotkey_uses);
           game.plants.push(broccoli);
           break;
         case 'lettuce':
           let lettuce = new Lettuce();
           lettuce.setSize(message.size);
           lettuce.setIsHarvested(message.harvested);
+          lettuce.setHotKeyUses(message.hotkey_uses);
           game.plants.push(lettuce);
           break;
         case 'tomato':
           let tomato = new Tomato();
           tomato.setSize(message.size);
-          lettuce.setIsHarvested(message.harvested);
+          tomato.setIsHarvested(message.harvested);
+          tomato.setHotKeyUses(message.hotkey_uses);
           game.plants.push(tomato);
           break;
       }
@@ -208,7 +213,8 @@ function getPlantsString(){
     let plantString = {
       'species': plant.species,
       'size': plant.size,
-      'harvested': harvested
+      'harvested': harvested, 
+      'hotkey_uses': plant.num_hotkey_uses
     }
     plantsString.push(plantString);
   })}

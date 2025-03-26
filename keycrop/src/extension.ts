@@ -12,6 +12,7 @@ type Plant = {
   species: string; 
   size: string;
   harvested: boolean;
+  hotkey_uses: number
 }
 
 function loadPlantsFile() {
@@ -28,9 +29,10 @@ function loadPlantsFile() {
           action: 'load',
           species: p[1].species,
           size: p[1].size,
-          harvested: p[1].harvested
+          harvested: p[1].harvested, 
+          hotkey_uses: p[1].hotkey_uses
         })
-        plants.push({species: p[1].species, size: p[1].size, harvested: p[1].harvested});
+        plants.push({species: p[1].species, size: p[1].size, harvested: p[1].harvested, hotkey_uses: p[1].hotkey_uses});
       })
     } catch (e) {
       //Failed -> Reset plants
@@ -74,9 +76,8 @@ function growPlant(plant: Plant) {
     vscode.window.showInformationMessage("A new " +plant.species +" plant has sprouted in the greenhouse!");
     plants.push(plant);
     addPlant(plant);    
-    savePlants();
   }
-
+  savePlants();
 }
 
 export function activate(context: vscode.ExtensionContext) {
@@ -118,7 +119,8 @@ export function activate(context: vscode.ExtensionContext) {
       growPlant({
         species: "bean",
         size: "small", //TODO: left off here
-        harvested: false
+        harvested: false, 
+        hotkey_uses: 1
       });
 	});
 
@@ -126,7 +128,8 @@ export function activate(context: vscode.ExtensionContext) {
     growPlant({
       species: "chili",
       size: "small",
-      harvested: false
+      harvested: false,
+      hotkey_uses: 1
     });
   });
 
@@ -134,7 +137,8 @@ export function activate(context: vscode.ExtensionContext) {
     growPlant({
       species: "broccoli",
       size: "small",
-      harvested: false
+      harvested: false,
+      hotkey_uses: 1
     });
   })
 
@@ -142,7 +146,8 @@ export function activate(context: vscode.ExtensionContext) {
     growPlant({
       species: "lettuce",
       size: "small",
-      harvested: false
+      harvested: false,
+      hotkey_uses: 1
     });
   })
 
@@ -150,7 +155,8 @@ export function activate(context: vscode.ExtensionContext) {
     growPlant({
       species: "tomato",
       size: "small",
-      harvested: false
+      harvested: false, 
+      hotkey_uses: 1
     });
   })
 

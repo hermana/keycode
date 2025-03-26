@@ -52,9 +52,10 @@ function loadPlantsFile() {
           action: "load",
           species: p[1].species,
           size: p[1].size,
-          harvested: p[1].harvested
+          harvested: p[1].harvested,
+          hotkey_uses: p[1].hotkey_uses
         });
-        plants.push({ species: p[1].species, size: p[1].size, harvested: p[1].harvested });
+        plants.push({ species: p[1].species, size: p[1].size, harvested: p[1].harvested, hotkey_uses: p[1].hotkey_uses });
       });
     } catch (e) {
       console.error("Saved plants could not be loaded");
@@ -92,8 +93,8 @@ function growPlant(plant) {
     vscode.window.showInformationMessage("A new " + plant.species + " plant has sprouted in the greenhouse!");
     plants.push(plant);
     addPlant(plant);
-    savePlants();
   }
+  savePlants();
 }
 function activate(context) {
   extensionStorageFolder = context.globalStorageUri.path.substring(1);
@@ -123,35 +124,40 @@ function activate(context) {
       species: "bean",
       size: "small",
       //TODO: left off here
-      harvested: false
+      harvested: false,
+      hotkey_uses: 1
     });
   });
   const growChili = vscode.commands.registerCommand("keycrop.growChili", () => {
     growPlant({
       species: "chili",
       size: "small",
-      harvested: false
+      harvested: false,
+      hotkey_uses: 1
     });
   });
   const growBroccoli = vscode.commands.registerCommand("keycrop.growBroccoli", () => {
     growPlant({
       species: "broccoli",
       size: "small",
-      harvested: false
+      harvested: false,
+      hotkey_uses: 1
     });
   });
   const growLettuce = vscode.commands.registerCommand("keycrop.growLettuce", () => {
     growPlant({
       species: "lettuce",
       size: "small",
-      harvested: false
+      harvested: false,
+      hotkey_uses: 1
     });
   });
   const growTomato = vscode.commands.registerCommand("keycrop.growTomato", () => {
     growPlant({
       species: "tomato",
       size: "small",
-      harvested: false
+      harvested: false,
+      hotkey_uses: 1
     });
   });
   context.subscriptions.push(growBean, growChili, growBroccoli, growLettuce, growTomato, helloWorld);
