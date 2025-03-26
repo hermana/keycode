@@ -11,6 +11,7 @@ let plantsPath: string;
 type Plant = { 
   species: string; 
   size: string;
+  harvested: boolean;
 }
 
 function loadPlantsFile() {
@@ -21,20 +22,30 @@ function loadPlantsFile() {
   if (fs.existsSync(plantsPath)) {
     try {
       //Try to read plants file
-      plants = JSON.parse(fs.readFileSync(plantsPath, 'utf8'));
-      if (!Array.isArray(plants)) plants = new Array<Plant>();
+      let savedPlants = JSON.parse(fs.readFileSync(plantsPath, 'utf8'));
+      Object.entries(savedPlants).forEach((p: any) => {
+        webview.postMessage({
+          action: 'load',
+          species: p[1].species,
+          size: p[1].size,
+          harvested: p[1].harvested
+        })
+      })
     } catch (e) {
       //Failed -> Reset plants
+      console.error('Saved plants could not be loaded');
+      console.error(e);
       plants = new Array<Plant>();
     }
   } else {
-    //Create plants.json file
-    savePlants();
+    plants = new Array<Plant>();
   }
 }
 
 function savePlants() {
-  fs.writeFileSync(plantsPath, JSON.stringify(plants, null, 2));
+  webview.postMessage({
+    action: 'save_plants'
+  })
 }
 
 let plants = new Array<Plant>();
@@ -56,14 +67,13 @@ function growPlant(plant: Plant) {
         action: 'grow',
         species: plant.species
       })
-      //loadPlant(p);
     }
     );
   }else{
     vscode.window.showInformationMessage("A new " +plant.species +" plant has sprouted in the greenhouse!");
     plants.push(plant);
+    addPlant(plant);    
     savePlants();
-    addPlant(plant);
   }
 
 }
@@ -73,13 +83,8 @@ export function activate(context: vscode.ExtensionContext) {
   extensionStorageFolder = context.globalStorageUri.path.substring(1);
   plantsPath = path.join(extensionStorageFolder, 'plants.json');
 
-    //Load existing plants array
-  loadPlantsFile();
-
 	webview = new WebViewProvider(context);
 	context.subscriptions.push(vscode.window.registerWebviewViewProvider(WebViewProvider.viewType, webview));
-    
-
 
 	vscode.workspace.onDidChangeConfiguration(event => {
 	
@@ -111,35 +116,40 @@ export function activate(context: vscode.ExtensionContext) {
 	const growBean = vscode.commands.registerCommand('keycrop.growBean', () => {
       growPlant({
         species: "bean",
-        size: "small" //TODO: left off here
+        size: "small", //TODO: left off here
+        harvested: false
       });
 	});
 
   const growChili = vscode.commands.registerCommand('keycrop.growChili', () => {
     growPlant({
       species: "chili",
-      size: "small"
+      size: "small",
+      harvested: false
     });
   });
 
   const growBroccoli = vscode.commands.registerCommand('keycrop.growBroccoli', () => {
     growPlant({
       species: "broccoli",
-      size: "small"
+      size: "small",
+      harvested: false
     });
   })
 
   const growLettuce = vscode.commands.registerCommand('keycrop.growLettuce', () => {
     growPlant({
       species: "lettuce",
-      size: "small"
+      size: "small",
+      harvested: false
     });
   })
 
   const growTomato = vscode.commands.registerCommand('keycrop.growTomato', () => {
     growPlant({
       species: "tomato",
-      size: "small"
+      size: "small",
+      harvested: false
     });
   })
 
@@ -197,7 +207,11 @@ export class WebViewProvider implements vscode.WebviewViewProvider {
               action: 'background',
               value: 'dirt'
             })
-            plants.forEach(plant => { addPlant(plant); });
+            //Load existing plants array
+            loadPlantsFile();
+            break;
+          case 'save_plants':
+            fs.writeFileSync(plantsPath, JSON.stringify(message.content));
             break;
           case 'harvested':
             vscode.window.showInformationMessage("Your "+message.text+" plant has been harvested!");

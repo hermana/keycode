@@ -46,17 +46,28 @@ function loadPlantsFile() {
   if (!fs.existsSync(extensionStorageFolder)) fs.mkdirSync(extensionStorageFolder, { recursive: true });
   if (fs.existsSync(plantsPath)) {
     try {
-      plants = JSON.parse(fs.readFileSync(plantsPath, "utf8"));
-      if (!Array.isArray(plants)) plants = new Array();
+      let savedPlants = JSON.parse(fs.readFileSync(plantsPath, "utf8"));
+      Object.entries(savedPlants).forEach((p) => {
+        webview.postMessage({
+          action: "load",
+          species: p[1].species,
+          size: p[1].size,
+          harvested: p[1].harvested
+        });
+      });
     } catch (e) {
+      console.log("PLANTS COULD NOT BE LOADED");
+      console.log(e);
       plants = new Array();
     }
   } else {
-    savePlants();
+    plants = new Array();
   }
 }
 function savePlants() {
-  fs.writeFileSync(plantsPath, JSON.stringify(plants, null, 2));
+  webview.postMessage({
+    action: "save_plants"
+  });
 }
 var plants = new Array();
 function addPlant(plant) {
@@ -79,14 +90,13 @@ function growPlant(plant) {
   } else {
     vscode.window.showInformationMessage("A new " + plant.species + " plant has sprouted in the greenhouse!");
     plants.push(plant);
-    savePlants();
     addPlant(plant);
+    savePlants();
   }
 }
 function activate(context) {
   extensionStorageFolder = context.globalStorageUri.path.substring(1);
   plantsPath = path.join(extensionStorageFolder, "plants.json");
-  loadPlantsFile();
   webview = new WebViewProvider(context);
   context.subscriptions.push(vscode.window.registerWebviewViewProvider(WebViewProvider.viewType, webview));
   vscode.workspace.onDidChangeConfiguration((event) => {
@@ -110,32 +120,37 @@ function activate(context) {
   const growBean = vscode.commands.registerCommand("keycrop.growBean", () => {
     growPlant({
       species: "bean",
-      size: "small"
+      size: "small",
       //TODO: left off here
+      harvested: false
     });
   });
   const growChili = vscode.commands.registerCommand("keycrop.growChili", () => {
     growPlant({
       species: "chili",
-      size: "small"
+      size: "small",
+      harvested: false
     });
   });
   const growBroccoli = vscode.commands.registerCommand("keycrop.growBroccoli", () => {
     growPlant({
       species: "broccoli",
-      size: "small"
+      size: "small",
+      harvested: false
     });
   });
   const growLettuce = vscode.commands.registerCommand("keycrop.growLettuce", () => {
     growPlant({
       species: "lettuce",
-      size: "small"
+      size: "small",
+      harvested: false
     });
   });
   const growTomato = vscode.commands.registerCommand("keycrop.growTomato", () => {
     growPlant({
       species: "tomato",
-      size: "small"
+      size: "small",
+      harvested: false
     });
   });
   context.subscriptions.push(growBean, growChili, growBroccoli, growLettuce, growTomato, helloWorld);
@@ -150,6 +165,8 @@ var WebViewProvider = class {
   //TODO: may be able to switch views later
   view;
   postMessage(message) {
+    console.log("TRYING TO POST");
+    console.log(message.action);
     this.view?.webview.postMessage(message);
   }
   resolveWebviewView(webviewView, context, _token) {
@@ -176,9 +193,11 @@ var WebViewProvider = class {
             action: "background",
             value: "dirt"
           });
-          plants.forEach((plant) => {
-            addPlant(plant);
-          });
+          loadPlantsFile();
+          break;
+        case "save_plants":
+          console.log("THE SAVE FUNCTION IS CALLED");
+          fs.writeFileSync(plantsPath, JSON.stringify(message.content));
           break;
         case "harvested":
           vscode.window.showInformationMessage("Your " + message.text + " plant has been harvested!");

@@ -61,6 +61,25 @@ class Plant{
         }
     }
 
+    setSize(s){
+      this.#size = s; //FIXME: am I really doing anything with this?
+      this.#html_element.classList.remove("start");
+      this.#html_element.classList.remove("small");
+      this.#html_element.classList.remove("medium");
+      this.#html_element.classList.remove("large");
+      this.#html_element.classList.add(this.#size);
+    }
+
+    setIsHarvested(h){
+      if(h){
+        this.#html_element.classList.remove("plant");
+        this.#html_element.classList.add('harvested-plant');
+      }else{
+        this.#html_element.classList.remove("harvested-plant");
+        this.#html_element.classList.add('plant');
+      }
+    }
+    
   }
 
 

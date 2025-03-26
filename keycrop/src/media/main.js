@@ -1,4 +1,3 @@
-
 const vscode = acquireVsCodeApi();
 
 const game = {
@@ -65,7 +64,6 @@ window.addEventListener('message', event => {
           game.plants.push(new Broccoli());
           break;
         case 'lettuce':
-          console.log('ADD NEW LETTUCE TO PLANT ARRAY');
           game.plants.push(new Lettuce());
           break;
         case 'tomato':
@@ -117,6 +115,44 @@ window.addEventListener('message', event => {
           break;
       }
       break;
+    case 'save_plants':
+      plantsString = getPlantsString();
+      vscode.postMessage({ type: 'save_plants', content: plantsString })
+      break;
+    case 'load':
+      switch(message.species){
+        case 'bean':
+          let bean = new Bean();
+          bean.setSize(message.size);
+          bean.setIsHarvested(message.harvested);
+          game.plants.push(bean);
+          break;
+        case 'chili':
+          let chili = new Chili();
+          chili.setSize(message.size);
+          chili.setIsHarvested(message.harvested);
+          game.plants.push(chili);
+          break;
+        case 'broccoli':
+          let broccoli = new Broccoli();
+          broccoli.setSize(message.size);
+          broccoli.setIsHarvested(message.harvested);
+          game.plants.push(broccoli);
+          break;
+        case 'lettuce':
+          let lettuce = new Lettuce();
+          lettuce.setSize(message.size);
+          lettuce.setIsHarvested(message.harvested);
+          game.plants.push(lettuce);
+          break;
+        case 'tomato':
+          let tomato = new Tomato();
+          tomato.setSize(message.size);
+          lettuce.setIsHarvested(message.harvested);
+          game.plants.push(tomato);
+          break;
+      }
+      break;
     //Update scale - take this out?
     case 'scale':
       switch (message.value.toLowerCase()) {
@@ -149,9 +185,7 @@ function checkAcheivements(){
           levelOneChecklist+=1;
         }
     }          
-  })
-  console.log('the length of the list');
-  console.log(levelOneChecklist); 
+  }); 
   if(LEVEL_ONE.length == levelOneChecklist){
     vscode.postMessage({type: 'level_one'});
   }
@@ -164,6 +198,22 @@ function onResize() {
 }
 
 
+function getPlantsString(){
+  var plantsString = [];
+  //FIXME: why do I have to do this? I'm double adding plants somewhere
+  currentPlants = [...new Set(game.plants)];
+  if(currentPlants.length>0){
+  currentPlants.forEach(plant => {
+    let harvested = plant.html_element.classList.contains('harvested-plant');
+    let plantString = {
+      'species': plant.species,
+      'size': plant.size,
+      'harvested': harvested
+    }
+    plantsString.push(plantString);
+  })}
+  return plantsString;
+}
 
 
 function update() {
