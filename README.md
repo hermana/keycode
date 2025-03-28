@@ -1,4 +1,4 @@
-# keycode
+# KeyCrop
 A virtual greenhouse game for learning VSCode hotkeys
 
 ## Setting up
