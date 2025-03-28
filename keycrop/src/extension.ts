@@ -238,6 +238,7 @@ export class WebViewProvider implements vscode.WebviewViewProvider {
       const plantsJS = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'src/media', 'plants.js'));
       const levelsJS = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'src/media', 'levels.js'));
 
+      const iconsPath = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'src/media/vegetables'));
 
       return ` 
         <!DOCTYPE html>
@@ -250,8 +251,20 @@ export class WebViewProvider implements vscode.WebviewViewProvider {
         </head>
         <body>
           <div id="keycrop" background="${config.get('background')}">
-          <button class="btn" id="inventory-button">See Inventory</button>
-          <button class="btn" id="greenhouse-button" hidden="true">See Greenhouse</button>
+          <div id="generator-instructions" hidden="true">
+            <p class="instructions">Congratulations, you've managed to power up the KeyCrop Greenhouse! To unlock more seeds, all of the following plants must be harvested. </p>
+            <!-- how many plants to make it to the next level -->
+            <p class="key-instruction"><img src="${iconsPath+'/chilli_harvested.png'}" alt="Chili" width="20" height="20"> <span class="instruction-bold"> CTRL+C</span>: Copy text </p>
+            <p class="key-instruction"><img src="${iconsPath+'/bean_harvested.png'}" alt="Chili" width="20" height="20"> <span class="instruction-bold"> CTRL+V</span>: Paste text </p>
+            <p class="key-instruction"><img src="${iconsPath+'/tomato_harvested.png'}" alt="Chili" width="20" height="20"> <span class="instruction-bold"> CTRL+L</span>: Clear the terminal. </p>
+            <p class="key-instruction"><img src="${iconsPath+'/lettuce_harvested.png'}" alt="Chili" width="20" height="20"> <span class="instruction-bold"> CTRL+A</span>: Select all text. </p>
+            <p class="key-instruction"><img src="${iconsPath+'/broccoli_harvested.png'}" alt="Chili" width="20" height="20"> <span class="instruction-bold"> CTRL+X</span>: Cut text. </p>
+          </div>
+          <div class="btn-wrapper">
+            <button class="btn" id="inventory-button">Inventory</button>
+            <button class="selected btn" id="greenhouse-button">Greenhouse</button>
+            <button class="btn" id="generator-button">Generator</button>
+          </div>
           </div>
           <script src="${mainJS}"></script>
           <script src="${plantsJS}"></script>
