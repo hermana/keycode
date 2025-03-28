@@ -1,0 +1,174 @@
+#keycrop[background="dirt"]{
+    background: url(./backgrounds/dirt.png);
+    width:100%;
+    height:100%;
+    position: absolute;
+  }
+  
+#keycrop[background="inventory"]{
+    background: none;
+    width:100%;
+    height:100%;
+    position: absolute;
+  }
+
+#generator-instructions{
+  font-family: monospace;
+}
+
+.instructions{
+  font-size:0.8rem;
+  margin:5px;
+}
+
+.key-instructions{
+  font-size: 0.5rem;
+  font-family: monospace;
+}
+
+.instructions-bold{
+  font-weight:bold;
+}
+
+.btn-wrapper{
+  position:absolute;
+  bottom:0px;
+  margin-left:10vw;
+}
+
+.btn{
+  float:left;
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.btn.selected{
+  background-color: #005999 !important;
+}
+
+.plant {
+    float: left;
+    margin-top:30vh;
+    margin-left:5vw;
+    width:50px;
+    height:50px;
+}
+
+.harvested-plant {
+  float: left;
+  margin-top:30vh;
+  width:50px;
+  height:50px;
+}
+
+.bean.start {
+  background: url(./vegetables/bean_start.png);
+}
+
+.bean.small {
+    background: url(./vegetables/bean_small.png);
+  }
+
+.bean.medium {
+    background: url(./vegetables/bean_medium.png);
+}
+
+.bean.large {
+  background: url(./vegetables/bean_large.png);
+}
+
+.bean.harvested-plant {
+  background: url(./vegetables/bean_harvested.png);
+}
+
+.chili.start {
+  background: url(./vegetables/chilli_start.png);
+}
+
+.chili.small {
+  background: url(./vegetables/chilli_small.png);
+}
+
+.chili.medium {
+  background: url(./vegetables/chilli_medium.png);
+}
+
+.chili.large {
+background: url(./vegetables/chilli_large.png);
+}
+
+.chili.harvested-plant {
+  background: url(./vegetables/chilli_harvested.png);
+  }
+
+.broccoli.start {
+  background: url(./vegetables/broccoli_start.png);
+}
+
+.broccoli.small {
+  background: url(./vegetables/broccoli_small.png);
+}
+
+.broccoli.medium {
+  background: url(./vegetables/broccoli_medium.png);
+}
+
+.broccoli.large {
+background: url(./vegetables/broccoli_large.png);
+}
+
+.broccoli.harvested-plant {
+  background: url(./vegetables/broccoli_harvested.png);
+  }  
+
+.lettuce.start {
+  background: url(./vegetables/lettuce_start.png);
+}
+
+.lettuce.small {
+  background: url(./vegetables/lettuce_small.png);
+}
+
+.lettuce.medium {
+  background: url(./vegetables/lettuce_medium.png);
+}
+
+.lettuce.large {
+background: url(./vegetables/lettuce_large.png);
+}
+
+.lettuce.harvested-plant {
+  background: url(./vegetables/lettuce_harvested.png);
+  }
+
+.tomato.start {
+  background: url(./vegetables/tomato_start.png);
+}
+
+.tomato.small {
+  background: url(./vegetables/tomato_small.png);
+}
+
+.tomato.medium {
+  background: url(./vegetables/tomato_medium.png);
+}
+
+.tomato.large {
+background: url(./vegetables/tomato_large.png);
+}
+
+.tomato.harvested-plant {
+  background: url(./vegetables/tomato_harvested.png);
+  }
+
+.chili-icon{
+  max-width: 100%;
+  height: auto;
+  background: url(./vegetables/chilli_harvested.png);
+  height:20px;
+  width:20px;
+  display:block;
+}
