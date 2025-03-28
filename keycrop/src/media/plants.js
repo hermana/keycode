@@ -40,7 +40,10 @@ class Plant{
   
     grow() {
         this.#num_hotkey_uses+=1;
-        if(this.#num_hotkey_uses>8){
+        if(this.#num_hotkey_uses>8 && this.#html_element.classList.contains('harvested-plant')){
+          vscode.postMessage({ type: 'harvested', text: this.species })
+        }
+        else if(this.#num_hotkey_uses>8){
           this.#html_element.classList.remove("plant");
           this.#html_element.classList.add("harvested-plant");
           this.#html_element.hidden = true;

@@ -232,8 +232,8 @@ var WebViewProvider = class {
           <div id="generator-instructions" hidden="true">
             <p class="instructions">Congratulations, you've managed to power up the KeyCrop Greenhouse! To unlock more seeds, all of the following plants must be harvested. </p>
             <!-- how many plants to make it to the next level -->
-            <p class="key-instruction"><img src="${iconsPath + "/chilli_harvested.png"}" alt="Chili" width="20" height="20"> <span class="instruction-bold"> CTRL+C </span>: Copy text </p>
-            <p class="key-instruction"><img src="${iconsPath + "/bean_harvested.png"}" alt="Chili" width="20" height="20"> <span class="instruction-bold"> CTRL+V </span>: Paste text </p>
+            <p class="key-instruction"><img src="${iconsPath + "/chilli_harvested.png"}" alt="Chili" width="20" height="20"> <span class="instruction-bold"> CTRL+C</span>: Copy text </p>
+            <p class="key-instruction"><img src="${iconsPath + "/bean_harvested.png"}" alt="Chili" width="20" height="20"> <span class="instruction-bold"> CTRL+V</span>: Paste text </p>
             <p class="key-instruction"><img src="${iconsPath + "/tomato_harvested.png"}" alt="Chili" width="20" height="20"> <span class="instruction-bold"> CTRL+L</span>: Clear the terminal. </p>
             <p class="key-instruction"><img src="${iconsPath + "/lettuce_harvested.png"}" alt="Chili" width="20" height="20"> <span class="instruction-bold"> CTRL+A</span>: Select all text. </p>
             <p class="key-instruction"><img src="${iconsPath + "/broccoli_harvested.png"}" alt="Chili" width="20" height="20"> <span class="instruction-bold"> CTRL+X</span>: Cut text. </p>
