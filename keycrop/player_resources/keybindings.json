@@ -1,48 +1,52 @@
 // Place your key bindings in this file to override the defaults
 [
     {
-        "key": "ctrl+shift+p",
+        "key": "ctrl+c",
         "command": "runCommands",
         "args": {
             "commands": [
-                "workbench.action.showCommands",
-                "keycrop.growBean"
-            ]
-        }
-    },
-    {
-        "key": "ctrl+shift+space",
-        "command": "runCommands",
-        "args": {
-            "commands": [
-                {
-                    "command": "editor.action.triggerParameterHints",
-                    "when": "editorHasSignatureHelpProvider && editorTextFocus"
-                },
+                "editor.action.clipboardCopyAction",
                 "keycrop.growChili"
             ]
         }
     },
     {
-        "key": "ctrl+\\",
+        "key": "ctrl+v",
         "command": "runCommands",
         "args": {
             "commands": [
-                "workbench.action.splitEditor",
-                "keycrop.helloWorld"
+                "editor.action.clipboardPasteAction",
+                "keycrop.growBean"
             ]
         }
     },
     {
-        "key": "ctrl+/",
+        "key": "ctrl+p",
         "command": "runCommands",
         "args": {
             "commands": [
-                {
-                    "command": "editor.action.commentLine",
-                    "when": "editorTextFocus && !editorReadonly"
-                },
-                "keycrop.helloWorld"
+                "workbench.action.quickOpen",
+                "keycrop.growTomato"
+            ]
+        }
+    },
+    {
+        "key": "ctrl+a",
+        "command": "runCommands",
+        "args": {
+            "commands": [
+                "editor.action.selectAll",
+                "keycrop.growLettuce"
+            ]
+        }
+    },
+    {
+        "key": "ctrl+x",
+        "command": "runCommands",
+        "args": {
+            "commands": [
+                "editor.action.clipboardCutAction" ,
+                "keycrop.growBroccoli"
             ]
         }
     }

@@ -1,0 +1,70 @@
+
+[
+    {
+        "key": "ctrl+shift+p",
+        "command": "runCommands",
+        "args": {
+            "commands": [
+                "workbench.action.showCommands",
+                "keycrop.growBean"
+            ]
+        }
+    },
+    {
+        "key": "ctrl+shift+space",
+        "command": "runCommands",
+        "args": {
+            "commands": [
+                {
+                    "command": "editor.action.triggerParameterHints",
+                    "when": "editorHasSignatureHelpProvider && editorTextFocus"
+                },
+                "keycrop.growChili"
+            ]
+        }
+    },
+    {
+        "key": "ctrl+\\",
+        "command": "runCommands",
+        "args": {
+            "commands": [
+                "workbench.action.splitEditor",
+                "keycrop.growBroccoli"
+            ]
+        }
+    },
+    {
+        "key": "ctrl+/",
+        "command": "runCommands",
+        "args": {
+            "commands": [
+                {
+                    "command": "editor.action.commentLine",
+                    "when": "editorTextFocus && !editorReadonly"
+                },
+                "keycrop.growLettuce"
+            ]
+        }
+    },
+    {
+        "key": "ctrl+shift+l",
+        "command": "runCommands",
+        "args": {
+            "commands": [
+                {
+                    "command": "editor.action.selectHighlights",
+                    "when": "editorFocus" 
+                },
+                {
+                    "command": "addCursorsAtSearchResults",
+                    "when": "fileMatchOrMatchFocus && searchViewletVisible"
+                },
+                {
+                    "command": "selectAllSearchEditorMatches",
+                    "when": "inSearchEditor" 
+                },
+                "keycrop.growTomato"
+            ]
+        }
+    }
+]
