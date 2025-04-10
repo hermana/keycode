@@ -4,4 +4,4 @@ LEVEL_ONE = [
     'lettuce',
     'bean',
     'chili'
-]
+];

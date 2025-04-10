@@ -1,4 +1,4 @@
-import * as vscode from 'vscode'
+import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -17,7 +17,9 @@ type Plant = {
 
 function loadPlantsFile() {
   //Storage folder does not exist
-  if (!fs.existsSync(extensionStorageFolder)) fs.mkdirSync(extensionStorageFolder, { recursive: true });
+  if (!fs.existsSync(extensionStorageFolder)){
+    fs.mkdirSync(extensionStorageFolder, { recursive: true });
+  } 
 
   //Read plants file
   if (fs.existsSync(plantsPath)) {
@@ -31,9 +33,9 @@ function loadPlantsFile() {
           size: p[1].size,
           harvested: p[1].harvested, 
           hotkey_uses: p[1].hotkey_uses
-        })
+        });
         plants.push({species: p[1].species, size: p[1].size, harvested: p[1].harvested, hotkey_uses: p[1].hotkey_uses});
-      })
+      });
     } catch (e) {
       //Failed -> Reset plants
       console.error('Saved plants could not be loaded');
@@ -48,7 +50,7 @@ function loadPlantsFile() {
 function savePlants() {
   webview.postMessage({
     action: 'save_plants'
-  })
+  });
 }
 
 let plants = new Array<Plant>();
@@ -57,19 +59,18 @@ function addPlant(plant: Plant) {
   webview.postMessage({
     action: 'add',
     species: plant.species
-  })
+  });
 }
 
 function growPlant(plant: Plant) {
   if(plants.some(p => p.species === plant.species)){
-    //FIXME: am i doing multiple?
     let patch = plants.filter(p =>p.species === plant.species);
     patch.forEach( p => 
     {
       webview.postMessage({
         action: 'grow',
         species: plant.species
-      })
+      });
     }
     );
   }else{
@@ -99,16 +100,16 @@ export function activate(context: vscode.ExtensionContext) {
       webview.postMessage({
         action: 'background',
         value: config.get('background')
-      })
+      });
 	  }
   
     if (event.affectsConfiguration("keycrop-view.scale")) {
       webview.postMessage({
         action: 'scale',
         value: config.get('scale')
-      })
+      });
     }
-})
+});
 
   const helloWorld = vscode.commands.registerCommand('keycrop.helloWorld', () => {
     vscode.window.showInformationMessage(`Hello world from keycrop!`);
@@ -140,7 +141,7 @@ export function activate(context: vscode.ExtensionContext) {
       harvested: false,
       hotkey_uses: 1
     });
-  })
+  });
 
   const growLettuce = vscode.commands.registerCommand('keycrop.growLettuce', () => {
     growPlant({
@@ -149,7 +150,7 @@ export function activate(context: vscode.ExtensionContext) {
       harvested: false,
       hotkey_uses: 1
     });
-  })
+  });
 
   const growTomato = vscode.commands.registerCommand('keycrop.growTomato', () => {
     growPlant({
@@ -158,7 +159,7 @@ export function activate(context: vscode.ExtensionContext) {
       harvested: false, 
       hotkey_uses: 1
     });
-  })
+  });
 
 	context.subscriptions.push(growBean, growChili, growBroccoli, growLettuce, growTomato, helloWorld);
 
@@ -213,7 +214,7 @@ export class WebViewProvider implements vscode.WebviewViewProvider {
             webview.postMessage({
               action: 'background',
               value: 'dirt'
-            })
+            });
             //Load existing plants array
             loadPlantsFile();
             break;

@@ -1,3 +1,5 @@
+NUM_MILLISECONDS_ALLOWED_BETWEEN_KEY_USES = 60000; // 1 minute
+
 
 class Plant{
 
@@ -10,6 +12,10 @@ class Plant{
     get html_element() { return this.#html_element; } 
     #num_hotkey_uses =0;
     get num_hotkey_uses() {return this.#num_hotkey_uses;}
+    #last_key_use = Date.now();
+    get last_key_use() {return this.#last_key_use;}
+    #num_mashes = 0;
+    get num_mashes() {return this.#num_mashes;}
 
     constructor() {
     }
@@ -17,10 +23,14 @@ class Plant{
     //Init
     init(species) {
       //Already initialized
-      if (this.#init) return;
+      if (this.#init) {
+        return;
+      }
   
-      //No type
-      if (species == '') return;
+      //TODO: error handling if no type?
+      if (species === '') {
+        return;
+      }
       this.#species = species;
       this.#size = 'start';
   
@@ -39,29 +49,36 @@ class Plant{
     }
   
     grow() {
-        this.#num_hotkey_uses+=1;
-        if(this.#num_hotkey_uses>8 && this.#html_element.classList.contains('harvested-plant')){
-          vscode.postMessage({ type: 'harvested', text: this.species })
-        }
-        else if(this.#num_hotkey_uses>8){
-          this.#html_element.classList.remove("plant");
-          this.#html_element.classList.add("harvested-plant");
-          this.#html_element.hidden = true;
-          vscode.postMessage({ type: 'harvested', text: this.species })
-        }
-        else if(this.#num_hotkey_uses>6){
-          this.#size = "large";
-          this.#html_element.classList.remove("medium");
-          this.#html_element.classList.add(this.#size);
-        }
-        else if(this.#num_hotkey_uses>4){
-          this.#size = "medium";
-          this.#html_element.classList.remove("small");
-          this.#html_element.classList.add(this.#size);
-        }else if(this.#num_hotkey_uses>2){
-          this.#size = "small";
-          this.#html_element.classList.remove("start");
-          this.#html_element.classList.add(this.#size);
+        //check for mashing 
+        let now = Date.now();
+        if(now - this.#last_key_use > NUM_MILLISECONDS_ALLOWED_BETWEEN_KEY_USES){
+          this.#num_hotkey_uses+=1;
+          this.#last_key_use = now;
+          if(this.#num_hotkey_uses>8 && this.#html_element.classList.contains('harvested-plant')){
+            vscode.postMessage({ type: 'harvested', text: this.species });
+          }
+          else if(this.#num_hotkey_uses>8){
+            this.#html_element.classList.remove("plant");
+            this.#html_element.classList.add("harvested-plant");
+            this.#html_element.hidden = true;
+            vscode.postMessage({ type: 'harvested', text: this.species });
+          }
+          else if(this.#num_hotkey_uses>6){
+            this.#size = "large";
+            this.#html_element.classList.remove("medium");
+            this.#html_element.classList.add(this.#size);
+          }
+          else if(this.#num_hotkey_uses>4){
+            this.#size = "medium";
+            this.#html_element.classList.remove("small");
+            this.#html_element.classList.add(this.#size);
+          }else if(this.#num_hotkey_uses>2){
+            this.#size = "small";
+            this.#html_element.classList.remove("start");
+            this.#html_element.classList.add(this.#size);
+          }
+        }else{
+          this.#num_mashes +=1;
         }
     }
 
@@ -78,11 +95,11 @@ class Plant{
       if(h){
         this.#html_element.classList.remove("plant");
         this.#html_element.classList.add('harvested-plant');
-        this.#html_element.hidden = game.div.getAttribute('background') == 'inventory' ? false : true;
+        this.#html_element.hidden = game.div.getAttribute('background') === 'inventory' ? false : true;
       }else{
         this.#html_element.classList.remove("harvested-plant");
         this.#html_element.classList.add('plant');
-        this.#html_element.hidden = game.div.getAttribute('background') == 'inventory' ? true : false;
+        this.#html_element.hidden = game.div.getAttribute('background') === 'inventory' ? true : false;
       }
     }
 
