@@ -1,6 +1,9 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
+import { MODE } from './mode';
+
+const CURRENT_MODE: MODE = MODE.KEYTRACKING;
 
 let webview: WebViewProvider;
 let config = vscode.workspace.getConfiguration('keycrop');
@@ -81,11 +84,17 @@ function growPlant(plant: Plant) {
   savePlants();
 }
 
+function logKeyPress(plant: string) {
+  console.log("KEY WAS PRESSED");
+  console.log(plant);
+}
+
 export function activate(context: vscode.ExtensionContext) {
 
   extensionStorageFolder = context.globalStorageUri.path.substring(1);
   plantsPath = path.join(extensionStorageFolder, 'plants.json');
 
+  //TODO GAMEMODE: do not initialize this in nongame mode
 	webview = new WebViewProvider(context);
 	context.subscriptions.push(vscode.window.registerWebviewViewProvider(WebViewProvider.viewType, webview));
 
@@ -94,74 +103,90 @@ export function activate(context: vscode.ExtensionContext) {
 	  //Update config
 	  config = vscode.workspace.getConfiguration('keycrop');
 
-
-	  //Background changed
-	  if (event.affectsConfiguration("keycrop.background")) {
-      webview.postMessage({
-        action: 'background',
-        value: config.get('background')
-      });
-	  }
-  
-    if (event.affectsConfiguration("keycrop-view.scale")) {
-      webview.postMessage({
-        action: 'scale',
-        value: config.get('scale')
-      });
+    if(CURRENT_MODE === MODE.GAME){
+      //Background changed
+      if (event.affectsConfiguration("keycrop.background")) {
+        webview.postMessage({
+          action: 'background',
+          value: config.get('background')
+        });
+      }
+      //TODO: fix this or delete
+      if (event.affectsConfiguration("keycrop-view.scale")) {
+        webview.postMessage({
+          action: 'scale',
+          value: config.get('scale')
+        });
+      }
     }
 });
 
-  const helloWorld = vscode.commands.registerCommand('keycrop.helloWorld', () => {
-    vscode.window.showInformationMessage(`Hello world from keycrop!`);
-  });
-
-
 	const growBean = vscode.commands.registerCommand('keycrop.growBean', () => {
+    if(CURRENT_MODE === MODE.GAME){
       growPlant({
         species: "bean",
         size: "small", //TODO: left off here
         harvested: false, 
         hotkey_uses: 1
       });
+    }else{
+      logKeyPress('bean');
+    }
 	});
 
   const growChili = vscode.commands.registerCommand('keycrop.growChili', () => {
-    growPlant({
-      species: "chili",
-      size: "small",
-      harvested: false,
-      hotkey_uses: 1
-    });
+    if(CURRENT_MODE === MODE.GAME){
+      growPlant({
+        species: "chili",
+        size: "small",
+        harvested: false,
+        hotkey_uses: 1
+      });
+    }else{
+      logKeyPress('chili');
+    }
   });
 
   const growBroccoli = vscode.commands.registerCommand('keycrop.growBroccoli', () => {
-    growPlant({
-      species: "broccoli",
-      size: "small",
-      harvested: false,
-      hotkey_uses: 1
-    });
+    if(CURRENT_MODE === MODE.GAME){
+      growPlant({
+        species: "broccoli",
+        size: "small",
+        harvested: false,
+        hotkey_uses: 1
+      }); 
+    }else{
+      logKeyPress('broccoli');
+    }
   });
 
   const growLettuce = vscode.commands.registerCommand('keycrop.growLettuce', () => {
-    growPlant({
-      species: "lettuce",
-      size: "small",
-      harvested: false,
-      hotkey_uses: 1
-    });
+    if(CURRENT_MODE === MODE.GAME){
+      growPlant({
+        species: "lettuce",
+        size: "small",
+        harvested: false,
+        hotkey_uses: 1
+      });
+    }else{
+      logKeyPress('lettuce');
+    }
   });
 
   const growTomato = vscode.commands.registerCommand('keycrop.growTomato', () => {
-    growPlant({
-      species: "tomato",
-      size: "small",
-      harvested: false, 
-      hotkey_uses: 1
-    });
+    if(CURRENT_MODE === MODE.GAME){
+      growPlant({
+        species: "tomato",
+        size: "small",
+        harvested: false, 
+        hotkey_uses: 1
+      });
+    }else{
+      logKeyPress('tomato');
+    }
   });
 
-	context.subscriptions.push(growBean, growChili, growBroccoli, growLettuce, growTomato, helloWorld);
+	context.subscriptions.push(growBean, growChili, growBroccoli, growLettuce, growTomato);
 
 }
 

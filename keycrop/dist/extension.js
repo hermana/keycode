@@ -38,6 +38,7 @@ module.exports = __toCommonJS(extension_exports);
 var vscode = __toESM(require("vscode"));
 var fs = __toESM(require("fs"));
 var path = __toESM(require("path"));
+var CURRENT_MODE = 1 /* KEYTRACKING */;
 var webview;
 var config = vscode.workspace.getConfiguration("keycrop");
 var extensionStorageFolder = "";
@@ -98,6 +99,10 @@ function growPlant(plant) {
   }
   savePlants();
 }
+function logKeyPress(plant) {
+  console.log("KEY WAS PRESSED");
+  console.log(plant);
+}
 function activate(context) {
   extensionStorageFolder = context.globalStorageUri.path.substring(1);
   plantsPath = path.join(extensionStorageFolder, "plants.json");
@@ -105,64 +110,83 @@ function activate(context) {
   context.subscriptions.push(vscode.window.registerWebviewViewProvider(WebViewProvider.viewType, webview));
   vscode.workspace.onDidChangeConfiguration((event) => {
     config = vscode.workspace.getConfiguration("keycrop");
-    if (event.affectsConfiguration("keycrop.background")) {
-      webview.postMessage({
-        action: "background",
-        value: config.get("background")
-      });
+    if (CURRENT_MODE === 0 /* GAME */) {
+      if (event.affectsConfiguration("keycrop.background")) {
+        webview.postMessage({
+          action: "background",
+          value: config.get("background")
+        });
+      }
+      if (event.affectsConfiguration("keycrop-view.scale")) {
+        webview.postMessage({
+          action: "scale",
+          value: config.get("scale")
+        });
+      }
     }
-    if (event.affectsConfiguration("keycrop-view.scale")) {
-      webview.postMessage({
-        action: "scale",
-        value: config.get("scale")
-      });
-    }
-  });
-  const helloWorld = vscode.commands.registerCommand("keycrop.helloWorld", () => {
-    vscode.window.showInformationMessage(`Hello world from keycrop!`);
   });
   const growBean = vscode.commands.registerCommand("keycrop.growBean", () => {
-    growPlant({
-      species: "bean",
-      size: "small",
-      //TODO: left off here
-      harvested: false,
-      hotkey_uses: 1
-    });
+    if (CURRENT_MODE === 0 /* GAME */) {
+      growPlant({
+        species: "bean",
+        size: "small",
+        //TODO: left off here
+        harvested: false,
+        hotkey_uses: 1
+      });
+    } else {
+      logKeyPress("bean");
+    }
   });
   const growChili = vscode.commands.registerCommand("keycrop.growChili", () => {
-    growPlant({
-      species: "chili",
-      size: "small",
-      harvested: false,
-      hotkey_uses: 1
-    });
+    if (CURRENT_MODE === 0 /* GAME */) {
+      growPlant({
+        species: "chili",
+        size: "small",
+        harvested: false,
+        hotkey_uses: 1
+      });
+    } else {
+      logKeyPress("chili");
+    }
   });
   const growBroccoli = vscode.commands.registerCommand("keycrop.growBroccoli", () => {
-    growPlant({
-      species: "broccoli",
-      size: "small",
-      harvested: false,
-      hotkey_uses: 1
-    });
+    if (CURRENT_MODE === 0 /* GAME */) {
+      growPlant({
+        species: "broccoli",
+        size: "small",
+        harvested: false,
+        hotkey_uses: 1
+      });
+    } else {
+      logKeyPress("broccoli");
+    }
   });
   const growLettuce = vscode.commands.registerCommand("keycrop.growLettuce", () => {
-    growPlant({
-      species: "lettuce",
-      size: "small",
-      harvested: false,
-      hotkey_uses: 1
-    });
+    if (CURRENT_MODE === 0 /* GAME */) {
+      growPlant({
+        species: "lettuce",
+        size: "small",
+        harvested: false,
+        hotkey_uses: 1
+      });
+    } else {
+      logKeyPress("lettuce");
+    }
   });
   const growTomato = vscode.commands.registerCommand("keycrop.growTomato", () => {
-    growPlant({
-      species: "tomato",
-      size: "small",
-      harvested: false,
-      hotkey_uses: 1
-    });
+    if (CURRENT_MODE === 0 /* GAME */) {
+      growPlant({
+        species: "tomato",
+        size: "small",
+        harvested: false,
+        hotkey_uses: 1
+      });
+    } else {
+      logKeyPress("tomato");
+    }
   });
-  context.subscriptions.push(growBean, growChili, growBroccoli, growLettuce, growTomato, helloWorld);
+  context.subscriptions.push(growBean, growChili, growBroccoli, growLettuce, growTomato);
 }
 function deactivate() {
 }
