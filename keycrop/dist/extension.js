@@ -43,6 +43,8 @@ var webview;
 var config = vscode.workspace.getConfiguration("keycrop");
 var extensionStorageFolder = "";
 var plantsPath;
+var keyTrackingPath;
+var keyTrackingString = [];
 function loadPlantsFile() {
   if (!fs.existsSync(extensionStorageFolder)) {
     fs.mkdirSync(extensionStorageFolder, { recursive: true });
@@ -100,12 +102,16 @@ function growPlant(plant) {
   savePlants();
 }
 function logKeyPress(plant) {
-  console.log("KEY WAS PRESSED");
-  console.log(plant);
+  keyTrackingString.push({
+    key: plant,
+    time: Date.now()
+  });
+  fs.writeFileSync(keyTrackingPath, JSON.stringify(keyTrackingString));
 }
 function activate(context) {
   extensionStorageFolder = context.globalStorageUri.path.substring(1);
   plantsPath = path.join(extensionStorageFolder, "plants.json");
+  keyTrackingPath = path.join(extensionStorageFolder, "keytracking.json");
   webview = new WebViewProvider(context);
   context.subscriptions.push(vscode.window.registerWebviewViewProvider(WebViewProvider.viewType, webview));
   vscode.workspace.onDidChangeConfiguration((event) => {

@@ -9,7 +9,8 @@ let webview: WebViewProvider;
 let config = vscode.workspace.getConfiguration('keycrop');
 let extensionStorageFolder: string = '';
 let plantsPath: string;
-
+let keyTrackingPath: string;
+let keyTrackingString: { key: string; time: number; }[] = [];
 
 type Plant = { 
   species: string; 
@@ -85,14 +86,18 @@ function growPlant(plant: Plant) {
 }
 
 function logKeyPress(plant: string) {
-  console.log("KEY WAS PRESSED");
-  console.log(plant);
+  keyTrackingString.push({
+    key: plant,
+    time: Date.now()
+  });
+  fs.writeFileSync(keyTrackingPath, JSON.stringify(keyTrackingString));
 }
 
 export function activate(context: vscode.ExtensionContext) {
 
   extensionStorageFolder = context.globalStorageUri.path.substring(1);
   plantsPath = path.join(extensionStorageFolder, 'plants.json');
+  keyTrackingPath = path.join(extensionStorageFolder, 'keytracking.json');
 
   //TODO GAMEMODE: do not initialize this in nongame mode
 	webview = new WebViewProvider(context);
