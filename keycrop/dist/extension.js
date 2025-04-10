@@ -116,19 +116,24 @@ function activate(context) {
   context.subscriptions.push(vscode.window.registerWebviewViewProvider(WebViewProvider.viewType, webview));
   vscode.workspace.onDidChangeConfiguration((event) => {
     config = vscode.workspace.getConfiguration("keycrop");
-    if (CURRENT_MODE === 0 /* GAME */) {
-      if (event.affectsConfiguration("keycrop.background")) {
+    if (event.affectsConfiguration("keycrop.background")) {
+      if (CURRENT_MODE === 0 /* GAME */) {
         webview.postMessage({
           action: "background",
           value: config.get("background")
         });
-      }
-      if (event.affectsConfiguration("keycrop-view.scale")) {
+      } else {
         webview.postMessage({
-          action: "scale",
-          value: config.get("scale")
+          action: "background",
+          value: "blackout"
         });
       }
+    }
+    if (event.affectsConfiguration("keycrop-view.scale")) {
+      webview.postMessage({
+        action: "scale",
+        value: config.get("scale")
+      });
     }
   });
   const growBean = vscode.commands.registerCommand("keycrop.growBean", () => {
@@ -226,11 +231,13 @@ var WebViewProvider = class {
           vscode.window.showInformationMessage(message.text);
           break;
         case "init":
-          webview2.postMessage({
-            action: "background",
-            value: "dirt"
-          });
-          loadPlantsFile();
+          if (CURRENT_MODE === 0 /* GAME */) {
+            webview2.postMessage({
+              action: "background",
+              value: "dirt"
+            });
+            loadPlantsFile();
+          }
           break;
         case "save_plants":
           fs.writeFileSync(plantsPath, JSON.stringify(message.content));
@@ -243,6 +250,9 @@ var WebViewProvider = class {
           break;
       }
     });
+  }
+  isGameMode() {
+    return CURRENT_MODE === 0 /* GAME */;
   }
   getHtmlContent(webview2) {
     const style = webview2.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, "src/media", "style.css"));
@@ -260,7 +270,7 @@ var WebViewProvider = class {
           <title>KeyCrop</title>
         </head>
         <body>
-          <div id="keycrop" background="${config.get("background")}">
+          <div id="keycrop" background="${CURRENT_MODE === 0 /* GAME */ ? config.get("background") : "blackout"}">
           <div id="generator-instructions" hidden="true">
             <p class="instructions">Congratulations, you've managed to power up the KeyCrop Greenhouse! To unlock more seeds, all of the following plants must be harvested. </p>
             <!-- how many plants to make it to the next level -->
@@ -271,9 +281,9 @@ var WebViewProvider = class {
             <p class="key-instruction"><img src="${iconsPath + "/broccoli_harvested.png"}" alt="Chili" width="20" height="20"> <span class="instruction-bold"> CTRL+X</span>: Cut text. </p>
           </div>
           <div class="btn-wrapper">
-            <button class="btn" id="inventory-button">Inventory</button>
-            <button class="selected btn" id="greenhouse-button">Greenhouse</button>
-            <button class="btn" id="generator-button">Generator</button>
+            <button class="btn" id="inventory-button" hidden="${this.isGameMode()}">Inventory</button>
+            <button class="selected btn" id="greenhouse-button" hidden="${this.isGameMode()}">Greenhouse</button>
+            <button class="btn" id="generator-button" hidden="${this.isGameMode()}">Generator</button>
           </div>
           </div>
           <script src="${mainJS}"></script>
