@@ -1,7 +1,6 @@
-// Place your key bindings in this file to override the defaults
 [
     {
-        "key": "ctrl+shift+p",
+        "key": "cmd+shift+p",
         "command": "runCommands",
         "args": {
             "commands": [
@@ -11,7 +10,7 @@
         }
     },
     {
-        "key": "ctrl+shift+space",
+        "key": "cmd+shift+space",
         "command": "runCommands",
         "args": {
             "commands": [
@@ -24,7 +23,7 @@
         }
     },
     {
-        "key": "ctrl+\\",
+        "key": "cmd+\\",
         "command": "runCommands",
         "args": {
             "commands": [
@@ -34,7 +33,7 @@
         }
     },
     {
-        "key": "ctrl+/",
+        "key": "cmd+/",
         "command": "runCommands",
         "args": {
             "commands": [

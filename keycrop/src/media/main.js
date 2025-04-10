@@ -14,7 +14,7 @@ const game = {
   
   //List with all the plants
   plants: []
-}
+};
 
 // Handle button clicks
 window.document.getElementById('inventory-button').addEventListener('click',() =>{
@@ -31,7 +31,7 @@ window.document.getElementById('inventory-button').addEventListener('click',() =
   for (var i = 0; i < harvested_plants.length; ++i) { 
       harvested_plants[i].hidden = false;
   }
-})
+});
 
 window.document.getElementById('greenhouse-button').addEventListener('click',() =>{
   game.div.setAttribute('background', 'dirt');
@@ -47,7 +47,7 @@ window.document.getElementById('greenhouse-button').addEventListener('click',() 
   for (var i = 0; i < harvested_plants.length; ++i) { 
       harvested_plants[i].hidden = true;
   }
-})
+});
 
 window.document.getElementById('generator-button').addEventListener('click',() =>{
   game.div.setAttribute('background', 'inventory');
@@ -63,7 +63,7 @@ window.document.getElementById('generator-button').addEventListener('click',() =
   for (var i = 0; i < harvested_plants.length; ++i) { 
       harvested_plants[i].hidden = true;
   }
-})
+});
 
 //Messages from VSCode
 window.addEventListener('message', event => {
@@ -95,7 +95,7 @@ window.addEventListener('message', event => {
       switch(message.species) {
         case 'bean':
           game.plants.forEach(plant => {
-            if(plant.species == 'bean'){
+            if(plant.species === 'bean'){
               plant.grow();
             }
           });
@@ -103,7 +103,7 @@ window.addEventListener('message', event => {
           break;
         case 'chili':
           game.plants.forEach(plant => {
-            if(plant.species == 'chili'){
+            if(plant.species === 'chili'){
               plant.grow();
             }
           });
@@ -111,33 +111,33 @@ window.addEventListener('message', event => {
           break;
         case 'broccoli':
           game.plants.forEach(plant => {
-            if(plant.species == 'broccoli'){
+            if(plant.species === 'broccoli'){
               plant.grow();
             }
-          })
+          });
           checkAcheivements();
           break;
         case 'lettuce':
           game.plants.forEach(plant => {
-            if(plant.species == 'lettuce'){
+            if(plant.species === 'lettuce'){
               plant.grow();
             }
-          })
+          });
           checkAcheivements();
           break;
         case 'tomato':
             game.plants.forEach(plant => {
-              if(plant.species == 'tomato'){
+              if(plant.species === 'tomato'){
                 plant.grow();
               }
-            })
+            });
           checkAcheivements();
           break;
       }
       break;
     case 'save_plants':
       plantsString = getPlantsString();
-      vscode.postMessage({ type: 'save_plants', content: plantsString })
+      vscode.postMessage({ type: 'save_plants', content: plantsString });
       break;
     case 'load':
       switch(message.species){
@@ -211,7 +211,7 @@ function checkAcheivements(){
         }
     }          
   }); 
-  if(LEVEL_ONE.length == levelOneChecklist){
+  if(LEVEL_ONE.length === levelOneChecklist){
     vscode.postMessage({type: 'level_one'});
   }
 }
@@ -234,23 +234,27 @@ function getPlantsString(){
       'species': plant.species,
       'size': plant.size,
       'harvested': harvested, 
-      'hotkey_uses': plant.num_hotkey_uses
-    }
+      'hotkey_uses': plant.num_hotkey_uses,
+      'num_mashes': plant.num_mashes
+    };
     plantsString.push(plantString);
-  })}
+  });
+}
   return plantsString;
 }
 
 
 function update() {
-  if (game.width != window.innerWidth || game.height != window.innerHeight) onResize()
-  game.frames++
+  if (game.width !== window.innerWidth || game.height !== window.innerHeight) {
+    onResize();
+  }
+  game.frames++;
 }
 
 
 //Start loop
-const timer = setInterval(update, 1000 / game.fps)
+const timer = setInterval(update, 1000 / game.fps);
 
 //Tell vscode game loaded
 //TODO: type or action here?
-vscode.postMessage({ type: 'init' })
+vscode.postMessage({ type: 'init' });

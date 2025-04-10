@@ -43,7 +43,9 @@ var config = vscode.workspace.getConfiguration("keycrop");
 var extensionStorageFolder = "";
 var plantsPath;
 function loadPlantsFile() {
-  if (!fs.existsSync(extensionStorageFolder)) fs.mkdirSync(extensionStorageFolder, { recursive: true });
+  if (!fs.existsSync(extensionStorageFolder)) {
+    fs.mkdirSync(extensionStorageFolder, { recursive: true });
+  }
   if (fs.existsSync(plantsPath)) {
     try {
       let savedPlants = JSON.parse(fs.readFileSync(plantsPath, "utf8"));
