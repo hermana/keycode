@@ -18,7 +18,6 @@
 
 ## Study Instructions
 
-
 ### Day One:
 1. Fill out the consent form [LINK], followed by the Pre-Survey [LINK].
 2. Switch your branch of KeyCrop to `866-study` using `git checkout 866-study` or your preferred Git GUI.
@@ -42,4 +41,4 @@
 5. KeyCrop will create a file called `keytracking.json` in the background. Please send this file to hermana@usask.ca - we can also schedule your PlayTesting Interview.
 
 ### Playtesting Interview
-1. This interview will take place over Zoom. You will be asked open-ended questions about the game and have an opportunity to provide suggestions as well as any thoughts you have that were not covered by the surveys. 
+1. This interview will take place over Zoom. You will be asked open-ended questions about KeyCrop and have an opportunity to provide suggestions as well as discuss any thoughts you have that were not covered by the surveys. 

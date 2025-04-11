@@ -108,21 +108,6 @@ export function activate(context: vscode.ExtensionContext) {
 	  //Update config
 	  config = vscode.workspace.getConfiguration('keycrop');
 
-    
-      //Background changed
-      // if (event.affectsConfiguration("keycrop.background")) {
-      //   if(CURRENT_MODE === MODE.GAME){
-      //     webview.postMessage({
-      //       action: 'background',
-      //       value: config.get('background')
-      //     });
-      //   }else{
-      //     webview.postMessage({
-      //       action: 'background',
-      //       value: 'blackout'
-      //     });
-      //   }
-      // }
       //TODO: fix this or delete
       if (event.affectsConfiguration("keycrop-view.scale")) {
         webview.postMessage({
@@ -296,11 +281,11 @@ export class WebViewProvider implements vscode.WebviewViewProvider {
           <div id="generator-instructions" hidden>
             <p class="instructions">Congratulations, you've managed to power up the KeyCrop Greenhouse! To unlock more seeds, all of the following plants must be harvested. </p>
             <!-- how many plants to make it to the next level -->
-            <p class="key-instruction"><img src="${iconsPath+'/chilli_harvested.png'}" alt="Chili" width="20" height="20"> <span class="instruction-bold"> CTRL+C</span>: Copy text </p>
-            <p class="key-instruction"><img src="${iconsPath+'/bean_harvested.png'}" alt="Bean" width="20" height="20"> <span class="instruction-bold"> CTRL+V</span>: Paste text </p>
-            <p class="key-instruction"><img src="${iconsPath+'/tomato_harvested.png'}" alt="Tomato" width="20" height="20"> <span class="instruction-bold"> CTRL+L</span>: Clear the terminal. </p>
-            <p class="key-instruction"><img src="${iconsPath+'/lettuce_harvested.png'}" alt="Lettuce" width="20" height="20"> <span class="instruction-bold"> CTRL+A</span>: Select all text. </p>
-            <p class="key-instruction"><img src="${iconsPath+'/broccoli_harvested.png'}" alt="Broccoli" width="20" height="20"> <span class="instruction-bold"> CTRL+X</span>: Cut text. </p>
+            <p class="key-instruction"><img src="${iconsPath+'/chilli_harvested.png'}" alt="Chili" width="20" height="20"> <span class="instruction-bold"> CTRL+SHIFT+SPACE</span>: See function parameter hints.</p>
+            <p class="key-instruction"><img src="${iconsPath+'/bean_harvested.png'}" alt="Bean" width="20" height="20"> <span class="instruction-bold"> CTRL+SHIFT+M</span>: See warnings and errors in the Problems view.</p>
+            <p class="key-instruction"><img src="${iconsPath+'/tomato_harvested.png'}" alt="Tomato" width="20" height="20"> <span class="instruction-bold"> CTRL+SHIFT+L</span>: Multicursor-select all instances of a specific word.</p>
+            <p class="key-instruction"><img src="${iconsPath+'/lettuce_harvested.png'}" alt="Lettuce" width="20" height="20"> <span class="instruction-bold"> CTRL+/</span>: Comment or un-comment code.</p>
+            <p class="key-instruction"><img src="${iconsPath+'/broccoli_harvested.png'}" alt="Broccoli" width="20" height="20"> <span class="instruction-bold"> CTRL+[</span>: Outdent a line.</p>
           </div>
           <div class="btn-wrapper">
             <button class="btn" id="inventory-button">Inventory</button>

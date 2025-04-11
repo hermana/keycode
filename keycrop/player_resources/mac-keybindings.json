@@ -38,12 +38,12 @@
             ]
         }
     },
-    { "key": "cmd+]",         
+    { "key": "cmd+[",         
         "command": "runCommands",
         "args": {
             "commands": [
                 {
-                "command": "editor.action.indentLines",
+                "command": "editor.action.outdentLines",
                 "when": "editorTextFocus && !editorReadonly" 
             },
             "keycrop.growBroccoli"
