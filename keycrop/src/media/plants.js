@@ -57,22 +57,22 @@ class Plant{
           if(this.#num_hotkey_uses>8 && this.#html_element.classList.contains('harvested-plant')){
             vscode.postMessage({ type: 'harvested', text: this.species });
           }
-          else if(this.#num_hotkey_uses>8){
+          else if(this.#num_hotkey_uses>4){
             this.#html_element.classList.remove("plant");
             this.#html_element.classList.add("harvested-plant");
             this.#html_element.hidden = true;
             vscode.postMessage({ type: 'harvested', text: this.species });
           }
-          else if(this.#num_hotkey_uses>6){
+          else if(this.#num_hotkey_uses>3){
             this.#size = "large";
             this.#html_element.classList.remove("medium");
             this.#html_element.classList.add(this.#size);
           }
-          else if(this.#num_hotkey_uses>4){
+          else if(this.#num_hotkey_uses>2){
             this.#size = "medium";
             this.#html_element.classList.remove("small");
             this.#html_element.classList.add(this.#size);
-          }else if(this.#num_hotkey_uses>2){
+          }else if(this.#num_hotkey_uses>1){
             this.#size = "small";
             this.#html_element.classList.remove("start");
             this.#html_element.classList.add(this.#size);

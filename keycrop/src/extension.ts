@@ -1,12 +1,16 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
+import { MODE } from './mode';
+
+const CURRENT_MODE: MODE = MODE.KEYTRACKING;
 
 let webview: WebViewProvider;
 let config = vscode.workspace.getConfiguration('keycrop');
 let extensionStorageFolder: string = '';
 let plantsPath: string;
-
+let keyTrackingPath: string;
+let keyTrackingString: { key: string; time: number; }[] = [];
 
 type Plant = { 
   species: string; 
@@ -81,11 +85,21 @@ function growPlant(plant: Plant) {
   savePlants();
 }
 
+function logKeyPress(plant: string) {
+  keyTrackingString.push({
+    key: plant,
+    time: Date.now()
+  });
+  fs.writeFileSync(keyTrackingPath, JSON.stringify(keyTrackingString));
+}
+
 export function activate(context: vscode.ExtensionContext) {
 
   extensionStorageFolder = context.globalStorageUri.path.substring(1);
   plantsPath = path.join(extensionStorageFolder, 'plants.json');
+  keyTrackingPath = path.join(extensionStorageFolder, 'keytracking.json');
 
+  //TODO GAMEMODE: do not initialize this in nongame mode
 	webview = new WebViewProvider(context);
 	context.subscriptions.push(vscode.window.registerWebviewViewProvider(WebViewProvider.viewType, webview));
 
@@ -94,74 +108,96 @@ export function activate(context: vscode.ExtensionContext) {
 	  //Update config
 	  config = vscode.workspace.getConfiguration('keycrop');
 
-
-	  //Background changed
-	  if (event.affectsConfiguration("keycrop.background")) {
-      webview.postMessage({
-        action: 'background',
-        value: config.get('background')
-      });
-	  }
-  
-    if (event.affectsConfiguration("keycrop-view.scale")) {
-      webview.postMessage({
-        action: 'scale',
-        value: config.get('scale')
-      });
-    }
-});
-
-  const helloWorld = vscode.commands.registerCommand('keycrop.helloWorld', () => {
-    vscode.window.showInformationMessage(`Hello world from keycrop!`);
+    
+      //Background changed
+      // if (event.affectsConfiguration("keycrop.background")) {
+      //   if(CURRENT_MODE === MODE.GAME){
+      //     webview.postMessage({
+      //       action: 'background',
+      //       value: config.get('background')
+      //     });
+      //   }else{
+      //     webview.postMessage({
+      //       action: 'background',
+      //       value: 'blackout'
+      //     });
+      //   }
+      // }
+      //TODO: fix this or delete
+      if (event.affectsConfiguration("keycrop-view.scale")) {
+        webview.postMessage({
+          action: 'scale',
+          value: config.get('scale')
+        });
+      }
   });
 
-
 	const growBean = vscode.commands.registerCommand('keycrop.growBean', () => {
+    if(CURRENT_MODE === MODE.GAME){
       growPlant({
         species: "bean",
         size: "small", //TODO: left off here
         harvested: false, 
         hotkey_uses: 1
       });
+    }else{
+      logKeyPress('bean');
+    }
 	});
 
   const growChili = vscode.commands.registerCommand('keycrop.growChili', () => {
-    growPlant({
-      species: "chili",
-      size: "small",
-      harvested: false,
-      hotkey_uses: 1
-    });
+    if(CURRENT_MODE === MODE.GAME){
+      growPlant({
+        species: "chili",
+        size: "small",
+        harvested: false,
+        hotkey_uses: 1
+      });
+    }else{
+      logKeyPress('chili');
+    }
   });
 
   const growBroccoli = vscode.commands.registerCommand('keycrop.growBroccoli', () => {
-    growPlant({
-      species: "broccoli",
-      size: "small",
-      harvested: false,
-      hotkey_uses: 1
-    });
+    if(CURRENT_MODE === MODE.GAME){
+      growPlant({
+        species: "broccoli",
+        size: "small",
+        harvested: false,
+        hotkey_uses: 1
+      }); 
+    }else{
+      logKeyPress('broccoli');
+    }
   });
 
   const growLettuce = vscode.commands.registerCommand('keycrop.growLettuce', () => {
-    growPlant({
-      species: "lettuce",
-      size: "small",
-      harvested: false,
-      hotkey_uses: 1
-    });
+    if(CURRENT_MODE === MODE.GAME){
+      growPlant({
+        species: "lettuce",
+        size: "small",
+        harvested: false,
+        hotkey_uses: 1
+      });
+    }else{
+      logKeyPress('lettuce');
+    }
   });
 
   const growTomato = vscode.commands.registerCommand('keycrop.growTomato', () => {
-    growPlant({
-      species: "tomato",
-      size: "small",
-      harvested: false, 
-      hotkey_uses: 1
-    });
+    if(CURRENT_MODE === MODE.GAME){
+      growPlant({
+        species: "tomato",
+        size: "small",
+        harvested: false, 
+        hotkey_uses: 1
+      });
+    }else{
+      logKeyPress('tomato');
+    }
   });
 
-	context.subscriptions.push(growBean, growChili, growBroccoli, growLettuce, growTomato, helloWorld);
+	context.subscriptions.push(growBean, growChili, growBroccoli, growLettuce, growTomato);
 
 }
 
@@ -171,7 +207,7 @@ export function deactivate() {}
 
 export class WebViewProvider implements vscode.WebviewViewProvider {
 
-    public static readonly viewType = 'keycrop'; //TODO: may be able to switch views later
+    public static readonly viewType = 'keycrop'; 
   
     private view ?: vscode.WebviewView;
   
@@ -210,13 +246,19 @@ export class WebViewProvider implements vscode.WebviewViewProvider {
             break;
   
           case 'init':
-            //Send background
-            webview.postMessage({
-              action: 'background',
-              value: 'dirt'
-            });
-            //Load existing plants array
-            loadPlantsFile();
+            if(CURRENT_MODE === MODE.GAME){
+              //Send background
+              webview.postMessage({
+                action: 'background',
+                value: 'dirt'
+              });
+              //Load existing plants array
+              loadPlantsFile();
+            }else{
+              webview.postMessage({
+                action: 'key-tracking-mode'
+              });
+            }
             break;
           case 'save_plants':
             fs.writeFileSync(plantsPath, JSON.stringify(message.content));
@@ -230,7 +272,6 @@ export class WebViewProvider implements vscode.WebviewViewProvider {
         }
       });
     }
-
 
     private getHtmlContent(webview: vscode.Webview): string {
 
@@ -251,15 +292,15 @@ export class WebViewProvider implements vscode.WebviewViewProvider {
           <title>KeyCrop</title>
         </head>
         <body>
-          <div id="keycrop" background="${config.get('background')}">
-          <div id="generator-instructions" hidden="true">
+          <div id="keycrop" background="${CURRENT_MODE === MODE.GAME ? config.get('background') : 'blackout'}">
+          <div id="generator-instructions" hidden>
             <p class="instructions">Congratulations, you've managed to power up the KeyCrop Greenhouse! To unlock more seeds, all of the following plants must be harvested. </p>
             <!-- how many plants to make it to the next level -->
             <p class="key-instruction"><img src="${iconsPath+'/chilli_harvested.png'}" alt="Chili" width="20" height="20"> <span class="instruction-bold"> CTRL+C</span>: Copy text </p>
-            <p class="key-instruction"><img src="${iconsPath+'/bean_harvested.png'}" alt="Chili" width="20" height="20"> <span class="instruction-bold"> CTRL+V</span>: Paste text </p>
-            <p class="key-instruction"><img src="${iconsPath+'/tomato_harvested.png'}" alt="Chili" width="20" height="20"> <span class="instruction-bold"> CTRL+L</span>: Clear the terminal. </p>
-            <p class="key-instruction"><img src="${iconsPath+'/lettuce_harvested.png'}" alt="Chili" width="20" height="20"> <span class="instruction-bold"> CTRL+A</span>: Select all text. </p>
-            <p class="key-instruction"><img src="${iconsPath+'/broccoli_harvested.png'}" alt="Chili" width="20" height="20"> <span class="instruction-bold"> CTRL+X</span>: Cut text. </p>
+            <p class="key-instruction"><img src="${iconsPath+'/bean_harvested.png'}" alt="Bean" width="20" height="20"> <span class="instruction-bold"> CTRL+V</span>: Paste text </p>
+            <p class="key-instruction"><img src="${iconsPath+'/tomato_harvested.png'}" alt="Tomato" width="20" height="20"> <span class="instruction-bold"> CTRL+L</span>: Clear the terminal. </p>
+            <p class="key-instruction"><img src="${iconsPath+'/lettuce_harvested.png'}" alt="Lettuce" width="20" height="20"> <span class="instruction-bold"> CTRL+A</span>: Select all text. </p>
+            <p class="key-instruction"><img src="${iconsPath+'/broccoli_harvested.png'}" alt="Broccoli" width="20" height="20"> <span class="instruction-bold"> CTRL+X</span>: Cut text. </p>
           </div>
           <div class="btn-wrapper">
             <button class="btn" id="inventory-button">Inventory</button>

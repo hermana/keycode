@@ -69,8 +69,14 @@ window.document.getElementById('generator-button').addEventListener('click',() =
 window.addEventListener('message', event => {
   const message = event.data; 
   switch (message.action) {
+    case 'key-tracking-mode':
+      hideGameElements();
+      break;
     case 'background':
       game.div.setAttribute('background', message.value);
+      if(message.value === 'blackout'){
+        hideGameElements();
+      }
       break;
     case 'add':
       switch (message.species) {
@@ -214,6 +220,12 @@ function checkAcheivements(){
   if(LEVEL_ONE.length === levelOneChecklist){
     vscode.postMessage({type: 'level_one'});
   }
+}
+
+function hideGameElements(){
+  document.getElementById("generator-button").hidden=true;
+  document.getElementById("greenhouse-button").hidden=true;
+  document.getElementById("inventory-button").hidden=true;
 }
 
 //TODO: do I need a resize at all
