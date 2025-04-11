@@ -1,5 +1,4 @@
 # KeyCrop
-A virtual greenhouse game for learning VSCode hotkeys
 
 ## Setting up
 
@@ -17,3 +16,29 @@ A virtual greenhouse game for learning VSCode hotkeys
 
 6. A new, development-version of VSCode should now pop-up. KeyCrop should appear as a collapsable view in the side panel. 
 
+## Study Instructions
+
+### Day One:
+1. Fill out the consent form [LINK], followed by the Pre-Survey [LINK].
+2. Switch your branch of KeyCrop to `866-study` using `git checkout 866-study` or your preferred Git GUI.
+3. Repeat Step 1 of the setup, that is, update your personal `keybindings.json` file by copying the new `player-resources/keybindings.json`.  
+4. Re-run `yarn run compile`. 
+5. Repeat Steps 4&5 of the Setup Instructions, that is, run the development version of VSCode. 
+6. In the development version of VSCode, with keycrop running, open the folder in the 866-study branch called "study-tasks".
+7. In the study-tasks folder, `pip install pygame`. 
+8. You will see five tasks. Each is a simple game written in python - but unfortunately, the games are not working. Try to use the hotkeys suggested by KeyCrop to debug the games. You can search each file for the word "HINT" for additional clues. 
+9. While it is theoretically possible to complete Level One of KeyCrop by debugging the games, please keep in mind that you are under no pressure to do so as a study participant. Also, you are encouraged to attempt to debug each script but if you need to stop due to time limitations or getting stuck that is perfectly OK.
+10. The game will create a file called `plants.json` [FULL APPLICATION PATH OR CHANGE STORAGE PATH] in your local VSCode application storage. Please send this file to hermana@usask.ca.
+
+### Day Two:
+1. At some point on the second day, fill out this Memory Test [LINK]. 
+
+### Day Three:
+1. Switch your branch of KeyCrop to `866-study-nongame-mode` using `git checkout 866-study` or your preferred Git GUI. 
+2. Re-run `yarn run compile`. 
+3. Repeat Steps 4&5 of the Setup Instructions, that is, run the development version of VSCode. You will still see the VSCode Panel, but it should be blacked out and the game should not be visible. 
+4. Repeat the study tasks - debug each of the five games. The games, and their bugs, will be the same as the first day.
+5. KeyCrop will create a file called `keytracking.json` in the background. Please send this file to hermana@usask.ca - we can also schedule your PlayTesting Interview.
+
+### Playtesting Interview
+1. This interview will take place over Zoom. You will be asked open-ended questions about KeyCrop and have an opportunity to provide suggestions as well as discuss any thoughts you have that were not covered by the surveys. 

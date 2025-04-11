@@ -1,11 +1,14 @@
 // Place your key bindings in this file to override the defaults
 [
     {
-        "key": "ctrl+shift+p",
+        "key": "ctrl+shift+m",
         "command": "runCommands",
         "args": {
             "commands": [
-                "workbench.action.showCommands",
+                {
+                    "command": "workbench.actions.view.problems",
+                    "when": "workbench.panel.markers.view.active" 
+                },
                 "keycrop.growBean"
             ]
         }
@@ -24,16 +27,6 @@
         }
     },
     {
-        "key": "ctrl+\\",
-        "command": "runCommands",
-        "args": {
-            "commands": [
-                "workbench.action.splitEditor",
-                "keycrop.growBroccoli"
-            ]
-        }
-    },
-    {
         "key": "ctrl+/",
         "command": "runCommands",
         "args": {
@@ -45,5 +38,37 @@
                 "keycrop.growLettuce"
             ]
         }
-    }
+    },
+    { "key": "ctrl+[",         
+        "command": "runCommands",
+        "args": {
+            "commands": [
+                {
+                "command": "editor.action.outdentLines",
+                "when": "editorTextFocus && !editorReadonly" 
+            },
+            "keycrop.growBroccoli"
+            ]
+        }       
+    },
+    { "key": "ctrl+shift+l",   
+        "command": "runCommands",
+            "args": {
+                "commands" :[
+                    {
+                        "command": "editor.action.selectHighlights",
+                        "when": "editorFocus"
+                    },
+                    {
+                        "command": "selectAllSearchEditorMatches",
+                        "when": "inSearchEditor"
+                    },
+                    {
+                        "command": "addCursorsAtSearchResults",
+                        "when": "fileMatchOrMatchFocus && searchViewletVisible"
+                    },
+                    "keycrop.growTomato"
+                ]
+            }    
+        }  
 ]
