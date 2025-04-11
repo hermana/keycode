@@ -116,19 +116,6 @@ function activate(context) {
   context.subscriptions.push(vscode.window.registerWebviewViewProvider(WebViewProvider.viewType, webview));
   vscode.workspace.onDidChangeConfiguration((event) => {
     config = vscode.workspace.getConfiguration("keycrop");
-    if (event.affectsConfiguration("keycrop.background")) {
-      if (CURRENT_MODE === 0 /* GAME */) {
-        webview.postMessage({
-          action: "background",
-          value: config.get("background")
-        });
-      } else {
-        webview.postMessage({
-          action: "background",
-          value: "blackout"
-        });
-      }
-    }
     if (event.affectsConfiguration("keycrop-view.scale")) {
       webview.postMessage({
         action: "scale",
@@ -206,7 +193,6 @@ var WebViewProvider = class {
     this.context = context;
   }
   static viewType = "keycrop";
-  //TODO: may be able to switch views later
   view;
   postMessage(message) {
     this.view?.webview.postMessage(message);
@@ -237,6 +223,10 @@ var WebViewProvider = class {
               value: "dirt"
             });
             loadPlantsFile();
+          } else {
+            webview2.postMessage({
+              action: "key-tracking-mode"
+            });
           }
           break;
         case "save_plants":
@@ -250,9 +240,6 @@ var WebViewProvider = class {
           break;
       }
     });
-  }
-  isGameMode() {
-    return CURRENT_MODE === 0 /* GAME */;
   }
   getHtmlContent(webview2) {
     const style = webview2.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, "src/media", "style.css"));
@@ -271,19 +258,19 @@ var WebViewProvider = class {
         </head>
         <body>
           <div id="keycrop" background="${CURRENT_MODE === 0 /* GAME */ ? config.get("background") : "blackout"}">
-          <div id="generator-instructions" hidden="true">
+          <div id="generator-instructions" hidden>
             <p class="instructions">Congratulations, you've managed to power up the KeyCrop Greenhouse! To unlock more seeds, all of the following plants must be harvested. </p>
             <!-- how many plants to make it to the next level -->
             <p class="key-instruction"><img src="${iconsPath + "/chilli_harvested.png"}" alt="Chili" width="20" height="20"> <span class="instruction-bold"> CTRL+C</span>: Copy text </p>
-            <p class="key-instruction"><img src="${iconsPath + "/bean_harvested.png"}" alt="Chili" width="20" height="20"> <span class="instruction-bold"> CTRL+V</span>: Paste text </p>
-            <p class="key-instruction"><img src="${iconsPath + "/tomato_harvested.png"}" alt="Chili" width="20" height="20"> <span class="instruction-bold"> CTRL+L</span>: Clear the terminal. </p>
-            <p class="key-instruction"><img src="${iconsPath + "/lettuce_harvested.png"}" alt="Chili" width="20" height="20"> <span class="instruction-bold"> CTRL+A</span>: Select all text. </p>
-            <p class="key-instruction"><img src="${iconsPath + "/broccoli_harvested.png"}" alt="Chili" width="20" height="20"> <span class="instruction-bold"> CTRL+X</span>: Cut text. </p>
+            <p class="key-instruction"><img src="${iconsPath + "/bean_harvested.png"}" alt="Bean" width="20" height="20"> <span class="instruction-bold"> CTRL+V</span>: Paste text </p>
+            <p class="key-instruction"><img src="${iconsPath + "/tomato_harvested.png"}" alt="Tomato" width="20" height="20"> <span class="instruction-bold"> CTRL+L</span>: Clear the terminal. </p>
+            <p class="key-instruction"><img src="${iconsPath + "/lettuce_harvested.png"}" alt="Lettuce" width="20" height="20"> <span class="instruction-bold"> CTRL+A</span>: Select all text. </p>
+            <p class="key-instruction"><img src="${iconsPath + "/broccoli_harvested.png"}" alt="Broccoli" width="20" height="20"> <span class="instruction-bold"> CTRL+X</span>: Cut text. </p>
           </div>
           <div class="btn-wrapper">
-            <button class="btn" id="inventory-button" hidden="${this.isGameMode()}">Inventory</button>
-            <button class="selected btn" id="greenhouse-button" hidden="${this.isGameMode()}">Greenhouse</button>
-            <button class="btn" id="generator-button" hidden="${this.isGameMode()}">Generator</button>
+            <button class="btn" id="inventory-button">Inventory</button>
+            <button class="selected btn" id="greenhouse-button">Greenhouse</button>
+            <button class="btn" id="generator-button">Generator</button>
           </div>
           </div>
           <script src="${mainJS}"></script>
