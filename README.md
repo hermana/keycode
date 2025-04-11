@@ -11,7 +11,9 @@ A virtual greenhouse game for learning VSCode hotkeys
 
 3. Clone this repository and open it in VSCode. In the `keycrop/` directory, run `yarn install` (I used yarn but you could try `npm` as well).
 
-4. Open `src/extentsion.ts`. Select the debugger arrow from the side panel and then clicking the "Run and Debug" button, or use **cmd+shift+p** and search for "Debug: Start debugging". The first time you do this, you will be prompted to select a debugging environment - choose "VSCode Extension Development (preview)". 
+4. Run `yarn run compile`.
 
-5. A new, development-version of VSCode should now pop-up. KeyCrop should appear as a collapsable view in the side panel. 
+5. Open `src/extension.ts`. Select the debugger arrow from the side panel and then clicking the "Run and Debug" button, or use **cmd+shift+p** and search for "Debug: Start debugging". The first time you do this, you will be prompted to select a debugging environment - choose "VSCode Extension Development (preview)". 
+
+6. A new, development-version of VSCode should now pop-up. KeyCrop should appear as a collapsable view in the side panel. 
 

@@ -38,7 +38,7 @@ module.exports = __toCommonJS(extension_exports);
 var vscode = __toESM(require("vscode"));
 var fs = __toESM(require("fs"));
 var path = __toESM(require("path"));
-var CURRENT_MODE = 1 /* KEYTRACKING */;
+var CURRENT_MODE = 0 /* GAME */;
 var webview;
 var config = vscode.workspace.getConfiguration("keycrop");
 var extensionStorageFolder = "";
