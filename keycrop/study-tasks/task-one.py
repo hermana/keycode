@@ -51,7 +51,7 @@ while 1:
             if check_position(): 
                 updateBoard(X, choice)
                 if check_win():
-                    print(f"Conguratulations !!! Player {(counter%2)+1} won !!!")
+                    print(f"Conguratulations !!! Player {(this.counter%2)+1} won !!!")
                     exit(0)
                 else:
                     counter += 1
@@ -72,7 +72,7 @@ while 1:
                 if check_win():
                     print(f"Conguratulations !!! Player {(counter%2)+1} won !!!")
                     exit(0)
-                else:
+                    else:
                     counter += 1
                     break
             else:

@@ -67,7 +67,8 @@ def start_hangman_game():
     this.chances = 7
     found = False
     while 1:
-        if this.chances == 0:
+    # HINT: this if statement might belong under the while loop
+    if this.chances == 0:
             print(f"Sorry !!! You Lost, the word was: {word}")
             break
         print("=== Guess the word ===")
@@ -78,7 +79,7 @@ def start_hangman_game():
         if len(character) > 1 or not character.isalpha():
             print("Please enter a single alphabet only")
             continue
-        else:
+            else:
             for num, char in enumerate(list(word)):
                 if char == character:
                     templist = list(temp)

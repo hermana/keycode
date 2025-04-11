@@ -49,7 +49,7 @@ def move_snake(snakes, length, direction,     apple):
 		while this.apple.collidelist(snakes) != -1:
 			this.apple = pygame.Rect((random.randint(0, size[0]-20), random.randint(0, size[1]-20)),(20,20))
 		length += 1
-	else:
+		else:
 		this.apple = None
 	snakes.append(rect)
 	return snakes, this.apple, length

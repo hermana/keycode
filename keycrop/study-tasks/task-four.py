@@ -73,7 +73,7 @@ def move_ball():
 			ball_speed_x *= -1
 		elif abs(ball.bottom - player2.top) < 10 and ball_speed_y < 0:
 			ball_speed_y *= -1
-		elif abs(ball.top - player2.bottom) < 10 and ball_speed_y > 0:
+			elif abs(ball.top - player2.bottom) < 10 and ball_speed_y > 0:
 			ball_speed_y *= -1
 
 # def move_players():

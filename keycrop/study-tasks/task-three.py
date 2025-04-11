@@ -101,11 +101,11 @@ while True:
 					print("You won!!!")
 					pygame.quit()
 					sys.exit()
-				elif block.color == (0,0,255):
+					elif block.color == (0,0,255):
 					p.rect.x -= this.direction[0]
 					p.rect.y -= this.direction[1]
 					this.direction = block.this.direction
-				elif block.color == (25,25,25):
+					elif block.color == (25,25,25):
 					p.rect.x -= this.direction[0]
 					p.rect.y -= this.direction[1]
 					this.direction = None
