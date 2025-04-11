@@ -1,0 +1,6 @@
+- ctrl+shift+m
+- need one more keybinding that will work for your tasks
+- update the keybindings file (everywhere)
+- update the generator instructions
+- both branches (the keytracking and this one) should have same keybindings, README, and studies. 
+- 
