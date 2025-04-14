@@ -45,9 +45,6 @@ var extensionStorageFolder = "";
 var plantsPath;
 var keyTrackingPath;
 var keyTrackingString = [];
-var studyOutputPath = "./output";
-var plantsStudyOutputPath;
-var keytrackingStudyOutputPath;
 function loadPlantsFile() {
   if (!fs.existsSync(extensionStorageFolder)) {
     fs.mkdirSync(extensionStorageFolder, { recursive: true });
@@ -109,18 +106,12 @@ function logKeyPress(plant) {
     key: plant,
     time: Date.now()
   });
-  fs.writeFileSync(keytrackingStudyOutputPath, JSON.stringify(keyTrackingString));
   fs.writeFileSync(keyTrackingPath, JSON.stringify(keyTrackingString));
 }
 function activate(context) {
   extensionStorageFolder = context.globalStorageUri.path.substring(1);
   plantsPath = path.join(extensionStorageFolder, "plants.json");
-  plantsStudyOutputPath = path.join(studyOutputPath, "plants.json");
   keyTrackingPath = path.join(extensionStorageFolder, "keytracking.json");
-  keytrackingStudyOutputPath = path.join(studyOutputPath, "keytracking.json");
-  if (!fs.existsSync(studyOutputPath)) {
-    fs.mkdirSync(studyOutputPath, { recursive: true });
-  }
   webview = new WebViewProvider(context);
   context.subscriptions.push(vscode.window.registerWebviewViewProvider(WebViewProvider.viewType, webview));
   vscode.workspace.onDidChangeConfiguration((event) => {
@@ -239,7 +230,6 @@ var WebViewProvider = class {
           }
           break;
         case "save_plants":
-          fs.writeFileSync(plantsStudyOutputPath, JSON.stringify(message.content));
           fs.writeFileSync(plantsPath, JSON.stringify(message.content));
           break;
         case "harvested":
