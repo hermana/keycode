@@ -8,8 +8,9 @@
 2. Switch your branch of Keycrop to `866-study` using `git checkout 866-study` or your preferred Git GUI.
 3. Check that your personal `keybindings.json` file, which you edited as part of the setup, matches the one in `player-resources/keybindings.json`.  
 4. Re-run `yarn run compile`. 
-5. Repeat Steps 4&5 of the "Setting up" instructions, that is, run the development version of VSCode. 
-6. In the development version of VSCode, with Keycrop running, open the folder called `study-tasks`.
+5. Copy the folder called `study-tasks` to a location outside of the Keycode repository.
+6. Repeat Steps 4&5 of the "Setting up" instructions, that is, run the development version of VSCode.  
+7. In the development version of VSCode, with Keycrop running, open the `study-tasks` folder in its new location.
 7. In the study-tasks folder, run `pip install pygame`. 
 8. You will see five tasks. Each is a simple game written in python, but none of them are in a working state. Try to use the hotkeys suggested by Keycrop to debug the games. You can search each file for the word "HINT" for additional clues. 
 9. While it is theoretically possible to complete Level One of Keycrop by debugging the games, please keep in mind that you are under no pressure to do so as a study participant. Also, you are encouraged to attempt to debug each script, but it is fine if you do not get all the games working.
