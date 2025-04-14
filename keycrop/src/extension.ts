@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { MODE } from './mode';
 
-const CURRENT_MODE: MODE = MODE.GAME;
+const CURRENT_MODE: MODE = MODE.KEYTRACKING;
 
 let webview: WebViewProvider;
 let config = vscode.workspace.getConfiguration('keycrop');
