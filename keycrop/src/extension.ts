@@ -89,6 +89,7 @@ function growPlant(plant: Plant) {
 }
 
 function logKeyPress(plant: string) {
+  vscode.window.showInformationMessage("Your "+plant+ " is growing!");
   keyTrackingString.push({
     key: plant,
     time: Date.now()
@@ -135,6 +136,7 @@ export function activate(context: vscode.ExtensionContext) {
         hotkey_uses: 1
       });
     }else{
+      
       logKeyPress('bean');
     }
 	});

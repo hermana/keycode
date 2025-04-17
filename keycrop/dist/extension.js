@@ -102,6 +102,7 @@ function growPlant(plant) {
   savePlants();
 }
 function logKeyPress(plant) {
+  vscode.window.showInformationMessage("Your " + plant + "is growing!");
   keyTrackingString.push({
     key: plant,
     time: Date.now()
