@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { MODE } from './mode';
 
-const CURRENT_MODE: MODE = MODE.GAME;
+const CURRENT_MODE: MODE = MODE.KEYTRACKING;
 
 let webview: WebViewProvider;
 let config = vscode.workspace.getConfiguration('keycrop');
@@ -11,6 +11,9 @@ let extensionStorageFolder: string = '';
 let plantsPath: string;
 let keyTrackingPath: string;
 let keyTrackingString: { key: string; time: number; }[] = [];
+let studyOutputPath: string = './output'
+let plantsStudyOutputPath: string;
+let keytrackingStudyOutputPath: string;
 
 type Plant = { 
   species: string; 
@@ -86,10 +89,12 @@ function growPlant(plant: Plant) {
 }
 
 function logKeyPress(plant: string) {
+  vscode.window.showInformationMessage("Your "+plant+ " is growing!");
   keyTrackingString.push({
     key: plant,
     time: Date.now()
   });
+  // fs.writeFileSync(keytrackingStudyOutputPath, JSON.stringify(keyTrackingString))
   fs.writeFileSync(keyTrackingPath, JSON.stringify(keyTrackingString));
 }
 
@@ -97,9 +102,14 @@ export function activate(context: vscode.ExtensionContext) {
 
   extensionStorageFolder = context.globalStorageUri.path.substring(1);
   plantsPath = path.join(extensionStorageFolder, 'plants.json');
+  // plantsStudyOutputPath = path.join(studyOutputPath, 'plants.json');
   keyTrackingPath = path.join(extensionStorageFolder, 'keytracking.json');
+  // keytrackingStudyOutputPath = path.join(studyOutputPath, 'keytracking.json');
 
-  //TODO GAMEMODE: do not initialize this in nongame mode
+  // if (!fs.existsSync(studyOutputPath)){
+  //   fs.mkdirSync(studyOutputPath, { recursive: true });
+  // } 
+
 	webview = new WebViewProvider(context);
 	context.subscriptions.push(vscode.window.registerWebviewViewProvider(WebViewProvider.viewType, webview));
 
@@ -126,6 +136,7 @@ export function activate(context: vscode.ExtensionContext) {
         hotkey_uses: 1
       });
     }else{
+      
       logKeyPress('bean');
     }
 	});
@@ -246,6 +257,7 @@ export class WebViewProvider implements vscode.WebviewViewProvider {
             }
             break;
           case 'save_plants':
+            //fs.writeFileSync(plantsStudyOutputPath, JSON.stringify(message.content));
             fs.writeFileSync(plantsPath, JSON.stringify(message.content));
             break;
           case 'harvested':
