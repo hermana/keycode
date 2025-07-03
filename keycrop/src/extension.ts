@@ -98,7 +98,8 @@ function logKeyPress(plant: string) {
 }
 
 export function activate(context: vscode.ExtensionContext) {
-
+  
+  //TODO GAMEMODE: do not initialize this in nongame mode
   extensionStorageFolder = context.globalStorageUri.path.substring(1);
   plantsPath = path.join(extensionStorageFolder, 'plants.json');
   // plantsStudyOutputPath = path.join(studyOutputPath, 'plants.json');
@@ -109,7 +110,6 @@ export function activate(context: vscode.ExtensionContext) {
   //   fs.mkdirSync(studyOutputPath, { recursive: true });
   // } 
 
-  //TODO GAMEMODE: do not initialize this in nongame mode
 	webview = new WebViewProvider(context);
 	context.subscriptions.push(vscode.window.registerWebviewViewProvider(WebViewProvider.viewType, webview));
 
