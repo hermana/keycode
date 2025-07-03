@@ -20,10 +20,26 @@
       }
     ],
     "views": {
-      "explorer": [
+      "keycrop-greenhouse": [
         {
-          "id": "keycrop",
-          "name": "keycrop",
+          "id": "greenhouse",
+          "name": "keycrop greenhouse",
+          "contextualTitle": "Use hotkeys to grow your crop!",
+          "type": "webview"
+        }
+      ],
+      "keycrop-generator": [
+        {
+          "id": "generator",
+          "name": "keycrop generator",
+          "contextualTitle": "Use hotkeys to grow your crop!",
+          "type": "webview"
+        }
+      ],
+      "keycrop-inventory": [
+        {
+          "id": "inventory",
+          "name": "keycrop inventory",
           "contextualTitle": "Use hotkeys to grow your crop!",
           "type": "webview"
         }
