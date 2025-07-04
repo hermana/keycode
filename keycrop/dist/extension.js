@@ -30,6 +30,7 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 // src/extension.ts
 var extension_exports = {};
 __export(extension_exports, {
+  GeneratorWebViewProvider: () => GeneratorWebViewProvider,
   GreenhouseWebViewProvider: () => GreenhouseWebViewProvider,
   InventoryWebViewProvider: () => InventoryWebViewProvider,
   activate: () => activate,
@@ -41,6 +42,7 @@ var fs = __toESM(require("fs"));
 var path = __toESM(require("path"));
 var CURRENT_MODE = 0 /* GAME */;
 var greenhouse;
+var generator;
 var inventory;
 var config = vscode.workspace.getConfiguration("keycrop");
 var extensionStorageFolder = "";
@@ -116,6 +118,8 @@ function activate(context) {
   keyTrackingPath = path.join(extensionStorageFolder, "keytracking.json");
   greenhouse = new GreenhouseWebViewProvider(context);
   context.subscriptions.push(vscode.window.registerWebviewViewProvider(GreenhouseWebViewProvider.viewType, greenhouse));
+  generator = new GeneratorWebViewProvider(context);
+  context.subscriptions.push(vscode.window.registerWebviewViewProvider(GeneratorWebViewProvider.viewType, generator));
   inventory = new InventoryWebViewProvider(context);
   context.subscriptions.push(vscode.window.registerWebviewViewProvider(InventoryWebViewProvider.viewType, inventory));
   vscode.workspace.onDidChangeConfiguration((event) => {
@@ -192,11 +196,11 @@ function activate(context) {
 }
 function deactivate() {
 }
-var InventoryWebViewProvider = class {
+var GeneratorWebViewProvider = class {
   constructor(context) {
     this.context = context;
   }
-  static viewType = "inventory";
+  static viewType = "generator";
   view;
   resolveWebviewView(webviewView, context, token) {
     this.view = webviewView;
@@ -221,10 +225,9 @@ var InventoryWebViewProvider = class {
           <meta charset="UTF-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
           <link href="${style}" rel="stylesheet">
-          <title>KeyCrop</title>
+          <title>KeyCrop Generator</title>
         </head>
         <body>
-          <div id="inventory" background="${CURRENT_MODE === 0 /* GAME */ ? config.get("background") : "blackout"}">
           <div id="generator-instructions">
             <p class="instructions">Congratulations, you've managed to power up the KeyCrop Greenhouse! To unlock more seeds, all of the following plants must be harvested. </p>
             <!-- how many plants to make it to the next level -->
@@ -313,12 +316,67 @@ var GreenhouseWebViewProvider = class {
         </head>
         <body>
           <div id="keycrop" background="${CURRENT_MODE === 0 /* GAME */ ? config.get("background") : "blackout"}">
-          <div class="btn-wrapper">
-       
-            <button class="selected btn" id="greenhouse-button">Greenhouse</button>
-            <button class="btn" id="generator-button">Generator</button>
           </div>
+          <script src="${mainJS}"></script>
+          <script src="${plantsJS}"></script>
+          <script src="${levelsJS}"></script>
+        </body>
+        </html>
+      `;
+  }
+};
+var InventoryWebViewProvider = class {
+  constructor(context) {
+    this.context = context;
+  }
+  static viewType = "inventory";
+  view;
+  resolveWebviewView(webviewView, context, token) {
+    this.view = webviewView;
+    const webview = webviewView.webview;
+    webview.options = {
+      enableScripts: true
+    };
+    webview.html = this.getHtmlContent(
+      webviewView.webview
+    );
+    webview.onDidReceiveMessage((message) => {
+      switch (message.type) {
+        case "init":
+          if (CURRENT_MODE === 0 /* GAME */) {
+            webview.postMessage({
+              action: "background",
+              value: "blackout"
+            });
+            loadPlantsFile();
+          } else {
+            webview.postMessage({
+              action: "key-tracking-mode"
+            });
+          }
+          break;
+      }
+    });
+  }
+  getHtmlContent(webview) {
+    const style = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, "src/media", "style.css"));
+    const mainJS = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, "src/media", "main.js"));
+    const plantsJS = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, "src/media", "plants.js"));
+    const levelsJS = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, "src/media", "levels.js"));
+    const iconsPath = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, "src/media/vegetables"));
+    return ` 
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <link href="${style}" rel="stylesheet">
+          <title>KeyCrop Inventory</title>
+        </head>
+        <body>
+          <div id="inventory">
           </div>
+          <div class="instructions">You currently don't have anything in your inventory.</div>
           <script src="${mainJS}"></script>
           <script src="${plantsJS}"></script>
           <script src="${levelsJS}"></script>
@@ -329,6 +387,7 @@ var GreenhouseWebViewProvider = class {
 };
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
+  GeneratorWebViewProvider,
   GreenhouseWebViewProvider,
   InventoryWebViewProvider,
   activate,

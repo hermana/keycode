@@ -6,6 +6,7 @@ import { MODE } from './mode';
 const CURRENT_MODE: MODE = MODE.GAME;
 
 let greenhouse: GreenhouseWebViewProvider;
+let generator: GeneratorWebViewProvider;
 let inventory: InventoryWebViewProvider;
 let config = vscode.workspace.getConfiguration('keycrop');
 let extensionStorageFolder: string = '';
@@ -114,6 +115,10 @@ export function activate(context: vscode.ExtensionContext) {
 	greenhouse = new GreenhouseWebViewProvider(context);
 	context.subscriptions.push(vscode.window.registerWebviewViewProvider(GreenhouseWebViewProvider.viewType, greenhouse));
 
+	generator = new GeneratorWebViewProvider(context);
+  //FIXME: do I need this?
+	context.subscriptions.push(vscode.window.registerWebviewViewProvider(GeneratorWebViewProvider.viewType, generator));
+
 	inventory = new InventoryWebViewProvider(context);
   //FIXME: do I need this?
 	context.subscriptions.push(vscode.window.registerWebviewViewProvider(InventoryWebViewProvider.viewType, inventory));
@@ -205,9 +210,9 @@ export function activate(context: vscode.ExtensionContext) {
 export function deactivate() {}
 
 //make an interface that forces them to implement getHTMLcontent
-export class InventoryWebViewProvider implements vscode.WebviewViewProvider {
+export class GeneratorWebViewProvider implements vscode.WebviewViewProvider {
 
-  public static readonly viewType = "inventory"
+  public static readonly viewType = "generator"
   private view?: vscode.WebviewView;
 
   constructor(private readonly context: vscode.ExtensionContext){}
@@ -244,10 +249,9 @@ export class InventoryWebViewProvider implements vscode.WebviewViewProvider {
           <meta charset="UTF-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
           <link href="${style}" rel="stylesheet">
-          <title>KeyCrop</title>
+          <title>KeyCrop Generator</title>
         </head>
         <body>
-          <div id="inventory" background="${CURRENT_MODE === MODE.GAME ? config.get('background') : 'blackout'}">
           <div id="generator-instructions">
             <p class="instructions">Congratulations, you've managed to power up the KeyCrop Greenhouse! To unlock more seeds, all of the following plants must be harvested. </p>
             <!-- how many plants to make it to the next level -->
@@ -359,11 +363,6 @@ export class GreenhouseWebViewProvider implements vscode.WebviewViewProvider {
         </head>
         <body>
           <div id="keycrop" background="${CURRENT_MODE === MODE.GAME ? config.get('background') : 'blackout'}">
-          <div class="btn-wrapper">
-       
-            <button class="selected btn" id="greenhouse-button">Greenhouse</button>
-            <button class="btn" id="generator-button">Generator</button>
-          </div>
           </div>
           <script src="${mainJS}"></script>
           <script src="${plantsJS}"></script>
@@ -374,13 +373,90 @@ export class GreenhouseWebViewProvider implements vscode.WebviewViewProvider {
     }
   }
 
-          // <div id="generator-instructions" hidden>
-          //   <p class="instructions">Congratulations, you've managed to power up the KeyCrop Greenhouse! To unlock more seeds, all of the following plants must be harvested. </p>
-          //   <!-- how many plants to make it to the next level -->
-          //   <p class="key-instruction"><img src="${iconsPath+'/chilli_harvested.png'}" alt="Chili" width="20" height="20"> <span class="instruction-bold"> CTRL+SHIFT+SPACE</span>: See function parameter hints.</p>
-          //   <p class="key-instruction"><img src="${iconsPath+'/bean_harvested.png'}" alt="Bean" width="20" height="20"> <span class="instruction-bold"> CTRL+SHIFT+M</span>: See warnings and errors in the Problems view.</p>
-          //   <p class="key-instruction"><img src="${iconsPath+'/tomato_harvested.png'}" alt="Tomato" width="20" height="20"> <span class="instruction-bold"> CTRL+SHIFT+L</span>: Multicursor-select all instances of a specific word.</p>
-          //   <p class="key-instruction"><img src="${iconsPath+'/lettuce_harvested.png'}" alt="Lettuce" width="20" height="20"> <span class="instruction-bold"> CTRL+/</span>: Comment or un-comment code.</p>
-          //   <p class="key-instruction"><img src="${iconsPath+'/broccoli_harvested.png'}" alt="Broccoli" width="20" height="20"> <span class="instruction-bold"> CTRL+[</span>: Outdent a line.</p>
-          // </div>
-          //    <button class="btn" id="inventory-button">Inventory</button>
+export class InventoryWebViewProvider implements vscode.WebviewViewProvider {
+
+  public static readonly viewType = "inventory"
+  private view?: vscode.WebviewView;
+
+  constructor(private readonly context: vscode.ExtensionContext){}
+    
+  public resolveWebviewView(webviewView: vscode.WebviewView, context: vscode.WebviewViewResolveContext, token: vscode.CancellationToken): Thenable<void> | void {
+      this.view = webviewView; //FIXME: do I need this?
+  
+      const webview = webviewView.webview; //FIXME: ditto
+  
+      //ditto
+      webview.options = {
+        enableScripts: true 
+      };
+  
+      //Set the HTML content for the webview
+      webview.html = this.getHtmlContent(
+        webviewView.webview,
+      );
+
+      //Handle messages
+      webview.onDidReceiveMessage((message) => {
+        switch (message.type) {
+          case 'init':
+            if(CURRENT_MODE === MODE.GAME){
+              //Send background
+              webview.postMessage({
+                action: 'background',
+                value: 'blackout'
+              });
+              //Load existing plants array
+              loadPlantsFile();
+            }else{
+              webview.postMessage({
+                action: 'key-tracking-mode'
+              });
+            }
+            break;
+          // case 'save_plants':
+          //   // fs.writeFileSync(plantsStudyOutputPath, JSON.stringify(message.content));
+          //   fs.writeFileSync(plantsPath, JSON.stringify(message.content));
+          //   break;
+          // case 'harvested':
+          //   vscode.window.showInformationMessage("Your "+message.text+" plant has been harvested!");
+          //   break;
+          // case 'level_one':
+          //   vscode.window.showInformationMessage("Congratulations! You have finished the game!");
+          //   break;
+        }
+      });
+  }
+
+  private getHtmlContent(webview: vscode.Webview): string {
+
+      const style = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'src/media', 'style.css'));
+      const mainJS = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'src/media', 'main.js'));
+      const plantsJS = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'src/media', 'plants.js'));
+      const levelsJS = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'src/media', 'levels.js'));
+
+      const iconsPath = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'src/media/vegetables'));
+  
+
+      return ` 
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <link href="${style}" rel="stylesheet">
+          <title>KeyCrop Inventory</title>
+        </head>
+        <body>
+          <div id="inventory">
+          </div>
+          <div class="instructions">You currently don't have anything in your inventory.</div>
+          <script src="${mainJS}"></script>
+          <script src="${plantsJS}"></script>
+          <script src="${levelsJS}"></script>
+        </body>
+        </html>
+      `;
+  
+  
+    }
+}
