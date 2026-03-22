@@ -33,35 +33,35 @@ const game = {
 //   }
 // });
 
-window.document.getElementById('greenhouse-button').addEventListener('click',() =>{
-  game.div.setAttribute('background', 'dirt');
-  document.getElementById("generator-instructions").hidden=true;
-  document.getElementById("greenhouse-button").classList.add('selected');
-  document.getElementById("generator-button").classList.remove('selected');
-  var greenhouse_plants = document.getElementsByClassName('plant');
-  for (var i = 0; i < greenhouse_plants.length; ++i) { 
-      greenhouse_plants[i].hidden = false;
-  }
-  var harvested_plants = document.getElementsByClassName('harvested-plant');
-  for (var i = 0; i < harvested_plants.length; ++i) { 
-      harvested_plants[i].hidden = true;
-  }
-});
+// window.document.getElementById('greenhouse-button').addEventListener('click',() =>{
+//   game.div.setAttribute('background', 'dirt');
+//   document.getElementById("generator-instructions").hidden=true;
+//   document.getElementById("greenhouse-button").classList.add('selected');
+//   document.getElementById("generator-button").classList.remove('selected');
+//   var greenhouse_plants = document.getElementsByClassName('plant');
+//   for (var i = 0; i < greenhouse_plants.length; ++i) { 
+//       greenhouse_plants[i].hidden = false;
+//   }
+//   var harvested_plants = document.getElementsByClassName('harvested-plant');
+//   for (var i = 0; i < harvested_plants.length; ++i) { 
+//       harvested_plants[i].hidden = true;
+//   }
+// });
 
-window.document.getElementById('generator-button').addEventListener('click',() =>{
-  game.div.setAttribute('background', 'inventory');
-  document.getElementById("generator-instructions").hidden=false;
-  document.getElementById("generator-button").classList.add('selected');
-  document.getElementById("greenhouse-button").classList.remove('selected');
-  var greenhouse_plants = document.getElementsByClassName('plant');
-  for (var i = 0; i < greenhouse_plants.length; ++i) { 
-      greenhouse_plants[i].hidden = true;
-  }
-  var harvested_plants = document.getElementsByClassName('harvested-plant');
-  for (var i = 0; i < harvested_plants.length; ++i) { 
-      harvested_plants[i].hidden = true;
-  }
-});
+// window.document.getElementById('generator-button').addEventListener('click',() =>{
+//   game.div.setAttribute('background', 'inventory');
+//   document.getElementById("generator-instructions").hidden=false;
+//   document.getElementById("generator-button").classList.add('selected');
+//   document.getElementById("greenhouse-button").classList.remove('selected');
+//   var greenhouse_plants = document.getElementsByClassName('plant');
+//   for (var i = 0; i < greenhouse_plants.length; ++i) { 
+//       greenhouse_plants[i].hidden = true;
+//   }
+//   var harvested_plants = document.getElementsByClassName('harvested-plant');
+//   for (var i = 0; i < harvested_plants.length; ++i) { 
+//       harvested_plants[i].hidden = true;
+//   }
+// });
 
 //Messages from VSCode
 window.addEventListener('message', event => {

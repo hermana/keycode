@@ -89,6 +89,7 @@ function addPlant(plant) {
 }
 function growPlant(plant) {
   if (plants.some((p) => p.species === plant.species)) {
+    console.log("going through plants");
     let patch = plants.filter((p) => p.species === plant.species);
     patch.forEach(
       (p) => {
@@ -101,6 +102,7 @@ function growPlant(plant) {
   } else {
     vscode.window.showInformationMessage("A new " + plant.species + " plant has sprouted in the greenhouse!");
     plants.push(plant);
+    console.log("push new plant to array");
     addPlant(plant);
   }
   savePlants();

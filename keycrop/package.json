@@ -24,7 +24,7 @@
         {
           "id": "generator",
           "name": "keycrop generator",
-          "contextualTitle": "Use hotkeys to grow your crop!",
+          "contextualTitle": "See instructions on how to grow plants!",
           "type": "webview"
         },
         {
@@ -36,7 +36,7 @@
         {
           "id": "inventory",
           "name": "keycrop inventory",
-          "contextualTitle": "Use hotkeys to grow your crop!",
+          "contextualTitle": "Collect all the plants to complete the game!",
           "type": "webview"
         }
       ]
