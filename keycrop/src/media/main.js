@@ -11,61 +11,16 @@ const game = {
   //Frames & framerate
   frames: 0,  //Frames since game start
   fps: 30,
-  
+
   //List with all the plants
   plants: []
 };
 
-// Handle button clicks
-// window.document.getElementById('inventory-button').addEventListener('click',() =>{
-//   game.div.setAttribute('background', 'inventory');
-//   document.getElementById("generator-instructions").hidden=true;
-//   document.getElementById("inventory-button").classList.add('selected');
-//   document.getElementById("greenhouse-button").classList.remove('selected');
-//   document.getElementById("generator-button").classList.remove('selected');
-//   var greenhouse_plants = document.getElementsByClassName('plant');
-//   for (var i = 0; i < greenhouse_plants.length; ++i) { 
-//       greenhouse_plants[i].hidden = true;
-//   }
-//   var harvested_plants = document.getElementsByClassName('harvested-plant');
-//   for (var i = 0; i < harvested_plants.length; ++i) { 
-//       harvested_plants[i].hidden = false;
-//   }
-// });
 
-// window.document.getElementById('greenhouse-button').addEventListener('click',() =>{
-//   game.div.setAttribute('background', 'dirt');
-//   document.getElementById("generator-instructions").hidden=true;
-//   document.getElementById("greenhouse-button").classList.add('selected');
-//   document.getElementById("generator-button").classList.remove('selected');
-//   var greenhouse_plants = document.getElementsByClassName('plant');
-//   for (var i = 0; i < greenhouse_plants.length; ++i) { 
-//       greenhouse_plants[i].hidden = false;
-//   }
-//   var harvested_plants = document.getElementsByClassName('harvested-plant');
-//   for (var i = 0; i < harvested_plants.length; ++i) { 
-//       harvested_plants[i].hidden = true;
-//   }
-// });
-
-// window.document.getElementById('generator-button').addEventListener('click',() =>{
-//   game.div.setAttribute('background', 'inventory');
-//   document.getElementById("generator-instructions").hidden=false;
-//   document.getElementById("generator-button").classList.add('selected');
-//   document.getElementById("greenhouse-button").classList.remove('selected');
-//   var greenhouse_plants = document.getElementsByClassName('plant');
-//   for (var i = 0; i < greenhouse_plants.length; ++i) { 
-//       greenhouse_plants[i].hidden = true;
-//   }
-//   var harvested_plants = document.getElementsByClassName('harvested-plant');
-//   for (var i = 0; i < harvested_plants.length; ++i) { 
-//       harvested_plants[i].hidden = true;
-//   }
-// });
 
 //Messages from VSCode
 window.addEventListener('message', event => {
-  const message = event.data; 
+  const message = event.data;
   switch (message.action) {
     case 'key-tracking-mode':
       hideGameElements();
@@ -206,15 +161,15 @@ window.addEventListener('message', event => {
 function checkAcheivements(){
   //check that there is one of each of the "level one"
   let levelOneChecklist = 0;
-  //FIXME: I'm not sure why there were duplicates in the list. 
+  //FIXME: I'm not sure why there were duplicates in the list.
   currentPlants = [...new Set(game.plants)];
   currentPlants.forEach(plant => {
     if(plant.html_element.classList.contains('harvested-plant')){
         if(LEVEL_ONE.includes(plant.species)){
           levelOneChecklist+=1;
         }
-    }          
-  }); 
+    }
+  });
   if(LEVEL_ONE.length === levelOneChecklist){
     vscode.postMessage({type: 'level_one'});
   }
@@ -242,7 +197,7 @@ function getPlantsString(){
     let plantString = {
       'species': plant.species,
       'size': plant.size,
-      'harvested': harvested, 
+      'harvested': harvested,
       'hotkey_uses': plant.num_hotkey_uses,
       'num_mashes': plant.num_mashes
     };
@@ -267,3 +222,8 @@ const timer = setInterval(update, 1000 / game.fps);
 //Tell vscode game loaded
 //TODO: type or action here?
 vscode.postMessage({ type: 'init' });
+
+
+
+
+

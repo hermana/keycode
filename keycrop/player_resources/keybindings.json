@@ -1,55 +1,78 @@
 // Place your key bindings in this file to override the defaults
 [
     {
-        "key": "ctrl+shift+m",
+        "key": "ctrl+shift+p",
         "command": "runCommands",
         "args": {
             "commands": [
                 {
-                    "command": "workbench.actions.view.problems",
-                    "when": "workbench.panel.markers.view.active" 
+                    "command": "workbench.action.showCommands"
                 },
-                "keycrop.growBean"
+                "keycrop.growCorn"
             ]
         }
     },
     {
-        "key": "ctrl+shift+space",
+        "key": "ctrl+shift+k",
         "command": "runCommands",
         "args": {
             "commands": [
                 {
-                    "command": "editor.action.triggerParameterHints",
-                    "when": "editorHasSignatureHelpProvider && editorTextFocus"
+                    "command": "editor.action.deleteLines",
+                    "when": "textInputFocus && !editorReadonly" 
                 },
-                "keycrop.growChili"
+                "keycrop.growStrawberry"
             ]
         }
     },
     {
-        "key": "ctrl+/",
+        "key": "ctrl+shift+\\",
         "command": "runCommands",
         "args": {
             "commands": [
                 {
-                    "command": "editor.action.commentLine",
-                    "when": "editorTextFocus && !editorReadonly"
+                    "command": "editor.action.jumpToBracket",
+                    "when": "editorTextFocus" 
                 },
-                "keycrop.growLettuce"
+                "keycrop.growMango"
+            ], 
+        }
+    },
+    {
+        "key": "ctrl+t",
+        "command": "runCommands",
+        "args": {
+            "commands": [
+                {
+                    "command": "workbench.action.showAllSymbols"
+                },
+                "keycrop.growPoppy"
             ]
         }
     },
-    { "key": "ctrl+[",         
+    { "key": "ctrl+shift+o",         
         "command": "runCommands",
         "args": {
             "commands": [
                 {
-                "command": "editor.action.outdentLines",
-                "when": "editorTextFocus && !editorReadonly" 
+                    "command": "workbench.action.gotoSymbol",
+                    "when": "!accessibilityHelpIsShown && !accessibleViewIsShown" 
             },
-            "keycrop.growBroccoli"
+                "keycrop.growSunflower"
             ]
         }       
+    },
+    { "key": "ctrl+shift+m",   
+        "command": "runCommands",
+            "args": {
+                "commands" :[
+                    {
+                        "command": "workbench.actions.view.problems",
+                        "when": "workbench.panel.markers.view.active" 
+                    },
+                    "keycrop.growSnapPea"
+                ]
+            }    
     },
     { "key": "ctrl+shift+l",   
         "command": "runCommands",
@@ -57,18 +80,81 @@
                 "commands" :[
                     {
                         "command": "editor.action.selectHighlights",
-                        "when": "editorFocus"
+                        "when": "editorFocus" 
                     },
                     {
+                    "command": "addCursorsAtSearchResults",
+                        "when": "fileMatchOrMatchFocus && searchViewletVisible"
+                    },
+                    {
+                        "command": "notebook.selectAllFindMatches",
+                        "when": "config.notebook.multiCursor.enabled && notebookFindWidgetFocused || config.notebook.multiCursor.enabled && notebookCellEditorFocused && activeEditor == 'workbench.editor.notebook'"  
+                    },
+                    {   
                         "command": "selectAllSearchEditorMatches",
                         "when": "inSearchEditor"
                     },
-                    {
-                        "command": "addCursorsAtSearchResults",
-                        "when": "fileMatchOrMatchFocus && searchViewletVisible"
-                    },
-                    "keycrop.growTomato"
+                    "keycrop.growSpaghettiFern"
                 ]
             }    
-        }  
+    },
+    { "key": "ctrl+shift+space",   
+        "command": "runCommands",
+            "args": {
+                "commands" :[
+                    {
+                         "command": "editor.action.triggerParameterHints",
+                         "when": "editorHasSignatureHelpProvider && editorTextFocus"
+                    },
+                    "keycrop.growOkra"
+                ]
+            }    
+    }, 
+    { "key": "ctrl+\\",   
+        "command": "runCommands",
+            "args": {
+                "commands" :[
+                    {
+                         "command": "workbench.action.splitEditor"
+                    },
+                    "keycrop.growCarrot"
+                ]
+            }    
+    }, 
+    { "key": "ctrl+shift+tab",   
+        "command": "runCommands",
+            "args": {
+                "commands" :[
+                    {
+                        "command": "workbench.action.quickOpenLeastRecentlyUsedEditorInGroup",
+                        "when": "!activeEditorGroupEmpty"
+                    },
+                    "keycrop.growCanola"
+                ]
+            }    
+    }, 
+    { "key": "ctrl+`",   
+        "command": "runCommands",
+            "args": {
+                "commands" :[
+                    {
+                        "command": "workbench.action.terminal.toggleTerminal",
+                        "when": "terminal.active"
+                    },
+                    "keycrop.growAppleTree"
+                ]
+            }    
+    }, 
+    { "key": "ctrl+shift+`",   
+        "command": "runCommands",
+            "args": {
+                "commands" :[
+                    {
+                        "command": "workbench.action.terminal.new",
+                        "when": "terminalProcessSupported || terminalWebExtensionContributedProfile"
+                    },
+                    "keycrop.growCherryTree"
+                ]
+            }    
+    }, 
 ]
