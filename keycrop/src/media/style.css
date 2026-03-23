@@ -72,105 +72,250 @@
   height:50px;
 }
 
-.bean.start {
+/* Fixme: Update the images when you get them... */
+.corn.start {
   background: url(./vegetables/bean_start.png);
 }
 
-.bean.small {
+.corn.small {
     background: url(./vegetables/bean_small.png);
   }
 
-.bean.medium {
+.corn.medium {
     background: url(./vegetables/bean_medium.png);
 }
 
-.bean.large {
+.corn.large {
   background: url(./vegetables/bean_large.png);
 }
 
-.bean.harvested-plant {
+.corn.harvested-plant {
   background: url(./vegetables/bean_harvested.png);
 }
 
-.chili.start {
-  background: url(./vegetables/chilli_start.png);
-}
-
-.chili.small {
-  background: url(./vegetables/chilli_small.png);
-}
-
-.chili.medium {
-  background: url(./vegetables/chilli_medium.png);
-}
-
-.chili.large {
-background: url(./vegetables/chilli_large.png);
-}
-
-.chili.harvested-plant {
-  background: url(./vegetables/chilli_harvested.png);
-  }
-
-.broccoli.start {
+.strawberry.start {
   background: url(./vegetables/broccoli_start.png);
 }
 
-.broccoli.small {
+.strawberry.small {
   background: url(./vegetables/broccoli_small.png);
 }
 
-.broccoli.medium {
+.strawberry.medium {
   background: url(./vegetables/broccoli_medium.png);
 }
 
-.broccoli.large {
+.strawberry.large {
 background: url(./vegetables/broccoli_large.png);
 }
 
-.broccoli.harvested-plant {
+.strawberry.harvested-plant {
   background: url(./vegetables/broccoli_harvested.png);
+  }
+
+.mango.start.start {
+  background: url(./vegetables/mango_start.png);
+}
+
+.mango.small {
+  background: url(./vegetables/chilli_small.png);
+}
+
+.mango.medium {
+  background: url(./vegetables/chilli_medium.png);
+}
+
+.mango.large {
+background: url(./vegetables/chilli_large.png);
+}
+
+.mango.harvested-plant {
+  background: url(./vegetables/chilli_harvested.png);
   }  
 
-.lettuce.start {
+.poppy.start {
+  background: url(./vegetables/grape_start.png);
+}
+
+.poppy.small {
+  background: url(./vegetables/grape_small.png);
+}
+
+.poppy.medium {
+  background: url(./vegetables/grape_medium.png);
+}
+
+.poppy.large {
+background: url(./vegetables/grape_large.png);
+}
+
+.poppy.harvested-plant {
+  background: url(./vegetables/grape_harvested.png);
+  }
+
+.sunflower.start {
+  background: url(./vegetables/grape_start.png);
+}
+
+.sunflower.small {
+  background: url(./vegetables/grape_small.png);
+}
+
+.sunflower.medium {
+  background: url(./vegetables/grape_medium.png);
+}
+
+.sunflower.large {
+background: url(./vegetables/grape_large.png);
+}
+
+.sunflower.harvested-plant {
+  background: url(./vegetables/grape_harvested.png);
+  }
+
+
+.snappea.start {
   background: url(./vegetables/lettuce_start.png);
 }
 
-.lettuce.small {
+.snappea.small {
   background: url(./vegetables/lettuce_small.png);
 }
 
-.lettuce.medium {
+.snappea.medium {
   background: url(./vegetables/lettuce_medium.png);
 }
 
-.lettuce.large {
+.snappea.large {
 background: url(./vegetables/lettuce_large.png);
 }
 
-.lettuce.harvested-plant {
+.snappea.harvested-plant {
   background: url(./vegetables/lettuce_harvested.png);
-  }
+}
 
-.tomato.start {
+.okra.start {
+  background: url(./vegetables/okra_start.png);
+}
+
+.okra.small {
+  background: url(./vegetables/okra_small.png);
+}
+
+.okra.medium {
+  background: url(./vegetables/okra_medium.png);
+}
+
+.okra.large {
+background: url(./vegetables/okra_large.png);
+}
+
+.okra.harvested-plant {
+  background: url(./vegetables/okra_harvested.png);
+}
+
+.carrot.start {
+  background: url(./vegetables/raspberry_start.png);
+}
+
+.carrot.small {
+  background: url(./vegetables/raspberry_small.png);
+}
+
+.carrot.medium {
+  background: url(./vegetables/raspberry_medium.png);
+}
+
+.carrot.large {
+background: url(./vegetables/raspberry_large.png);
+}
+
+.carrot.harvested-plant {
+  background: url(./vegetables/raspberry_harvested.png);
+}
+
+.canola.start {
+  background: url(./vegetables/rhubarb_start.png);
+}
+
+.canola.small {
+  background: url(./vegetables/rhubarb_small.png);
+}
+
+.canola.medium {
+  background: url(./vegetables/rhubarb_medium.png);
+}
+
+.canola.large {
+background: url(./vegetables/rhubarb_large.png);
+}
+
+.canola.harvested-plant {
+  background: url(./vegetables/rhubarb_harvested.png);
+}
+
+
+.apple_tree.start {
   background: url(./vegetables/tomato_start.png);
 }
 
-.tomato.small {
+.apple_tree.small {
   background: url(./vegetables/tomato_small.png);
 }
 
-.tomato.medium {
+.apple_tree.medium {
   background: url(./vegetables/tomato_medium.png);
 }
 
-.tomato.large {
+.apple_tree.large {
 background: url(./vegetables/tomato_large.png);
 }
 
-.tomato.harvested-plant {
+.apple_tree.harvested-plant {
   background: url(./vegetables/tomato_harvested.png);
-  }
+}
+
+.cherry_tree.start {
+  background: url(./vegetables/watermelon_start.png);
+}
+
+.cherry_tree.small {
+  background: url(./vegetables/watermelon_small.png);
+}
+
+.cherry_tree.medium {
+  background: url(./vegetables/watermelon_medium.png);
+}
+
+.cherry_tree.large {
+background: url(./vegetables/watermelon_large.png);
+}
+
+.cherry_tree.harvested-plant {
+  background: url(./vegetables/watermelon_harvested.png);
+}
+
+.sphagettifern.start {
+  background: url(./vegetables/watermelon_start.png);
+}
+
+.sphagettifern.small {
+  background: url(./vegetables/watermelon_small.png);
+}
+
+.sphagettifern.medium {
+  background: url(./vegetables/watermelon_medium.png);
+}
+
+.sphagettifern.large {
+background: url(./vegetables/watermelon_large.png);
+}
+
+.sphagettifern.harvested-plant {
+  background: url(./vegetables/watermelon_harvested.png);
+}
+
+
 
 .chili-icon{
   max-width: 100%;

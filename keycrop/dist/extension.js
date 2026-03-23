@@ -89,7 +89,6 @@ function addPlant(plant) {
 }
 function growPlant(plant) {
   if (plants.some((p) => p.species === plant.species)) {
-    console.log("going through plants");
     let patch = plants.filter((p) => p.species === plant.species);
     patch.forEach(
       (p) => {
@@ -102,7 +101,6 @@ function growPlant(plant) {
   } else {
     vscode.window.showInformationMessage("A new " + plant.species + " plant has sprouted in the greenhouse!");
     plants.push(plant);
-    console.log("push new plant to array");
     addPlant(plant);
   }
   savePlants();
@@ -134,7 +132,7 @@ function activate(context) {
     }
   });
   const growCorn = vscode.commands.registerCommand("keycrop.growCorn", () => {
-    if (CURRENT_MODE === 0 /* GAME */) {
+    if (CURRENT_MODE === 0) {
       growPlant({
         species: "corn",
         size: "small",
@@ -146,7 +144,7 @@ function activate(context) {
     }
   });
   const growStrawberry = vscode.commands.registerCommand("keycrop.growStrawberry", () => {
-    if (CURRENT_MODE === 0 /* GAME */) {
+    if (CURRENT_MODE === 0) {
       growPlant({
         species: "strawberry",
         size: "small",
@@ -158,7 +156,7 @@ function activate(context) {
     }
   });
   const growMango = vscode.commands.registerCommand("keycrop.growMango", () => {
-    if (CURRENT_MODE === 0 /* GAME */) {
+    if (CURRENT_MODE === 0) {
       growPlant({
         species: "mango",
         size: "small",
@@ -170,7 +168,7 @@ function activate(context) {
     }
   });
   const growPoppy = vscode.commands.registerCommand("keycrop.growPoppy", () => {
-    if (CURRENT_MODE === 0 /* GAME */) {
+    if (CURRENT_MODE === 0) {
       growPlant({
         species: "poppy",
         size: "small",
@@ -182,7 +180,7 @@ function activate(context) {
     }
   });
   const growSunflower = vscode.commands.registerCommand("keycrop.growSunflower", () => {
-    if (CURRENT_MODE === 0 /* GAME */) {
+    if (CURRENT_MODE === 0) {
       growPlant({
         species: "sunflower",
         size: "small",
@@ -194,7 +192,7 @@ function activate(context) {
     }
   });
   const growSnapPea = vscode.commands.registerCommand("keycrop.growSnapPea", () => {
-    if (CURRENT_MODE === 0 /* GAME */) {
+    if (CURRENT_MODE === 0) {
       growPlant({
         species: "snappea",
         size: "small",
@@ -206,7 +204,7 @@ function activate(context) {
     }
   });
   const growSphagettiFern = vscode.commands.registerCommand("keycrop.growSphagettiFern", () => {
-    if (CURRENT_MODE === 0 /* GAME */) {
+    if (CURRENT_MODE === 0) {
       growPlant({
         species: "sphagettifern",
         size: "small",
@@ -218,7 +216,7 @@ function activate(context) {
     }
   });
   const growOkra = vscode.commands.registerCommand("keycrop.growOkra", () => {
-    if (CURRENT_MODE === 0 /* GAME */) {
+    if (CURRENT_MODE === 0) {
       growPlant({
         species: "okra",
         size: "small",
@@ -230,7 +228,7 @@ function activate(context) {
     }
   });
   const growCarrot = vscode.commands.registerCommand("keycrop.growCarrot", () => {
-    if (CURRENT_MODE === 0 /* GAME */) {
+    if (CURRENT_MODE === 0) {
       growPlant({
         species: "carrot",
         size: "small",
@@ -242,7 +240,7 @@ function activate(context) {
     }
   });
   const growCanola = vscode.commands.registerCommand("keycrop.growCanola", () => {
-    if (CURRENT_MODE === 0 /* GAME */) {
+    if (CURRENT_MODE === 0) {
       growPlant({
         species: "canola",
         size: "small",
@@ -254,7 +252,7 @@ function activate(context) {
     }
   });
   const growAppleTree = vscode.commands.registerCommand("keycrop.growAppleTree", () => {
-    if (CURRENT_MODE === 0 /* GAME */) {
+    if (CURRENT_MODE === 0) {
       growPlant({
         species: "apple_tree",
         size: "small",
@@ -266,7 +264,7 @@ function activate(context) {
     }
   });
   const growCherryTree = vscode.commands.registerCommand("keycrop.growCherryTree", () => {
-    if (CURRENT_MODE === 0 /* GAME */) {
+    if (CURRENT_MODE === 0) {
       growPlant({
         species: "cherry_tree",
         size: "small",

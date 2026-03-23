@@ -94,7 +94,7 @@
                         "command": "selectAllSearchEditorMatches",
                         "when": "inSearchEditor"
                     },
-                    "keycrop.growSpaghettiFern"
+                    "keycrop.growSphagettiFern"
                 ]
             }    
     },

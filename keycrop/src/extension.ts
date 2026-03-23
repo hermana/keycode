@@ -137,72 +137,151 @@ export function activate(context: vscode.ExtensionContext) {
       }
   });
 
-	const growBean = vscode.commands.registerCommand('keycrop.growBean', () => {
-    if(CURRENT_MODE === MODE.GAME){
+  const growCorn = vscode.commands.registerCommand("keycrop.growCorn", () => {
+    if (CURRENT_MODE === 0 /* GAME */) {
       growPlant({
-        species: "bean",
-        size: "small", //TODO: left off here
-        harvested: false, 
-        hotkey_uses: 1
-      });
-    }else{
-      logKeyPress('bean');
-    }
-	});
-
-  const growChili = vscode.commands.registerCommand('keycrop.growChili', () => {
-    if(CURRENT_MODE === MODE.GAME){
-      growPlant({
-        species: "chili",
+        species: "corn",
         size: "small",
         harvested: false,
         hotkey_uses: 1
       });
-    }else{
-      logKeyPress('chili');
+    } else {
+      logKeyPress("corn");
     }
   });
-
-  const growBroccoli = vscode.commands.registerCommand('keycrop.growBroccoli', () => {
-    if(CURRENT_MODE === MODE.GAME){
+  const growStrawberry = vscode.commands.registerCommand("keycrop.growStrawberry", () => {
+    if (CURRENT_MODE === 0 /* GAME */) {
       growPlant({
-        species: "broccoli",
-        size: "small",
-        harvested: false,
-        hotkey_uses: 1
-      }); 
-    }else{
-      logKeyPress('broccoli');
-    }
-  });
-
-  const growLettuce = vscode.commands.registerCommand('keycrop.growLettuce', () => {
-    if(CURRENT_MODE === MODE.GAME){
-      growPlant({
-        species: "lettuce",
+        species: "strawberry",
         size: "small",
         harvested: false,
         hotkey_uses: 1
       });
-    }else{
-      logKeyPress('lettuce');
+    } else {
+      logKeyPress("strawberry");
     }
   });
-
-  const growTomato = vscode.commands.registerCommand('keycrop.growTomato', () => {
-    if(CURRENT_MODE === MODE.GAME){
+  const growMango = vscode.commands.registerCommand("keycrop.growMango", () => {
+    if (CURRENT_MODE === 0 /* GAME */) {
       growPlant({
-        species: "tomato",
+        species: "mango",
         size: "small",
-        harvested: false, 
+        harvested: false,
         hotkey_uses: 1
       });
-    }else{
-      logKeyPress('tomato');
+    } else {
+      logKeyPress("mango");
     }
   });
-
-	context.subscriptions.push(growBean, growChili, growBroccoli, growLettuce, growTomato);
+  const growPoppy = vscode.commands.registerCommand("keycrop.growPoppy", () => {
+    if (CURRENT_MODE === 0 /* GAME */) {
+      growPlant({
+        species: "poppy",
+        size: "small",
+        harvested: false,
+        hotkey_uses: 1
+      });
+    } else {
+      logKeyPress("poppy");
+    }
+  });
+  const growSunflower = vscode.commands.registerCommand("keycrop.growSunflower", () => {
+    if (CURRENT_MODE === 0 /* GAME */) {
+      growPlant({
+        species: "sunflower",
+        size: "small",
+        harvested: false,
+        hotkey_uses: 1
+      });
+    } else {
+      logKeyPress("sunflower");
+    }
+  });
+  const growSnapPea = vscode.commands.registerCommand("keycrop.growSnapPea", () => {
+    if (CURRENT_MODE === 0 /* GAME */) {
+      growPlant({
+        species: "snappea",
+        size: "small",
+        harvested: false,
+        hotkey_uses: 1
+      });
+    } else {
+      logKeyPress("snappea");
+    }
+  });
+  const growSphagettiFern = vscode.commands.registerCommand("keycrop.growSphagettiFern", () => {
+    if (CURRENT_MODE === 0 /* GAME */) {
+      growPlant({
+        species: "sphagettifern",
+        size: "small",
+        harvested: false,
+        hotkey_uses: 1
+      });
+    } else {
+      logKeyPress("sphagettifern");
+    }
+  });
+  const growOkra = vscode.commands.registerCommand("keycrop.growOkra", () => {
+    if (CURRENT_MODE === 0 /* GAME */) {
+      growPlant({
+        species: "okra",
+        size: "small",
+        harvested: false,
+        hotkey_uses: 1
+      });
+    } else {
+      logKeyPress("okra");
+    }
+  });
+  const growCarrot = vscode.commands.registerCommand("keycrop.growCarrot", () => {
+    if (CURRENT_MODE === 0 /* GAME */) {
+      growPlant({
+        species: "carrot",
+        size: "small",
+        harvested: false,
+        hotkey_uses: 1
+      });
+    } else {
+      logKeyPress("carrot");
+    }
+  });
+  const growCanola = vscode.commands.registerCommand("keycrop.growCanola", () => {
+    if (CURRENT_MODE === 0 /* GAME */) {
+      growPlant({
+        species: "canola",
+        size: "small",
+        harvested: false,
+        hotkey_uses: 1
+      });
+    } else {
+      logKeyPress("canola");
+    }
+  });
+  const growAppleTree = vscode.commands.registerCommand("keycrop.growAppleTree", () => {
+    if (CURRENT_MODE === 0 /* GAME */) {
+      growPlant({
+        species: "apple_tree",
+        size: "small",
+        harvested: false,
+        hotkey_uses: 1
+      });
+    } else {
+      logKeyPress("apple_tree");
+    }
+  });
+  const growCherryTree = vscode.commands.registerCommand("keycrop.growCherryTree", () => {
+    if (CURRENT_MODE === 0 /* GAME */) {
+      growPlant({
+        species: "cherry_tree",
+        size: "small",
+        harvested: false,
+        hotkey_uses: 1
+      });
+    } else {
+      logKeyPress("cherry_tree");
+    }
+  });
+  context.subscriptions.push(growStrawberry, growMango, growPoppy, growSunflower, growSnapPea, growSphagettiFern, growOkra, growCarrot, growCanola, growAppleTree, growCherryTree);
 
 }
 

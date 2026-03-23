@@ -110,37 +110,88 @@ class Plant{
   }
 
 
-class Bean extends Plant { 
+class Corn extends Plant { 
     constructor() {
       super();
-      this.init('bean');
+      this.init('corn');
     }
 }
 
-class Chili extends Plant { 
+class Strawberry extends Plant { 
   constructor() {
     super();
-    this.init('chili');
+    this.init('strawberry');
   }
 }
 
-class Broccoli extends Plant {
+class Mango extends Plant {
   constructor(){
     super();
-    this.init('broccoli');
+    this.init('mango');
   }
 }
 
-class Lettuce extends Plant {
+class Poppy extends Plant {
   constructor(){
     super();
-    this.init('lettuce');
+    this.init('poppy');
   }
 }
 
-class Tomato extends Plant {
+class Sunflower extends Plant {
   constructor(){
     super();
-    this.init('tomato');
+    this.init('sunflower');
+  }
+}
+
+
+class SnapPea extends Plant {
+  constructor(){
+    super();
+    this.init('snappea');
+  }
+}
+
+
+class Okra extends Plant {
+  constructor(){
+    super();
+    this.init('okra');
+  }
+}
+
+class Carrot extends Plant {
+  constructor(){
+    super();
+    this.init('carrot');
+  }
+}
+
+class Canola extends Plant {
+  constructor(){
+    super();
+    this.init('canola');
+  }
+}
+
+class AppleTree extends Plant {
+  constructor(){
+    super();
+    this.init('apple_tree');
+  }
+}
+
+class CherryTree extends Plant {
+  constructor(){
+    super();
+    this.init('cherry_tree');
+  }
+}
+
+class SphagettiFern extends Plant {
+  constructor(){
+    super();
+    this.init('sphagettifern');
   }
 }

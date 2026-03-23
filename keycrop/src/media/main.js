@@ -33,60 +33,137 @@ window.addEventListener('message', event => {
       break;
     case 'add':
       switch (message.species) {
-        case 'bean':
-          game.plants.push(new Bean());
+        case 'corn':
+          game.plants.push(new Corn());
           break;
-        case 'chili':
-          game.plants.push(new Chili());
+        case 'strawberry':
+          game.plants.push(new Strawberry());
           break;
-        case 'broccoli':
-          game.plants.push(new Broccoli());
+        case 'mango':
+          game.plants.push(new Mango());
           break;
-        case 'lettuce':
-          game.plants.push(new Lettuce());
+        case 'poppy':
+          game.plants.push(new Poppy());
           break;
-        case 'tomato':
-          game.plants.push(new Tomato());
+        case 'sunflower':
+          game.plants.push(new Sunflower());
+          break;
+        case 'snappea':
+          game.plants.push(new SnapPea());
+          break;
+        case 'sphagettifern':
+          game.plants.push(new SphagettiFern());
+          break;
+        case 'okra':
+          game.plants.push(new Okra());
+          break;
+        case 'carrot':
+          game.plants.push(new Carrot());
+          break;
+        case 'canola':
+          game.plants.push(new Canola());
+          break;
+        case 'apple_tree':
+          game.plants.push(new AppleTree());
+          break;
+        case 'cherry_tree':
+          game.plants.push(new CherryTree());
           break;
       }
       break;
     case 'grow':
       switch(message.species) {
-        case 'bean':
+        case 'corn':
           game.plants.forEach(plant => {
-            if(plant.species === 'bean'){
+            if(plant.species === 'corn'){
               plant.grow();
             }
           });
           checkAcheivements();
           break;
-        case 'chili':
+        case 'mango':
           game.plants.forEach(plant => {
-            if(plant.species === 'chili'){
+            if(plant.species === 'mango'){
               plant.grow();
             }
           });
           checkAcheivements();
           break;
-        case 'broccoli':
+        case 'strawberry':
           game.plants.forEach(plant => {
-            if(plant.species === 'broccoli'){
+            if(plant.species === 'strawberry'){
               plant.grow();
             }
           });
           checkAcheivements();
           break;
-        case 'lettuce':
+        case 'poppy':
           game.plants.forEach(plant => {
-            if(plant.species === 'lettuce'){
+            if(plant.species === 'poppy'){
               plant.grow();
             }
           });
           checkAcheivements();
           break;
-        case 'tomato':
+        case 'sunflower':
             game.plants.forEach(plant => {
-              if(plant.species === 'tomato'){
+              if(plant.species === 'sunflower'){
+                plant.grow();
+              }
+            });
+          checkAcheivements();
+          break;
+        case 'canola':
+            game.plants.forEach(plant => {
+              if(plant.species === 'canola'){
+                plant.grow();
+              }
+            });
+          checkAcheivements();
+          break;
+        case 'snappea':
+            game.plants.forEach(plant => {
+              if(plant.species === 'snappea'){
+                plant.grow();
+              }
+            });
+          checkAcheivements();
+          break;
+      case 'okra':
+            game.plants.forEach(plant => {
+              if(plant.species === 'okra'){
+                plant.grow();
+              }
+            });
+          checkAcheivements();
+          break;
+      case 'carrot':
+            game.plants.forEach(plant => {
+              if(plant.species === 'carrot'){
+                plant.grow();
+              }
+            });
+          checkAcheivements();
+          break;
+       case 'cherry_tree':
+            game.plants.forEach(plant => {
+              if(plant.species === 'cherry_tree'){
+                plant.grow();
+              }
+            });
+          checkAcheivements();
+          break;
+       case 'apple_tree':
+            game.plants.forEach(plant => {
+              if(plant.species === 'apple_tree'){
+                plant.grow();
+              }
+            });
+          checkAcheivements();
+          break;
+        case 'sphagettifern':
+            game.plants.forEach(plant => {
+              if(plant.species === 'sphagettifern'){
                 plant.grow();
               }
             });
@@ -100,40 +177,89 @@ window.addEventListener('message', event => {
       break;
     case 'load':
       switch(message.species){
-        case 'bean':
-          let bean = new Bean();
-          bean.setSize(message.size);
-          bean.setIsHarvested(message.harvested);
-          bean.setHotKeyUses(message.hotkey_uses);
-          game.plants.push(bean);
+        case 'corn':
+          let corn = new Corn();
+          corn.setSize(message.size);
+          corn.setIsHarvested(message.harvested);
+          corn.setHotKeyUses(message.hotkey_uses);
+          game.plants.push(corn);
           break;
-        case 'chili':
-          let chili = new Chili();
-          chili.setSize(message.size);
-          chili.setIsHarvested(message.harvested);
-          chili.setHotKeyUses(message.hotkey_uses);
-          game.plants.push(chili);
+        case 'strawberry':
+          let strawberry = new Strawberry();
+          strawberry.setSize(message.size);
+          strawberry.setIsHarvested(message.harvested);
+          strawberry.setHotKeyUses(message.hotkey_uses);
+          game.plants.push(strawberry);
           break;
-        case 'broccoli':
-          let broccoli = new Broccoli();
-          broccoli.setSize(message.size);
-          broccoli.setIsHarvested(message.harvested);
-          broccoli.setHotKeyUses(message.hotkey_uses);
-          game.plants.push(broccoli);
+        case 'mango':
+          let mango = new Mango();
+          mango.setSize(message.size);
+          mango.setIsHarvested(message.harvested);
+          mango.setHotKeyUses(message.hotkey_uses);
+          game.plants.push(mango);
           break;
-        case 'lettuce':
-          let lettuce = new Lettuce();
-          lettuce.setSize(message.size);
-          lettuce.setIsHarvested(message.harvested);
-          lettuce.setHotKeyUses(message.hotkey_uses);
-          game.plants.push(lettuce);
+        case 'poppy':
+          let poppy = new Poppy();
+          poppy.setSize(message.size);
+          poppy.setIsHarvested(message.harvested);
+          poppy.setHotKeyUses(message.hotkey_uses);
+          game.plants.push(poppy);
           break;
-        case 'tomato':
-          let tomato = new Tomato();
-          tomato.setSize(message.size);
-          tomato.setIsHarvested(message.harvested);
-          tomato.setHotKeyUses(message.hotkey_uses);
-          game.plants.push(tomato);
+        case 'sunflower':
+          let sunflower = new Sunflower();
+          sunflower.setSize(message.size);
+          sunflower.setIsHarvested(message.harvested);
+          sunflower.setHotKeyUses(message.hotkey_uses);
+          game.plants.push(sunflower);
+          break;
+        case 'snappea':
+          let snappea = new Snappea();
+          snappea.setSize(message.size);
+          snappea.setIsHarvested(message.harvested);
+          snappea.setHotKeyUses(message.hotkey_uses);
+          game.plants.push(snappea);
+          break;
+        case 'sphagettifern':
+          let sphagettifern = new Sphagettifern();
+          sphagettifern.setSize(message.size);
+          sphagettifern.setIsHarvested(message.harvested);
+          sphagettifern.setHotKeyUses(message.hotkey_uses);
+          game.plants.push(sphagettifern);
+          break;
+        case 'canola':
+          let canola = new Canola();
+          canola.setSize(message.size);
+          canola.setIsHarvested(message.harvested);
+          canola.setHotKeyUses(message.hotkey_uses);
+          game.plants.push(canola);
+          break;
+        case 'okra':
+          let okra = new Okra();
+          okra.setSize(message.size);
+          okra.setIsHarvested(message.harvested);
+          okra.setHotKeyUses(message.hotkey_uses);
+          game.plants.push(okra);
+          break;
+        case 'carrot':
+          let carrot = new Carrot();
+          carrot.setSize(message.size);
+          carrot.setIsHarvested(message.harvested);
+          carrot.setHotKeyUses(message.hotkey_uses);
+          game.plants.push(carrot);
+          break;
+        case 'apple_tree':
+          let apple_tree = new AppleTree();
+          apple_tree.setSize(message.size);
+          apple_tree.setIsHarvested(message.harvested);
+          apple_tree.setHotKeyUses(message.hotkey_uses);
+          game.plants.push(apple_tree);
+          break;
+        case 'cherry_tree':
+          let cherry_tree = new CherryTree();
+          cherry_tree.setSize(message.size);
+          cherry_tree.setIsHarvested(message.harvested);
+          cherry_tree.setHotKeyUses(message.hotkey_uses);
+          game.plants.push(cherry_tree);
           break;
       }
       break;
