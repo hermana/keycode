@@ -297,11 +297,9 @@ var GeneratorWebViewProvider = class {
   }
   getHtmlContent(webview) {
     const style = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, "src/media", "style.css"));
-    const mainJS = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, "src/media", "main.js"));
-    const plantsJS = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, "src/media", "plants.js"));
-    const levelsJS = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, "src/media", "levels.js"));
+    const webviewJS = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, "dist/media", "webview.js"));
     const iconsPath = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, "src/media/vegetables"));
-    return ` 
+    return `
         <!DOCTYPE html>
         <html lang="en">
         <head>
@@ -321,9 +319,7 @@ var GeneratorWebViewProvider = class {
             <p class="key-instruction"><img src="${iconsPath + "/broccoli_harvested.png"}" alt="Broccoli" width="20" height="20"> <span class="instruction-bold"> CTRL+[</span>: Outdent a line.</p>
           </div>
           </div>
-          <script src="${mainJS}"></script>
-          <script src="${plantsJS}"></script>
-          <script src="${levelsJS}"></script>
+          <script src="${webviewJS}"></script>
         </body>
         </html>
       `;
@@ -384,11 +380,8 @@ var GreenhouseWebViewProvider = class {
   }
   getHtmlContent(webview) {
     const style = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, "src/media", "style.css"));
-    const mainJS = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, "src/media", "main.js"));
-    const plantsJS = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, "src/media", "plants.js"));
-    const levelsJS = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, "src/media", "levels.js"));
-    const iconsPath = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, "src/media/vegetables"));
-    return ` 
+    const webviewJS = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, "dist/media", "webview.js"));
+    return `
         <!DOCTYPE html>
         <html lang="en">
         <head>
@@ -400,9 +393,7 @@ var GreenhouseWebViewProvider = class {
         <body>
           <div id="keycrop" background="${CURRENT_MODE === 0 /* GAME */ ? config.get("background") : "blackout"}">
           </div>
-          <script src="${mainJS}"></script>
-          <script src="${plantsJS}"></script>
-          <script src="${levelsJS}"></script>
+          <script src="${webviewJS}"></script>
         </body>
         </html>
       `;
@@ -443,11 +434,8 @@ var InventoryWebViewProvider = class {
   }
   getHtmlContent(webview) {
     const style = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, "src/media", "style.css"));
-    const mainJS = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, "src/media", "main.js"));
-    const plantsJS = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, "src/media", "plants.js"));
-    const levelsJS = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, "src/media", "levels.js"));
-    const iconsPath = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, "src/media/vegetables"));
-    return ` 
+    const webviewJS = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, "dist/media", "webview.js"));
+    return `
         <!DOCTYPE html>
         <html lang="en">
         <head>
@@ -460,9 +448,7 @@ var InventoryWebViewProvider = class {
           <div id="inventory">
           </div>
           <div class="instructions">You currently don't have anything in your inventory.</div>
-          <script src="${mainJS}"></script>
-          <script src="${plantsJS}"></script>
-          <script src="${levelsJS}"></script>
+          <script src="${webviewJS}"></script>
         </body>
         </html>
       `;
