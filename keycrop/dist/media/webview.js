@@ -1,40 +1,7 @@
 "use strict";
 (() => {
-  // src/media/webview.ts
+  // src/media/plant.ts
   var NUM_MILLISECONDS_ALLOWED_BETWEEN_KEY_USES = 0;
-  var Greenhouse = class {
-    plants = [];
-    constructor() {
-    }
-    addPlant(species) {
-      this.plants.push(new Plant(species));
-    }
-    grow(species) {
-      this.plants.forEach((plant) => {
-        if (plant.species === species) {
-          plant.grow();
-        }
-      });
-    }
-    loadPlant(message) {
-      let p = new Plant(message.species);
-      p.setSize(message.size);
-      p.setIsHarvested(message.harvested);
-      p.setHotKeyUses(message.hotkey_uses);
-      this.plants.push(p);
-    }
-  };
-  var vscode = acquireVsCodeApi();
-  var game = {
-    div: document.getElementById("keycrop"),
-    width: window.innerWidth,
-    height: window.innerHeight,
-    scale: 2,
-    frames: 0,
-    fps: 30,
-    greenhouse: new Greenhouse()
-    //plants: []
-  };
   var Plant = class {
     constructor(species) {
       this.init(species);
@@ -74,24 +41,24 @@
       this._species = species;
       this._size = "start";
       const element = document.createElement("div");
-      game.div.appendChild(element);
+      document.getElementById("keycrop").appendChild(element);
       this._html_element = element;
       element.classList.add("plant");
       element.classList.add(this.species);
       element.classList.add(this.size);
     }
-    grow() {
+    grow(vscode2) {
       const now = Date.now();
       if (now - this._last_key_use > NUM_MILLISECONDS_ALLOWED_BETWEEN_KEY_USES) {
         this._num_hotkey_uses += 1;
         this._last_key_use = now;
         if (this._num_hotkey_uses > 8 && this._html_element.classList.contains("harvested-plant")) {
-          vscode.postMessage({ type: "harvested", text: this.species });
+          vscode2.postMessage({ type: "harvested", text: this.species });
         } else if (this._num_hotkey_uses > 4) {
           this._html_element.classList.remove("plant");
           this._html_element.classList.add("harvested-plant");
           this._html_element.hidden = true;
-          vscode.postMessage({ type: "harvested", text: this.species });
+          vscode2.postMessage({ type: "harvested", text: this.species });
         } else if (this._num_hotkey_uses > 3) {
           this._size = "large";
           this._html_element.classList.remove("medium");
@@ -117,20 +84,56 @@
       this._html_element.classList.remove("large");
       this._html_element.classList.add(this._size);
     }
-    setIsHarvested(h) {
+    setIsHarvested(h, background) {
       if (h) {
         this._html_element.classList.remove("plant");
         this._html_element.classList.add("harvested-plant");
-        this._html_element.hidden = game.div.getAttribute("background") === "inventory" ? false : true;
+        this._html_element.hidden = background === "inventory" ? false : true;
       } else {
         this._html_element.classList.remove("harvested-plant");
         this._html_element.classList.add("plant");
-        this._html_element.hidden = game.div.getAttribute("background") === "inventory" ? true : false;
+        this._html_element.hidden = background === "inventory" ? true : false;
       }
     }
     setHotKeyUses(n) {
       this._num_hotkey_uses = n;
     }
+  };
+
+  // src/media/greenhouse.ts
+  var Greenhouse = class {
+    plants = [];
+    constructor() {
+    }
+    addPlant(species) {
+      this.plants.push(new Plant(species));
+    }
+    grow(species, vscode2) {
+      this.plants.forEach((plant) => {
+        if (plant.species === species) {
+          plant.grow(vscode2);
+        }
+      });
+    }
+    loadPlant(message, background) {
+      let p = new Plant(message.species);
+      p.setSize(message.size);
+      p.setIsHarvested(message.harvested, background);
+      p.setHotKeyUses(message.hotkey_uses);
+      this.plants.push(p);
+    }
+  };
+
+  // src/media/webview.ts
+  var vscode = acquireVsCodeApi();
+  var game = {
+    div: document.getElementById("keycrop"),
+    width: window.innerWidth,
+    height: window.innerHeight,
+    scale: 2,
+    frames: 0,
+    fps: 30,
+    greenhouse: new Greenhouse()
   };
   window.addEventListener("message", (event) => {
     const message = event.data;
@@ -148,7 +151,7 @@
         game.greenhouse.addPlant(message.species);
         break;
       case "grow":
-        game.greenhouse.grow(message.species);
+        game.greenhouse.grow(message.species, vscode);
         checkAcheivements();
         break;
       case "save_plants": {
@@ -157,7 +160,7 @@
         break;
       }
       case "load":
-        game.greenhouse.loadPlant(message);
+        game.greenhouse.loadPlant(message, game.div.getAttribute("background"));
       case "scale":
         switch (message.value.toLowerCase()) {
           case "small":
