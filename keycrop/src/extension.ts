@@ -36,6 +36,7 @@ function loadPlantsFile() {
       //Try to read plants file
       let savedPlants = JSON.parse(fs.readFileSync(plantsPath, 'utf8'));
       Object.entries(savedPlants).forEach((p: any) => {
+        //FIXME: do they need to be loaded one at a time? IDK
         greenhouse.postMessage({
           action: 'load',
           species: p[1].species,
@@ -410,9 +411,6 @@ export class GreenhouseWebViewProvider implements vscode.WebviewViewProvider {
             break;
           case 'harvested':
             vscode.window.showInformationMessage("Your "+message.text+" plant has been harvested!");
-            break;
-          case 'level_one':
-            vscode.window.showInformationMessage("Congratulations! You have finished the game!");
             break;
         }
       });

@@ -372,9 +372,6 @@ var GreenhouseWebViewProvider = class {
         case "harvested":
           vscode.window.showInformationMessage("Your " + message.text + " plant has been harvested!");
           break;
-        case "level_one":
-          vscode.window.showInformationMessage("Congratulations! You have finished the game!");
-          break;
       }
     });
   }
