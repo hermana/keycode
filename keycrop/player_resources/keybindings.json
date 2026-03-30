@@ -8,7 +8,7 @@
                 {
                     "command": "workbench.action.showCommands"
                 },
-                "keycrop.growCorn"
+                "keycrop.growCommandPalette"
             ]
         }
     },
@@ -21,7 +21,7 @@
                     "command": "editor.action.deleteLines",
                     "when": "textInputFocus && !editorReadonly" 
                 },
-                "keycrop.growStrawberry"
+                "keycrop.growDeleteCurrentLine"
             ]
         }
     },
@@ -34,7 +34,7 @@
                     "command": "editor.action.jumpToBracket",
                     "when": "editorTextFocus" 
                 },
-                "keycrop.growMango"
+                "keycrop.growJumpToBracket"
             ], 
         }
     },
@@ -46,7 +46,7 @@
                 {
                     "command": "workbench.action.showAllSymbols"
                 },
-                "keycrop.growPoppy"
+                "keycrop.growShowAllSymbols"
             ]
         }
     },
@@ -58,7 +58,7 @@
                     "command": "workbench.action.gotoSymbol",
                     "when": "!accessibilityHelpIsShown && !accessibleViewIsShown" 
             },
-                "keycrop.growSunflower"
+                "keycrop.growGoToSymbol"
             ]
         }       
     },
@@ -70,7 +70,7 @@
                         "command": "workbench.actions.view.problems",
                         "when": "workbench.panel.markers.view.active" 
                     },
-                    "keycrop.growSnapPea"
+                    "keycrop.growViewProblems"
                 ]
             }    
     },
@@ -94,7 +94,7 @@
                         "command": "selectAllSearchEditorMatches",
                         "when": "inSearchEditor"
                     },
-                    "keycrop.growSphagettiFern"
+                    "keycrop.growSelectAllOccurrences"
                 ]
             }    
     },
@@ -106,7 +106,7 @@
                          "command": "editor.action.triggerParameterHints",
                          "when": "editorHasSignatureHelpProvider && editorTextFocus"
                     },
-                    "keycrop.growOkra"
+                    "keycrop.growTriggerParameterHints"
                 ]
             }    
     }, 
@@ -117,7 +117,7 @@
                     {
                          "command": "workbench.action.splitEditor"
                     },
-                    "keycrop.growCarrot"
+                    "keycrop.growSplitEditor"
                 ]
             }    
     }, 
@@ -129,7 +129,7 @@
                         "command": "workbench.action.quickOpenLeastRecentlyUsedEditorInGroup",
                         "when": "!activeEditorGroupEmpty"
                     },
-                    "keycrop.growCanola"
+                    "keycrop.growOpenLastUsedEditorInGroup"
                 ]
             }    
     }, 
@@ -141,7 +141,7 @@
                         "command": "workbench.action.terminal.toggleTerminal",
                         "when": "terminal.active"
                     },
-                    "keycrop.growAppleTree"
+                    "keycrop.growToggleTerminal"
                 ]
             }    
     }, 
@@ -153,8 +153,8 @@
                         "command": "workbench.action.terminal.new",
                         "when": "terminalProcessSupported || terminalWebExtensionContributedProfile"
                     },
-                    "keycrop.growCherryTree"
+                    "keycrop.growCreateNewTerminal"
                 ]
             }    
-    }, 
+    }
 ]

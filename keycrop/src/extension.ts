@@ -138,7 +138,7 @@ export function activate(context: vscode.ExtensionContext) {
       }
   });
 
-  const growCorn = vscode.commands.registerCommand("keycrop.growCommandPalette", () => {
+  const growCommandPalette = vscode.commands.registerCommand("keycrop.growCommandPalette", () => {
     if (CURRENT_MODE === 0 /* GAME */) {
       growPlant({
         species: "corn",
