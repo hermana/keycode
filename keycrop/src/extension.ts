@@ -138,7 +138,7 @@ export function activate(context: vscode.ExtensionContext) {
       }
   });
 
-  const growCorn = vscode.commands.registerCommand("keycrop.growCorn", () => {
+  const growCorn = vscode.commands.registerCommand("keycrop.growCommandPalette", () => {
     if (CURRENT_MODE === 0 /* GAME */) {
       growPlant({
         species: "corn",
@@ -150,7 +150,7 @@ export function activate(context: vscode.ExtensionContext) {
       logKeyPress("corn");
     }
   });
-  const growStrawberry = vscode.commands.registerCommand("keycrop.growStrawberry", () => {
+  const growStrawberry = vscode.commands.registerCommand("keycrop.growDeleteCurrentLine", () => {
     if (CURRENT_MODE === 0 /* GAME */) {
       growPlant({
         species: "strawberry",
@@ -162,7 +162,7 @@ export function activate(context: vscode.ExtensionContext) {
       logKeyPress("strawberry");
     }
   });
-  const growMango = vscode.commands.registerCommand("keycrop.growMango", () => {
+  const growMango = vscode.commands.registerCommand("keycrop.growJumpToBracket", () => {
     if (CURRENT_MODE === 0 /* GAME */) {
       growPlant({
         species: "mango",
@@ -174,7 +174,7 @@ export function activate(context: vscode.ExtensionContext) {
       logKeyPress("mango");
     }
   });
-  const growPoppy = vscode.commands.registerCommand("keycrop.growPoppy", () => {
+  const growPoppy = vscode.commands.registerCommand("keycrop.growShowAllSymbols", () => {
     if (CURRENT_MODE === 0 /* GAME */) {
       growPlant({
         species: "poppy",
@@ -186,7 +186,7 @@ export function activate(context: vscode.ExtensionContext) {
       logKeyPress("poppy");
     }
   });
-  const growSunflower = vscode.commands.registerCommand("keycrop.growSunflower", () => {
+  const growSunflower = vscode.commands.registerCommand("keycrop.growGoToSymbol", () => {
     if (CURRENT_MODE === 0 /* GAME */) {
       growPlant({
         species: "sunflower",
@@ -198,7 +198,7 @@ export function activate(context: vscode.ExtensionContext) {
       logKeyPress("sunflower");
     }
   });
-  const growSnapPea = vscode.commands.registerCommand("keycrop.growSnapPea", () => {
+  const growSnapPea = vscode.commands.registerCommand("keycrop.growViewProblems", () => {
     if (CURRENT_MODE === 0 /* GAME */) {
       growPlant({
         species: "snappea",
@@ -210,7 +210,7 @@ export function activate(context: vscode.ExtensionContext) {
       logKeyPress("snappea");
     }
   });
-  const growSphagettiFern = vscode.commands.registerCommand("keycrop.growSphagettiFern", () => {
+  const growSphagettiFern = vscode.commands.registerCommand("keycrop.growSelectAllOccurrences", () => {
     if (CURRENT_MODE === 0 /* GAME */) {
       growPlant({
         species: "sphagettifern",
@@ -222,7 +222,7 @@ export function activate(context: vscode.ExtensionContext) {
       logKeyPress("sphagettifern");
     }
   });
-  const growOkra = vscode.commands.registerCommand("keycrop.growOkra", () => {
+  const growOkra = vscode.commands.registerCommand("keycrop.growTriggerParameterHints", () => {
     if (CURRENT_MODE === 0 /* GAME */) {
       growPlant({
         species: "okra",
@@ -234,7 +234,7 @@ export function activate(context: vscode.ExtensionContext) {
       logKeyPress("okra");
     }
   });
-  const growCarrot = vscode.commands.registerCommand("keycrop.growCarrot", () => {
+  const growCarrot = vscode.commands.registerCommand("keycrop.growSplitEditor", () => {
     if (CURRENT_MODE === 0 /* GAME */) {
       growPlant({
         species: "carrot",
@@ -246,7 +246,7 @@ export function activate(context: vscode.ExtensionContext) {
       logKeyPress("carrot");
     }
   });
-  const growCanola = vscode.commands.registerCommand("keycrop.growCanola", () => {
+  const growCanola = vscode.commands.registerCommand("keycrop.growOpenLastUsedEditorInGroup", () => {
     if (CURRENT_MODE === 0 /* GAME */) {
       growPlant({
         species: "canola",
@@ -258,7 +258,7 @@ export function activate(context: vscode.ExtensionContext) {
       logKeyPress("canola");
     }
   });
-  const growAppleTree = vscode.commands.registerCommand("keycrop.growAppleTree", () => {
+  const growAppleTree = vscode.commands.registerCommand("keycrop.growToggleTerminal", () => {
     if (CURRENT_MODE === 0 /* GAME */) {
       growPlant({
         species: "apple_tree",
@@ -270,7 +270,7 @@ export function activate(context: vscode.ExtensionContext) {
       logKeyPress("apple_tree");
     }
   });
-  const growCherryTree = vscode.commands.registerCommand("keycrop.growCherryTree", () => {
+  const growCherryTree = vscode.commands.registerCommand("keycrop.growCreateNewTerminal", () => {
     if (CURRENT_MODE === 0 /* GAME */) {
       growPlant({
         species: "cherry_tree",

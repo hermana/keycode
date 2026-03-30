@@ -131,7 +131,7 @@ function activate(context) {
       });
     }
   });
-  const growCorn = vscode.commands.registerCommand("keycrop.growCorn", () => {
+  const growCorn = vscode.commands.registerCommand("keycrop.growCommandPalette", () => {
     if (CURRENT_MODE === 0) {
       growPlant({
         species: "corn",
@@ -143,7 +143,7 @@ function activate(context) {
       logKeyPress("corn");
     }
   });
-  const growStrawberry = vscode.commands.registerCommand("keycrop.growStrawberry", () => {
+  const growStrawberry = vscode.commands.registerCommand("keycrop.growDeleteCurrentLine", () => {
     if (CURRENT_MODE === 0) {
       growPlant({
         species: "strawberry",
@@ -155,7 +155,7 @@ function activate(context) {
       logKeyPress("strawberry");
     }
   });
-  const growMango = vscode.commands.registerCommand("keycrop.growMango", () => {
+  const growMango = vscode.commands.registerCommand("keycrop.growJumpToBracket", () => {
     if (CURRENT_MODE === 0) {
       growPlant({
         species: "mango",
@@ -167,7 +167,7 @@ function activate(context) {
       logKeyPress("mango");
     }
   });
-  const growPoppy = vscode.commands.registerCommand("keycrop.growPoppy", () => {
+  const growPoppy = vscode.commands.registerCommand("keycrop.growShowAllSymbols", () => {
     if (CURRENT_MODE === 0) {
       growPlant({
         species: "poppy",
@@ -179,7 +179,7 @@ function activate(context) {
       logKeyPress("poppy");
     }
   });
-  const growSunflower = vscode.commands.registerCommand("keycrop.growSunflower", () => {
+  const growSunflower = vscode.commands.registerCommand("keycrop.growGoToSymbol", () => {
     if (CURRENT_MODE === 0) {
       growPlant({
         species: "sunflower",
@@ -191,7 +191,7 @@ function activate(context) {
       logKeyPress("sunflower");
     }
   });
-  const growSnapPea = vscode.commands.registerCommand("keycrop.growSnapPea", () => {
+  const growSnapPea = vscode.commands.registerCommand("keycrop.growViewProblems", () => {
     if (CURRENT_MODE === 0) {
       growPlant({
         species: "snappea",
@@ -203,7 +203,7 @@ function activate(context) {
       logKeyPress("snappea");
     }
   });
-  const growSphagettiFern = vscode.commands.registerCommand("keycrop.growSphagettiFern", () => {
+  const growSphagettiFern = vscode.commands.registerCommand("keycrop.growSelectAllOccurrences", () => {
     if (CURRENT_MODE === 0) {
       growPlant({
         species: "sphagettifern",
@@ -215,7 +215,7 @@ function activate(context) {
       logKeyPress("sphagettifern");
     }
   });
-  const growOkra = vscode.commands.registerCommand("keycrop.growOkra", () => {
+  const growOkra = vscode.commands.registerCommand("keycrop.growTriggerParameterHints", () => {
     if (CURRENT_MODE === 0) {
       growPlant({
         species: "okra",
@@ -227,7 +227,7 @@ function activate(context) {
       logKeyPress("okra");
     }
   });
-  const growCarrot = vscode.commands.registerCommand("keycrop.growCarrot", () => {
+  const growCarrot = vscode.commands.registerCommand("keycrop.growSplitEditor", () => {
     if (CURRENT_MODE === 0) {
       growPlant({
         species: "carrot",
@@ -239,7 +239,7 @@ function activate(context) {
       logKeyPress("carrot");
     }
   });
-  const growCanola = vscode.commands.registerCommand("keycrop.growCanola", () => {
+  const growCanola = vscode.commands.registerCommand("keycrop.growOpenLastUsedEditorInGroup", () => {
     if (CURRENT_MODE === 0) {
       growPlant({
         species: "canola",
@@ -251,7 +251,7 @@ function activate(context) {
       logKeyPress("canola");
     }
   });
-  const growAppleTree = vscode.commands.registerCommand("keycrop.growAppleTree", () => {
+  const growAppleTree = vscode.commands.registerCommand("keycrop.growToggleTerminal", () => {
     if (CURRENT_MODE === 0) {
       growPlant({
         species: "apple_tree",
@@ -263,7 +263,7 @@ function activate(context) {
       logKeyPress("apple_tree");
     }
   });
-  const growCherryTree = vscode.commands.registerCommand("keycrop.growCherryTree", () => {
+  const growCherryTree = vscode.commands.registerCommand("keycrop.growCreateNewTerminal", () => {
     if (CURRENT_MODE === 0) {
       growPlant({
         species: "cherry_tree",
