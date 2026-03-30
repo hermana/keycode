@@ -30,21 +30,68 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 // src/extension.ts
 var extension_exports = {};
 __export(extension_exports, {
-  GeneratorWebViewProvider: () => GeneratorWebViewProvider,
   GreenhouseWebViewProvider: () => GreenhouseWebViewProvider,
   InventoryWebViewProvider: () => InventoryWebViewProvider,
   activate: () => activate,
   deactivate: () => deactivate
 });
 module.exports = __toCommonJS(extension_exports);
-var vscode = __toESM(require("vscode"));
+var vscode2 = __toESM(require("vscode"));
 var fs = __toESM(require("fs"));
 var path = __toESM(require("path"));
+
+// src/instructionsWebViewProvider.ts
+var vscode = __toESM(require("vscode"));
+var InstructionsWebViewProvider = class {
+  constructor(context) {
+    this.context = context;
+  }
+  static viewType = "instructions";
+  view;
+  resolveWebviewView(webviewView, _context, _token) {
+    this.view = webviewView;
+    const webview = webviewView.webview;
+    webview.options = {
+      enableScripts: true
+    };
+    webview.html = this.getHtmlContent(webview);
+  }
+  getHtmlContent(webview) {
+    const style = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, "src/media", "style.css"));
+    const webviewJS = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, "dist/media", "webview.js"));
+    const iconsPath = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, "src/media/vegetables"));
+    return `
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="${style}" rel="stylesheet">
+        <title>KeyCrop Instructions</title>
+      </head>
+      <body>
+        <div id="generator-instructions">
+          <p class="instructions">Congratulations, you've managed to power up the KeyCrop Greenhouse! To unlock more seeds, all of the following plants must be harvested. </p>
+          <!-- how many plants to make it to the next level -->
+          <p class="key-instruction"><img src="${iconsPath + "/chilli_harvested.png"}" alt="Chili" width="20" height="20"> <span class="instruction-bold"> CTRL+SHIFT+SPACE</span>: See function parameter hints.</p>
+          <p class="key-instruction"><img src="${iconsPath + "/bean_harvested.png"}" alt="Bean" width="20" height="20"> <span class="instruction-bold"> CTRL+SHIFT+M</span>: See warnings and errors in the Problems view.</p>
+          <p class="key-instruction"><img src="${iconsPath + "/tomato_harvested.png"}" alt="Tomato" width="20" height="20"> <span class="instruction-bold"> CTRL+SHIFT+L</span>: Multicursor-select all instances of a specific word.</p>
+          <p class="key-instruction"><img src="${iconsPath + "/lettuce_harvested.png"}" alt="Lettuce" width="20" height="20"> <span class="instruction-bold"> CTRL+/</span>: Comment or un-comment code.</p>
+          <p class="key-instruction"><img src="${iconsPath + "/broccoli_harvested.png"}" alt="Broccoli" width="20" height="20"> <span class="instruction-bold"> CTRL+[</span>: Outdent a line.</p>
+        </div>
+        <script src="${webviewJS}"></script>
+      </body>
+      </html>
+    `;
+  }
+};
+
+// src/extension.ts
 var CURRENT_MODE = 0 /* GAME */;
 var greenhouse;
-var generator;
+var instructions;
 var inventory;
-var config = vscode.workspace.getConfiguration("keycrop");
+var config = vscode2.workspace.getConfiguration("keycrop");
 var extensionStorageFolder = "";
 var plantsPath;
 var keyTrackingPath;
@@ -100,11 +147,11 @@ function growPlant(key) {
       }
     );
   } else {
-    vscode.window.showQuickPick(["bean", "tomato", "broccoli"], {
+    vscode2.window.showQuickPick(["bean", "tomato", "broccoli"], {
       placeHolder: "Choose a species for your new plant"
     }).then((species) => {
       if (species) {
-        vscode.window.showInformationMessage("A new " + species + " plant has sprouted in the greenhouse!");
+        vscode2.window.showInformationMessage("A new " + species + " plant has sprouted in the greenhouse!");
         plants.push({ key, species, size: "start", harvested: false, hotkey_uses: 0 });
         addPlant({ key, species, size: "start", harvested: false, hotkey_uses: 0 });
       }
@@ -124,13 +171,13 @@ function activate(context) {
   plantsPath = path.join(extensionStorageFolder, "plants.json");
   keyTrackingPath = path.join(extensionStorageFolder, "keytracking.json");
   greenhouse = new GreenhouseWebViewProvider(context);
-  context.subscriptions.push(vscode.window.registerWebviewViewProvider(GreenhouseWebViewProvider.viewType, greenhouse));
-  generator = new GeneratorWebViewProvider(context);
-  context.subscriptions.push(vscode.window.registerWebviewViewProvider(GeneratorWebViewProvider.viewType, generator));
+  context.subscriptions.push(vscode2.window.registerWebviewViewProvider(GreenhouseWebViewProvider.viewType, greenhouse));
+  instructions = new InstructionsWebViewProvider(context);
+  context.subscriptions.push(vscode2.window.registerWebviewViewProvider(InstructionsWebViewProvider.viewType, instructions));
   inventory = new InventoryWebViewProvider(context);
-  context.subscriptions.push(vscode.window.registerWebviewViewProvider(InventoryWebViewProvider.viewType, inventory));
-  vscode.workspace.onDidChangeConfiguration((event) => {
-    config = vscode.workspace.getConfiguration("keycrop");
+  context.subscriptions.push(vscode2.window.registerWebviewViewProvider(InventoryWebViewProvider.viewType, inventory));
+  vscode2.workspace.onDidChangeConfiguration((event) => {
+    config = vscode2.workspace.getConfiguration("keycrop");
     if (event.affectsConfiguration("keycrop-view.scale")) {
       greenhouse.postMessage({
         action: "scale",
@@ -138,84 +185,84 @@ function activate(context) {
       });
     }
   });
-  const growCommandPalette = vscode.commands.registerCommand("keycrop.growCommandPalette", () => {
+  const growCommandPalette = vscode2.commands.registerCommand("keycrop.growCommandPalette", () => {
     if (CURRENT_MODE === 0) {
       growPlant("command_palette");
     } else {
       logKeyPress("command_palette");
     }
   });
-  const growDeleteCurrentLine = vscode.commands.registerCommand("keycrop.growDeleteCurrentLine", () => {
+  const growDeleteCurrentLine = vscode2.commands.registerCommand("keycrop.growDeleteCurrentLine", () => {
     if (CURRENT_MODE === 0) {
       growPlant("delete_current_line");
     } else {
       logKeyPress("delete_current_line");
     }
   });
-  const growJumpToBracket = vscode.commands.registerCommand("keycrop.growJumpToBracket", () => {
+  const growJumpToBracket = vscode2.commands.registerCommand("keycrop.growJumpToBracket", () => {
     if (CURRENT_MODE === 0) {
       growPlant("jump_to_bracket");
     } else {
       logKeyPress("jump_to_bracket");
     }
   });
-  const growShowAllSymbols = vscode.commands.registerCommand("keycrop.growShowAllSymbols", () => {
+  const growShowAllSymbols = vscode2.commands.registerCommand("keycrop.growShowAllSymbols", () => {
     if (CURRENT_MODE === 0) {
       growPlant("show_all_symbols");
     } else {
       logKeyPress("show_all_symbols");
     }
   });
-  const growGoToSymbol = vscode.commands.registerCommand("keycrop.growGoToSymbol", () => {
+  const growGoToSymbol = vscode2.commands.registerCommand("keycrop.growGoToSymbol", () => {
     if (CURRENT_MODE === 0) {
       growPlant("go_to_symbol");
     } else {
       logKeyPress("go_to_symbol");
     }
   });
-  const growViewProblems = vscode.commands.registerCommand("keycrop.growViewProblems", () => {
+  const growViewProblems = vscode2.commands.registerCommand("keycrop.growViewProblems", () => {
     if (CURRENT_MODE === 0) {
       growPlant("view_problems");
     } else {
       logKeyPress("view_problems");
     }
   });
-  const growSelectAllOccurrences = vscode.commands.registerCommand("keycrop.growCursorAtAllOccurrences", () => {
+  const growSelectAllOccurrences = vscode2.commands.registerCommand("keycrop.growCursorAtAllOccurrences", () => {
     if (CURRENT_MODE === 0) {
       growPlant("cursor_at_all_occurrences");
     } else {
       logKeyPress("cursor_at_all_occurrences");
     }
   });
-  const growTriggerParameterHints = vscode.commands.registerCommand("keycrop.growTriggerParameterHints", () => {
+  const growTriggerParameterHints = vscode2.commands.registerCommand("keycrop.growTriggerParameterHints", () => {
     if (CURRENT_MODE === 0) {
       growPlant("trigger_parameter_hints");
     } else {
       logKeyPress("trigger_parameter_hints");
     }
   });
-  const growSplitEditor = vscode.commands.registerCommand("keycrop.growSplitEditor", () => {
+  const growSplitEditor = vscode2.commands.registerCommand("keycrop.growSplitEditor", () => {
     if (CURRENT_MODE === 0) {
       growPlant("split_editor");
     } else {
       logKeyPress("split_editor");
     }
   });
-  const growOpenLastUsedEditorInGroup = vscode.commands.registerCommand("keycrop.growOpenLastUsedEditorInGroup", () => {
+  const growOpenLastUsedEditorInGroup = vscode2.commands.registerCommand("keycrop.growOpenLastUsedEditorInGroup", () => {
     if (CURRENT_MODE === 0) {
       growPlant("open_last_used_editor_in_group");
     } else {
       logKeyPress("open_last_used_editor_in_group");
     }
   });
-  const growToggleTerminal = vscode.commands.registerCommand("keycrop.growToggleTerminal", () => {
+  const growToggleTerminal = vscode2.commands.registerCommand("keycrop.growToggleTerminal", () => {
     if (CURRENT_MODE === 0) {
       growPlant("toggle_terminal");
     } else {
       logKeyPress("toggle_terminal");
     }
   });
-  const growCreateNewTerminal = vscode.commands.registerCommand("keycrop.growCreateNewTerminal", () => {
+  const growCreateNewTerminal = vscode2.commands.registerCommand("keycrop.growCreateNewTerminal", () => {
     if (CURRENT_MODE === 0) {
       growPlant("create_new_terminal");
     } else {
@@ -226,52 +273,6 @@ function activate(context) {
 }
 function deactivate() {
 }
-var GeneratorWebViewProvider = class {
-  constructor(context) {
-    this.context = context;
-  }
-  static viewType = "generator";
-  view;
-  resolveWebviewView(webviewView, context, token) {
-    this.view = webviewView;
-    const webview = webviewView.webview;
-    webview.options = {
-      enableScripts: true
-    };
-    webview.html = this.getHtmlContent(
-      webviewView.webview
-    );
-  }
-  getHtmlContent(webview) {
-    const style = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, "src/media", "style.css"));
-    const webviewJS = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, "dist/media", "webview.js"));
-    const iconsPath = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, "src/media/vegetables"));
-    return `
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <link href="${style}" rel="stylesheet">
-          <title>KeyCrop Generator</title>
-        </head>
-        <body>
-          <div id="generator-instructions">
-            <p class="instructions">Congratulations, you've managed to power up the KeyCrop Greenhouse! To unlock more seeds, all of the following plants must be harvested. </p>
-            <!-- how many plants to make it to the next level -->
-            <p class="key-instruction"><img src="${iconsPath + "/chilli_harvested.png"}" alt="Chili" width="20" height="20"> <span class="instruction-bold"> CTRL+SHIFT+SPACE</span>: See function parameter hints.</p>
-            <p class="key-instruction"><img src="${iconsPath + "/bean_harvested.png"}" alt="Bean" width="20" height="20"> <span class="instruction-bold"> CTRL+SHIFT+M</span>: See warnings and errors in the Problems view.</p>
-            <p class="key-instruction"><img src="${iconsPath + "/tomato_harvested.png"}" alt="Tomato" width="20" height="20"> <span class="instruction-bold"> CTRL+SHIFT+L</span>: Multicursor-select all instances of a specific word.</p>
-            <p class="key-instruction"><img src="${iconsPath + "/lettuce_harvested.png"}" alt="Lettuce" width="20" height="20"> <span class="instruction-bold"> CTRL+/</span>: Comment or un-comment code.</p>
-            <p class="key-instruction"><img src="${iconsPath + "/broccoli_harvested.png"}" alt="Broccoli" width="20" height="20"> <span class="instruction-bold"> CTRL+[</span>: Outdent a line.</p>
-          </div>
-          </div>
-          <script src="${webviewJS}"></script>
-        </body>
-        </html>
-      `;
-  }
-};
 var GreenhouseWebViewProvider = class {
   constructor(context) {
     this.context = context;
@@ -294,11 +295,11 @@ var GreenhouseWebViewProvider = class {
       switch (message.type) {
         //Error message
         case "error":
-          vscode.window.showErrorMessage(message.text);
+          vscode2.window.showErrorMessage(message.text);
           break;
         //Info message
         case "info":
-          vscode.window.showInformationMessage(message.text);
+          vscode2.window.showInformationMessage(message.text);
           break;
         case "init":
           if (CURRENT_MODE === 0 /* GAME */) {
@@ -317,14 +318,14 @@ var GreenhouseWebViewProvider = class {
           fs.writeFileSync(plantsPath, JSON.stringify(message.content));
           break;
         case "harvested":
-          vscode.window.showInformationMessage("Your " + message.text + " plant has been harvested!");
+          vscode2.window.showInformationMessage("Your " + message.text + " plant has been harvested!");
           break;
       }
     });
   }
   getHtmlContent(webview) {
-    const style = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, "src/media", "style.css"));
-    const webviewJS = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, "dist/media", "webview.js"));
+    const style = webview.asWebviewUri(vscode2.Uri.joinPath(this.context.extensionUri, "src/media", "style.css"));
+    const webviewJS = webview.asWebviewUri(vscode2.Uri.joinPath(this.context.extensionUri, "dist/media", "webview.js"));
     return `
         <!DOCTYPE html>
         <html lang="en">
@@ -377,8 +378,8 @@ var InventoryWebViewProvider = class {
     });
   }
   getHtmlContent(webview) {
-    const style = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, "src/media", "style.css"));
-    const webviewJS = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, "dist/media", "webview.js"));
+    const style = webview.asWebviewUri(vscode2.Uri.joinPath(this.context.extensionUri, "src/media", "style.css"));
+    const webviewJS = webview.asWebviewUri(vscode2.Uri.joinPath(this.context.extensionUri, "dist/media", "webview.js"));
     return `
         <!DOCTYPE html>
         <html lang="en">
@@ -400,7 +401,6 @@ var InventoryWebViewProvider = class {
 };
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
-  GeneratorWebViewProvider,
   GreenhouseWebViewProvider,
   InventoryWebViewProvider,
   activate,

@@ -22,8 +22,8 @@
     "views": {
       "explorer": [
         {
-          "id": "generator",
-          "name": "keycrop generator",
+          "id": "instructions",
+          "name": "keycrop instructions",
           "contextualTitle": "See instructions on how to grow plants!",
           "type": "webview"
         },
