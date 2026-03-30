@@ -317,6 +317,66 @@ background: url(./vegetables/watermelon_large.png);
 
 
 
+.bean.start {
+  background: url(./vegetables/bean_start.png);
+}
+
+.bean.small {
+  background: url(./vegetables/bean_small.png);
+}
+
+.bean.medium {
+  background: url(./vegetables/bean_medium.png);
+}
+
+.bean.large {
+  background: url(./vegetables/bean_large.png);
+}
+
+.bean.harvested-plant {
+  background: url(./vegetables/bean_harvested.png);
+}
+
+.tomato.start {
+  background: url(./vegetables/tomato_start.png);
+}
+
+.tomato.small {
+  background: url(./vegetables/tomato_small.png);
+}
+
+.tomato.medium {
+  background: url(./vegetables/tomato_medium.png);
+}
+
+.tomato.large {
+  background: url(./vegetables/tomato_large.png);
+}
+
+.tomato.harvested-plant {
+  background: url(./vegetables/tomato_harvested.png);
+}
+
+.broccoli.start {
+  background: url(./vegetables/broccoli_start.png);
+}
+
+.broccoli.small {
+  background: url(./vegetables/broccoli_small.png);
+}
+
+.broccoli.medium {
+  background: url(./vegetables/broccoli_medium.png);
+}
+
+.broccoli.large {
+  background: url(./vegetables/broccoli_large.png);
+}
+
+.broccoli.harvested-plant {
+  background: url(./vegetables/broccoli_harvested.png);
+}
+
 .chili-icon{
   max-width: 100%;
   height: auto;

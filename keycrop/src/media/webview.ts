@@ -43,7 +43,7 @@ window.addEventListener('message', (event: MessageEvent) => {
       }
       break;
     case 'add':
-      game.greenhouse.addPlant(message.species);
+      game.greenhouse.addPlant(message.key,message.species);
       break;
     case 'grow':
       game.greenhouse.grow(message.species, vscode);

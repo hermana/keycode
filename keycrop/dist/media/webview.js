@@ -3,10 +3,14 @@
   // src/media/plant.ts
   var NUM_MILLISECONDS_ALLOWED_BETWEEN_KEY_USES = 0;
   var Plant = class {
-    constructor(species) {
-      this.init(species);
+    constructor(key, species) {
+      this.init(key, species);
     }
     _init = false;
+    _key = "";
+    get key() {
+      return this._key;
+    }
     _species = "";
     get species() {
       return this._species;
@@ -31,13 +35,14 @@
     get num_mashes() {
       return this._num_mashes;
     }
-    init(species) {
+    init(key, species) {
       if (this._init) {
         return;
       }
-      if (species === "") {
+      if (species === "" || key === "") {
         return;
       }
+      this._key = key;
       this._species = species;
       this._size = "start";
       const element = document.createElement("div");
@@ -46,7 +51,7 @@
       element.classList.add("plant");
       element.classList.add(this.species);
       element.classList.add(this.size);
-      element.title = species;
+      element.title = this.species;
     }
     grow(vscode2) {
       const now = Date.now();
@@ -106,8 +111,8 @@
     plants = [];
     constructor() {
     }
-    addPlant(species) {
-      this.plants.push(new Plant(species));
+    addPlant(key, species) {
+      this.plants.push(new Plant(key, species));
     }
     grow(species, vscode2) {
       this.plants.forEach((plant) => {
@@ -117,7 +122,7 @@
       });
     }
     loadPlant(message, background) {
-      let p = new Plant(message.species);
+      let p = new Plant(message.key, message.species);
       p.setSize(message.size);
       p.setIsHarvested(message.harvested, background);
       p.setHotKeyUses(message.hotkey_uses);
@@ -149,7 +154,7 @@
         }
         break;
       case "add":
-        game.greenhouse.addPlant(message.species);
+        game.greenhouse.addPlant(message.key, message.species);
         break;
       case "grow":
         game.greenhouse.grow(message.species, vscode);

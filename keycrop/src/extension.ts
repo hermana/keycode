@@ -17,8 +17,9 @@ let studyOutputPath: string = './output';
 let plantsStudyOutputPath: string;
 let keytrackingStudyOutputPath: string;
 
-type Plant = { 
-  species: string; 
+type Plant = {
+  key: string;
+  species: string;
   size: string;
   harvested: boolean;
   hotkey_uses: number
@@ -44,7 +45,7 @@ function loadPlantsFile() {
           harvested: p[1].harvested, 
           hotkey_uses: p[1].hotkey_uses
         });
-        plants.push({species: p[1].species, size: p[1].size, harvested: p[1].harvested, hotkey_uses: p[1].hotkey_uses});
+        plants.push({key: p[1].key, species: p[1].species, size: p[1].size, harvested: p[1].harvested, hotkey_uses: p[1].hotkey_uses});
       });
     } catch (e) {
       //Failed -> Reset plants
@@ -68,25 +69,32 @@ let plants = new Array<Plant>();
 function addPlant(plant: Plant) {
   greenhouse.postMessage({
     action: 'add',
-    species: plant.species
+    species: plant.species, 
+    key: plant.key
   });
 }
 
-function growPlant(plant: Plant) {
-  if(plants.some(p => p.species === plant.species)){
-    let patch = plants.filter(p =>p.species === plant.species);
+function growPlant(key: string) {
+  if(plants.some(p => p.key === key)){
+    let patch = plants.filter(p =>p.key === key);
     patch.forEach( p => 
     {
       greenhouse.postMessage({
-        action: 'grow',
-        species: plant.species
+        action: 'grow', 
+        species: p.species
       });
     }
     );
   }else{
-    vscode.window.showInformationMessage("A new " +plant.species +" plant has sprouted in the greenhouse!");
-    plants.push(plant);
-    addPlant(plant);    
+    vscode.window.showQuickPick(['bean', 'tomato', 'broccoli'], {
+      placeHolder: 'Choose a species for your new plant'
+    }).then(species => {
+      if (species) {
+        vscode.window.showInformationMessage("A new " + species + " plant has sprouted in the greenhouse!");
+        plants.push({ key: key, species: species, size: 'start', harvested: false, hotkey_uses: 0 });
+        addPlant({ key: key, species: species, size: 'start', harvested: false, hotkey_uses: 0 });
+      }
+    });
   }
   savePlants();
 }
@@ -140,146 +148,86 @@ export function activate(context: vscode.ExtensionContext) {
 
   const growCommandPalette = vscode.commands.registerCommand("keycrop.growCommandPalette", () => {
     if (CURRENT_MODE === 0 /* GAME */) {
-      growPlant({
-        species: "corn",
-        size: "small",
-        harvested: false,
-        hotkey_uses: 1
-      });
+      growPlant("command_palette");
     } else {
-      logKeyPress("corn");
+      logKeyPress("command_palette");
     }
   });
   const growDeleteCurrentLine = vscode.commands.registerCommand("keycrop.growDeleteCurrentLine", () => {
     if (CURRENT_MODE === 0 /* GAME */) {
-      growPlant({
-        species: "strawberry",
-        size: "small",
-        harvested: false,
-        hotkey_uses: 1
-      });
+      growPlant("delete_current_line");
     } else {
-      logKeyPress("strawberry");
+      logKeyPress("delete_current_line");
     }
   });
   const growJumpToBracket = vscode.commands.registerCommand("keycrop.growJumpToBracket", () => {
     if (CURRENT_MODE === 0 /* GAME */) {
-      growPlant({
-        species: "mango",
-        size: "small",
-        harvested: false,
-        hotkey_uses: 1
-      });
+      growPlant("jump_to_bracket");
     } else {
-      logKeyPress("mango");
+      logKeyPress("jump_to_bracket");
     }
   });
   const growShowAllSymbols = vscode.commands.registerCommand("keycrop.growShowAllSymbols", () => {
     if (CURRENT_MODE === 0 /* GAME */) {
-      growPlant({
-        species: "poppy",
-        size: "small",
-        harvested: false,
-        hotkey_uses: 1
-      });
+      growPlant("show_all_symbols");
     } else {
-      logKeyPress("poppy");
+      logKeyPress("show_all_symbols");
     }
   });
   const growGoToSymbol = vscode.commands.registerCommand("keycrop.growGoToSymbol", () => {
     if (CURRENT_MODE === 0 /* GAME */) {
-      growPlant({
-        species: "sunflower",
-        size: "small",
-        harvested: false,
-        hotkey_uses: 1
-      });
+      growPlant("go_to_symbol");
     } else {
-      logKeyPress("sunflower");
+      logKeyPress("go_to_symbol");
     }
   });
   const growViewProblems = vscode.commands.registerCommand("keycrop.growViewProblems", () => {
     if (CURRENT_MODE === 0 /* GAME */) {
-      growPlant({
-        species: "snappea",
-        size: "small",
-        harvested: false,
-        hotkey_uses: 1
-      });
+      growPlant("view_problems");
     } else {
-      logKeyPress("snappea");
+      logKeyPress("view_problems");
     }
   });
-  const growSelectAllOccurrences = vscode.commands.registerCommand("keycrop.growSelectAllOccurrences", () => {
+  const growSelectAllOccurrences = vscode.commands.registerCommand("keycrop.growCursorAtAllOccurrences", () => {
     if (CURRENT_MODE === 0 /* GAME */) {
-      growPlant({
-        species: "sphagettifern",
-        size: "small",
-        harvested: false,
-        hotkey_uses: 1
-      });
+      growPlant("cursor_at_all_occurrences");
     } else {
-      logKeyPress("sphagettifern");
+      logKeyPress("cursor_at_all_occurrences");
     }
   });
   const growTriggerParameterHints = vscode.commands.registerCommand("keycrop.growTriggerParameterHints", () => {
     if (CURRENT_MODE === 0 /* GAME */) {
-      growPlant({
-        species: "okra",
-        size: "small",
-        harvested: false,
-        hotkey_uses: 1
-      });
+      growPlant("trigger_parameter_hints");
     } else {
-      logKeyPress("okra");
+      logKeyPress("trigger_parameter_hints");
     }
   });
   const growSplitEditor = vscode.commands.registerCommand("keycrop.growSplitEditor", () => {
     if (CURRENT_MODE === 0 /* GAME */) {
-      growPlant({
-        species: "carrot",
-        size: "small",
-        harvested: false,
-        hotkey_uses: 1
-      });
+      growPlant("split_editor");
     } else {
-      logKeyPress("carrot");
+      logKeyPress("split_editor");
     }
   });
   const growOpenLastUsedEditorInGroup = vscode.commands.registerCommand("keycrop.growOpenLastUsedEditorInGroup", () => {
     if (CURRENT_MODE === 0 /* GAME */) {
-      growPlant({
-        species: "canola",
-        size: "small",
-        harvested: false,
-        hotkey_uses: 1
-      });
+      growPlant("open_last_used_editor_in_group");
     } else {
-      logKeyPress("canola");
+      logKeyPress("open_last_used_editor_in_group");
     }
   });
   const growToggleTerminal = vscode.commands.registerCommand("keycrop.growToggleTerminal", () => {
     if (CURRENT_MODE === 0 /* GAME */) {
-      growPlant({
-        species: "apple_tree",
-        size: "small",
-        harvested: false,
-        hotkey_uses: 1
-      });
+      growPlant("toggle_terminal");
     } else {
-      logKeyPress("apple_tree");
+      logKeyPress("toggle_terminal");
     }
   });
   const growCreateNewTerminal = vscode.commands.registerCommand("keycrop.growCreateNewTerminal", () => {
     if (CURRENT_MODE === 0 /* GAME */) {
-      growPlant({
-        species: "cherry_tree",
-        size: "small",
-        harvested: false,
-        hotkey_uses: 1
-      });
+      growPlant("create_new_terminal");
     } else {
-      logKeyPress("cherry_tree");
+      logKeyPress("create_new_terminal");
     }
   });
   context.subscriptions.push(growCommandPalette, growJumpToBracket, growShowAllSymbols, growGoToSymbol, growViewProblems, growSelectAllOccurrences, growTriggerParameterHints, growSplitEditor, growOpenLastUsedEditorInGroup, growToggleTerminal, growCreateNewTerminal, growDeleteCurrentLine);

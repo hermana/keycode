@@ -1,10 +1,12 @@
 const NUM_MILLISECONDS_ALLOWED_BETWEEN_KEY_USES: number = 0; //30000; // 30 seconds
 
 export class Plant {
-  constructor(species: string) {
-    this.init(species);
+  constructor(key: string, species: string) {
+    this.init(key, species);
   }
   _init = false;
+  _key = '';
+  get key(): string { return this._key; }
   _species = '';
   get species(): string { return this._species; }
   _size = '';
@@ -18,16 +20,17 @@ export class Plant {
   _num_mashes = 0;
   get num_mashes(): number { return this._num_mashes; }
 
-  init(species: string): void {
+  init( key: string, species: string): void {
     //Already initialized
     if (this._init) {
       return;
     }
 
     //TODO: error handling if no type?
-    if (species === '') {
+    if (species === '' || key === '') {
       return;
     }
+    this._key = key;
     this._species = species;
     this._size = 'start';
 
@@ -40,7 +43,7 @@ export class Plant {
     element.classList.add('plant');
     element.classList.add(this.species);
     element.classList.add(this.size);
-    element.title = species;
+    element.title = this.species;
   }
 
   grow(vscode: { postMessage(msg: unknown): void }): void {

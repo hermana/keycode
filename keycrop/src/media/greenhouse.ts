@@ -6,8 +6,8 @@ export class Greenhouse {
   constructor() {
   }
 
-  addPlant(species: string): void {
-    this.plants.push(new Plant(species));
+  addPlant(key: string, species: string): void {
+    this.plants.push(new Plant(key, species));
   }
 
   grow(species: string, vscode: { postMessage(msg: unknown): void }): void {
@@ -17,7 +17,7 @@ export class Greenhouse {
   }
 
   loadPlant(message: any, background: string | null): void {
-    let p = new Plant(message.species);
+    let p = new Plant(message.key, message.species);
     p.setSize(message.size);
     p.setIsHarvested(message.harvested, background);
     p.setHotKeyUses(message.hotkey_uses);
