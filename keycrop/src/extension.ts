@@ -121,16 +121,16 @@ export function activate(context: vscode.ExtensionContext) {
   //   fs.mkdirSync(studyOutputPath, { recursive: true });
   // } 
 
-  //TODO GAMEMODE: do not initialize this in nongame mode
-	greenhouse = new GreenhouseWebViewProvider(context);
-	context.subscriptions.push(vscode.window.registerWebviewViewProvider(GreenhouseWebViewProvider.viewType, greenhouse));
-
-	instructions = new InstructionsWebViewProvider(context);
+  instructions = new InstructionsWebViewProvider(context);
 	context.subscriptions.push(vscode.window.registerWebviewViewProvider(InstructionsWebViewProvider.viewType, instructions));
 
-	inventory = new InventoryWebViewProvider(context);
-  //FIXME: do I need this?
-	context.subscriptions.push(vscode.window.registerWebviewViewProvider(InventoryWebViewProvider.viewType, inventory));
+	if (CURRENT_MODE === MODE.GAME) {
+		greenhouse = new GreenhouseWebViewProvider(context);
+		context.subscriptions.push(vscode.window.registerWebviewViewProvider(GreenhouseWebViewProvider.viewType, greenhouse));
+
+		inventory = new InventoryWebViewProvider(context);
+		context.subscriptions.push(vscode.window.registerWebviewViewProvider(InventoryWebViewProvider.viewType, inventory));
+	}
 
 	vscode.workspace.onDidChangeConfiguration(event => {
 	

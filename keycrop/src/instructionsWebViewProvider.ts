@@ -36,13 +36,32 @@ export class InstructionsWebViewProvider implements vscode.WebviewViewProvider {
       </head>
       <body>
         <div id="generator-instructions">
-          <p class="instructions">Congratulations, you've managed to power up the KeyCrop Greenhouse! To unlock more seeds, all of the following plants must be harvested. </p>
           <!-- how many plants to make it to the next level -->
-          <p class="key-instruction"><img src="${iconsPath+'/chilli_harvested.png'}" alt="Chili" width="20" height="20"> <span class="instruction-bold"> CTRL+SHIFT+SPACE</span>: See function parameter hints.</p>
-          <p class="key-instruction"><img src="${iconsPath+'/bean_harvested.png'}" alt="Bean" width="20" height="20"> <span class="instruction-bold"> CTRL+SHIFT+M</span>: See warnings and errors in the Problems view.</p>
-          <p class="key-instruction"><img src="${iconsPath+'/tomato_harvested.png'}" alt="Tomato" width="20" height="20"> <span class="instruction-bold"> CTRL+SHIFT+L</span>: Multicursor-select all instances of a specific word.</p>
-          <p class="key-instruction"><img src="${iconsPath+'/lettuce_harvested.png'}" alt="Lettuce" width="20" height="20"> <span class="instruction-bold"> CTRL+/</span>: Comment or un-comment code.</p>
-          <p class="key-instruction"><img src="${iconsPath+'/broccoli_harvested.png'}" alt="Broccoli" width="20" height="20"> <span class="instruction-bold"> CTRL+[</span>: Outdent a line.</p>
+          <div class="table-scroll">
+            <table class="key-table">
+              <thead>
+                <tr>
+                  <th>Hotkey</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>CTRL+SHIFT+SPACE</td><td>See function parameter hints.</td></tr>
+                <tr><td>CTRL+SHIFT+M</td><td>See warnings and errors in the Problems view.</td></tr>
+                <tr><td>CTRL+SHIFT+L</td><td>Multicursor-select all instances of a specific word.</td></tr>
+                <tr><td>CTRL+\\</td><td>Split editor.</td></tr>
+                <tr><td>CTRL+[</td><td>Outdent a line.</td></tr>
+                <tr><td>CTRL+SHIFT+P</td><td>Open command palette.</td></tr>
+                <tr><td>CTRL+SHIFT+K</td><td>Delete current line.</td></tr>
+                <tr><td>CTRL+SHIFT+\\</td><td>Jump to bracket.</td></tr>
+                <tr><td>CTRL+T</td><td>Show all symbols.</td></tr>
+                <tr><td>CTRL+SHIFT+O</td><td>Go to symbol in workspace.</td></tr>
+                <tr><td>CTRL+SHIFT+TAB</td><td>Open the last used editor.</td></tr>
+                <tr><td>CTRL+\`</td><td>Toggle terminal.</td></tr>
+                <tr><td>CTRL+SHIFT+\`</td><td>Create new terminal.</td></tr>
+              </tbody>
+            </table>
+          </div>
         </div>
         <script src="${webviewJS}"></script>
       </body>

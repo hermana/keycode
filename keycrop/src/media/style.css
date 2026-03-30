@@ -24,6 +24,40 @@
   margin:5px;
 }
 
+.table-scroll {
+  max-height: 250px;
+  overflow-y: auto;
+  margin-top: 8px;
+}
+
+.key-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.75rem;
+}
+
+.key-table th,
+.key-table td {
+  text-align: left;
+  padding: 4px 6px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  vertical-align: top;
+}
+
+.key-table thead th {
+  font-weight: bold;
+  position: sticky;
+  top: 0;
+  background: var(--vscode-sideBar-background, #1e1e1e);
+  z-index: 1;
+}
+
+.key-table td:first-child {
+  font-weight: bold;
+  white-space: nowrap;
+  padding-right: 10px;
+}
+
 .instructions{
   font-size:0.8rem;
   margin:5px;
