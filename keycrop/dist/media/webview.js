@@ -46,6 +46,7 @@
       element.classList.add("plant");
       element.classList.add(this.species);
       element.classList.add(this.size);
+      element.title = species;
     }
     grow(vscode2) {
       const now = Date.now();

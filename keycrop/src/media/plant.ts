@@ -40,6 +40,7 @@ export class Plant {
     element.classList.add('plant');
     element.classList.add(this.species);
     element.classList.add(this.size);
+    element.title = species;
   }
 
   grow(vscode: { postMessage(msg: unknown): void }): void {
