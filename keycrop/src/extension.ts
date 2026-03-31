@@ -59,6 +59,28 @@ function loadPlantsFile() {
   }
 }
 
+function loadPlantsToInventory() {
+  if (fs.existsSync(plantsPath)) {
+    try {
+      let savedPlants = JSON.parse(fs.readFileSync(plantsPath, 'utf8'));
+      Object.entries(savedPlants).forEach((p: any) => {
+        if (p[1].harvested) {
+          inventory.postMessage({
+            action: 'load',
+            key: p[1].key,
+            species: p[1].species,
+            size: p[1].size,
+            harvested: true,
+            hotkey_uses: p[1].hotkey_uses
+          });
+        }
+      });
+    } catch (e) {
+      console.error('Could not load plants for inventory');
+    }
+  }
+}
+
 function savePlants() {
   greenhouse.postMessage({
     action: 'save_plants'
@@ -296,9 +318,22 @@ export class GreenhouseWebViewProvider implements vscode.WebviewViewProvider {
             // fs.writeFileSync(plantsStudyOutputPath, JSON.stringify(message.content));
             fs.writeFileSync(plantsPath, JSON.stringify(message.content));
             break;
-          case 'harvested':
+          case 'harvested': {
             vscode.window.showInformationMessage("Your "+message.text+" plant has been harvested!");
+            const harvestedPlant = plants.find(p => p.species === message.text && !p.harvested);
+            if (harvestedPlant) {
+              harvestedPlant.harvested = true;
+              inventory.postMessage({
+                action: 'load',
+                key: harvestedPlant.key,
+                species: harvestedPlant.species,
+                size: 'large',
+                harvested: true,
+                hotkey_uses: harvestedPlant.hotkey_uses
+              });
+            }
             break;
+          }
         }
       });
     }
@@ -333,17 +368,21 @@ export class InventoryWebViewProvider implements vscode.WebviewViewProvider {
   private view?: vscode.WebviewView;
 
   constructor(private readonly context: vscode.ExtensionContext){}
-    
+
+  public postMessage(message: any) {
+    this.view?.webview.postMessage(message);
+  }
+
   public resolveWebviewView(webviewView: vscode.WebviewView, context: vscode.WebviewViewResolveContext, token: vscode.CancellationToken): Thenable<void> | void {
       this.view = webviewView; //FIXME: do I need this?
-  
+
       const webview = webviewView.webview; //FIXME: ditto
-  
+
       //ditto
       webview.options = {
-        enableScripts: true 
+        enableScripts: true
       };
-  
+
       //Set the HTML content for the webview
       webview.html = this.getHtmlContent(
         webviewView.webview,
@@ -357,10 +396,10 @@ export class InventoryWebViewProvider implements vscode.WebviewViewProvider {
               //Send background
               webview.postMessage({
                 action: 'background',
-                value: 'blackout'
+                value: 'inventory'
               });
-              //Load existing plants array
-              loadPlantsFile();
+              //Load harvested plants into inventory
+              loadPlantsToInventory();
             }else{
               webview.postMessage({
                 action: 'key-tracking-mode'
@@ -386,7 +425,7 @@ export class InventoryWebViewProvider implements vscode.WebviewViewProvider {
           <title>KeyCrop Inventory</title>
         </head>
         <body>
-          <div id="inventory">
+          <div id="keycrop">
           </div>
           <div class="instructions">You currently don't have anything in your inventory.</div>
           <script src="${webviewJS}"></script>

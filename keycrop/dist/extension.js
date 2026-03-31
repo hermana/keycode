@@ -106,7 +106,7 @@ var InstructionsWebViewProvider = class {
 };
 
 // src/extension.ts
-var CURRENT_MODE = 1 /* KEYTRACKING */;
+var CURRENT_MODE = 0 /* GAME */;
 var greenhouse;
 var instructions;
 var inventory;
@@ -139,6 +139,27 @@ function loadPlantsFile() {
     }
   } else {
     plants = new Array();
+  }
+}
+function loadPlantsToInventory() {
+  if (fs.existsSync(plantsPath)) {
+    try {
+      let savedPlants = JSON.parse(fs.readFileSync(plantsPath, "utf8"));
+      Object.entries(savedPlants).forEach((p) => {
+        if (p[1].harvested) {
+          inventory.postMessage({
+            action: "load",
+            key: p[1].key,
+            species: p[1].species,
+            size: p[1].size,
+            harvested: true,
+            hotkey_uses: p[1].hotkey_uses
+          });
+        }
+      });
+    } catch (e) {
+      console.error("Could not load plants for inventory");
+    }
   }
 }
 function savePlants() {
@@ -338,9 +359,22 @@ var GreenhouseWebViewProvider = class {
         case "save_plants":
           fs.writeFileSync(plantsPath, JSON.stringify(message.content));
           break;
-        case "harvested":
+        case "harvested": {
           vscode2.window.showInformationMessage("Your " + message.text + " plant has been harvested!");
+          const harvestedPlant = plants.find((p) => p.species === message.text && !p.harvested);
+          if (harvestedPlant) {
+            harvestedPlant.harvested = true;
+            inventory.postMessage({
+              action: "load",
+              key: harvestedPlant.key,
+              species: harvestedPlant.species,
+              size: "large",
+              harvested: true,
+              hotkey_uses: harvestedPlant.hotkey_uses
+            });
+          }
           break;
+        }
       }
     });
   }
@@ -371,6 +405,9 @@ var InventoryWebViewProvider = class {
   }
   static viewType = "inventory";
   view;
+  postMessage(message) {
+    this.view?.webview.postMessage(message);
+  }
   resolveWebviewView(webviewView, context, token) {
     this.view = webviewView;
     const webview = webviewView.webview;
@@ -386,9 +423,9 @@ var InventoryWebViewProvider = class {
           if (CURRENT_MODE === 0 /* GAME */) {
             webview.postMessage({
               action: "background",
-              value: "blackout"
+              value: "inventory"
             });
-            loadPlantsFile();
+            loadPlantsToInventory();
           } else {
             webview.postMessage({
               action: "key-tracking-mode"
@@ -411,7 +448,7 @@ var InventoryWebViewProvider = class {
           <title>KeyCrop Inventory</title>
         </head>
         <body>
-          <div id="inventory">
+          <div id="keycrop">
           </div>
           <div class="instructions">You currently don't have anything in your inventory.</div>
           <script src="${webviewJS}"></script>
