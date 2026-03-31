@@ -43,7 +43,14 @@ export class Plant {
     element.classList.add('plant');
     element.classList.add(this.species);
     element.classList.add(this.size);
-    element.title = this.species;
+    this._updateTooltip();
+  }
+
+  private _updateTooltip(): void {
+    const background = (document.getElementById('keycrop') as HTMLElement)?.getAttribute('background');
+    this._html_element.title = background === 'inventory'
+      ? ''
+      : `${this.species} (${this._key})\nUses: ${this._num_hotkey_uses}`;
   }
 
   grow(vscode: { postMessage(msg: unknown): void }): void {
@@ -52,26 +59,27 @@ export class Plant {
     if (now - this._last_key_use > NUM_MILLISECONDS_ALLOWED_BETWEEN_KEY_USES) {
       this._num_hotkey_uses += 1;
       this._last_key_use = now;
-      if (this._num_hotkey_uses > 8 && this._html_element.classList.contains('harvested-plant')) {
+      if (this._num_hotkey_uses > 14 && this._html_element.classList.contains('harvested-plant')) {
         vscode.postMessage({ type: 'harvested', text: this.species });
-      } else if (this._num_hotkey_uses > 4) {
+      } else if (this._num_hotkey_uses > 14) {
         this._html_element.classList.remove('plant');
         this._html_element.classList.add('harvested-plant');
         this._html_element.hidden = true;
         vscode.postMessage({ type: 'harvested', text: this.species });
-      } else if (this._num_hotkey_uses > 3) {
+      } else if (this._num_hotkey_uses > 10) {
         this._size = 'large';
         this._html_element.classList.remove('medium');
         this._html_element.classList.add(this._size);
-      } else if (this._num_hotkey_uses > 2) {
+      } else if (this._num_hotkey_uses > 6) {
         this._size = 'medium';
         this._html_element.classList.remove('small');
         this._html_element.classList.add(this._size);
-      } else if (this._num_hotkey_uses > 1) {
+      } else if (this._num_hotkey_uses > 3) {
         this._size = 'small';
         this._html_element.classList.remove('start');
         this._html_element.classList.add(this._size);
       }
+      this._updateTooltip();
     } else {
       this._num_mashes += 1;
     }
