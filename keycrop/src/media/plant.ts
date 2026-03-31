@@ -1,3 +1,5 @@
+import { KEY_MAP } from '../keyMap';
+
 const NUM_MILLISECONDS_ALLOWED_BETWEEN_KEY_USES: number = 0; //30000; // 30 seconds
 
 export class Plant {
@@ -48,9 +50,11 @@ export class Plant {
 
   private _updateTooltip(): void {
     const background = (document.getElementById('keycrop') as HTMLElement)?.getAttribute('background');
+    const capitalKey = KEY_MAP.find(k => k.command === this._key)?.capital_key ?? this._key;
+    const capitalSpecies = this.species.charAt(0).toUpperCase() + this.species.slice(1);
     this._html_element.title = background === 'inventory'
       ? ''
-      : `${this.species} (${this._key})\nUses: ${this._num_hotkey_uses}`;
+      : `${capitalSpecies} (${capitalKey})\nUses: ${this._num_hotkey_uses}`;
   }
 
   grow(vscode: { postMessage(msg: unknown): void }): void {
