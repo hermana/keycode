@@ -28,6 +28,11 @@
   max-height: 250px;
   overflow-y: auto;
   margin-top: 8px;
+  scrollbar-width: none;
+}
+
+.table-scroll::-webkit-scrollbar {
+  display: none;
 }
 
 .key-table {
