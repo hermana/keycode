@@ -61,13 +61,24 @@
       this._key = key;
       this._species = species;
       this._size = "start";
+      this._num_hotkey_uses = 1;
       const element = document.createElement("div");
       document.getElementById("keycrop").appendChild(element);
       this._html_element = element;
       element.classList.add("plant");
       element.classList.add(this.species);
       element.classList.add(this.size);
+      this._updateStageClass();
       this._updateTooltip();
+    }
+    _updateStageClass() {
+      const existing = Array.from(this._html_element.classList).find((c) => c.startsWith("stage-"));
+      if (existing) {
+        this._html_element.classList.remove(existing);
+      }
+      if (this._num_hotkey_uses <= 14) {
+        this._html_element.classList.add(`stage-${this._num_hotkey_uses}`);
+      }
     }
     _updateTooltip() {
       const background = document.getElementById("keycrop")?.getAttribute("background");
@@ -81,6 +92,7 @@ Uses: ${this._num_hotkey_uses}`;
       if (now - this._last_key_use > NUM_MILLISECONDS_ALLOWED_BETWEEN_KEY_USES) {
         this._num_hotkey_uses += 1;
         this._last_key_use = now;
+        this._updateStageClass();
         if (this._num_hotkey_uses > 14 && this._html_element.classList.contains("harvested-plant")) {
           vscode2.postMessage({ type: "harvested", text: this.species });
         } else if (this._num_hotkey_uses > 14) {
@@ -127,6 +139,7 @@ Uses: ${this._num_hotkey_uses}`;
     }
     setHotKeyUses(n) {
       this._num_hotkey_uses = n;
+      this._updateStageClass();
     }
   };
 
@@ -191,6 +204,7 @@ Uses: ${this._num_hotkey_uses}`;
       }
       case "load":
         game.greenhouse.loadPlant(message, game.div.getAttribute("background"));
+        document.getElementById("empty-inventory-message")?.remove();
       case "scale":
         switch (message.value.toLowerCase()) {
           case "small":

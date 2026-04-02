@@ -35,6 +35,7 @@ export class Plant {
     this._key = key;
     this._species = species;
     this._size = 'start';
+    this._num_hotkey_uses = 1; // Used once to initiate
 
     //Create plant element
     const element = document.createElement('div');
@@ -45,7 +46,18 @@ export class Plant {
     element.classList.add('plant');
     element.classList.add(this.species);
     element.classList.add(this.size);
+    this._updateStageClass();
     this._updateTooltip();
+  }
+
+  private _updateStageClass(): void {
+    const existing = Array.from(this._html_element.classList).find(c => c.startsWith('stage-'));
+    if (existing) {
+      this._html_element.classList.remove(existing);
+    }
+    if (this._num_hotkey_uses <= 14) {
+      this._html_element.classList.add(`stage-${this._num_hotkey_uses}`);
+    }
   }
 
   private _updateTooltip(): void {
@@ -63,6 +75,7 @@ export class Plant {
     if (now - this._last_key_use > NUM_MILLISECONDS_ALLOWED_BETWEEN_KEY_USES) {
       this._num_hotkey_uses += 1;
       this._last_key_use = now;
+      this._updateStageClass();
       if (this._num_hotkey_uses > 14 && this._html_element.classList.contains('harvested-plant')) {
         vscode.postMessage({ type: 'harvested', text: this.species });
       } else if (this._num_hotkey_uses > 14) {
@@ -112,5 +125,6 @@ export class Plant {
 
   setHotKeyUses(n: number): void {
     this._num_hotkey_uses = n;
+    this._updateStageClass();
   }
 }

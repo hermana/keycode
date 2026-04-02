@@ -450,7 +450,7 @@ var InventoryWebViewProvider = class {
         <body>
           <div id="keycrop">
           </div>
-          <div class="instructions">You currently don't have anything in your inventory.</div>
+          <div id="empty-inventory-message" class="instructions">You currently don't have anything in your inventory.</div>
           <script src="${webviewJS}"></script>
         </body>
         </html>

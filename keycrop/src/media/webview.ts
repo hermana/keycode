@@ -56,6 +56,7 @@ window.addEventListener('message', (event: MessageEvent) => {
     }
     case 'load':
       game.greenhouse.loadPlant(message, game.div.getAttribute('background'));
+      (document.getElementById('empty-inventory-message') as HTMLElement | null)?.remove();
     case 'scale':
       switch (message.value.toLowerCase()) {
         case 'small':
