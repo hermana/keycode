@@ -187,7 +187,9 @@ function growPlant(key) {
       }
     );
   } else {
-    vscode2.window.showQuickPick(["bean", "tomato", "broccoli"], {
+    const usedSpecies = new Set(plants.filter((p) => !p.harvested).map((p) => p.species));
+    const availableSpecies = ["bean", "tomato", "broccoli"].filter((s) => !usedSpecies.has(s));
+    vscode2.window.showQuickPick(availableSpecies, {
       placeHolder: "Choose a species for your new plant"
     }).then((species) => {
       if (species) {
