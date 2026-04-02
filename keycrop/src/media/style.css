@@ -399,6 +399,22 @@ background: url(./vegetables/watermelon_large.png);
 .broccoli.stage-14 { background: url(./midjourney-interpolated-vegetables/broccoli_14.png); background-size: contain; background-repeat: no-repeat; }
 .broccoli.harvested-plant { background: url(./midjourney-interpolated-vegetables/broccoli_harvested.png); background-size: contain; background-repeat: no-repeat; }
 
+.chilli.stage-1  { background: url(./midjourney-interpolated-vegetables/chilli_1.png); background-size: contain; background-repeat: no-repeat; }
+.chilli.stage-2  { background: url(./midjourney-interpolated-vegetables/chilli_2.png); background-size: contain; background-repeat: no-repeat; }
+.chilli.stage-3  { background: url(./midjourney-interpolated-vegetables/chilli_3.png); background-size: contain; background-repeat: no-repeat; }
+.chilli.stage-4  { background: url(./midjourney-interpolated-vegetables/chilli_4.png); background-size: contain; background-repeat: no-repeat; }
+.chilli.stage-5  { background: url(./midjourney-interpolated-vegetables/chilli_5.png); background-size: contain; background-repeat: no-repeat; }
+.chilli.stage-6  { background: url(./midjourney-interpolated-vegetables/chilli_6.png); background-size: contain; background-repeat: no-repeat; }
+.chilli.stage-7  { background: url(./midjourney-interpolated-vegetables/chilli_7.png); background-size: contain; background-repeat: no-repeat; }
+.chilli.stage-8  { background: url(./midjourney-interpolated-vegetables/chilli_8.png); background-size: contain; background-repeat: no-repeat; }
+.chilli.stage-9  { background: url(./midjourney-interpolated-vegetables/chilli_9.png); background-size: contain; background-repeat: no-repeat; }
+.chilli.stage-10 { background: url(./midjourney-interpolated-vegetables/chilli_10.png); background-size: contain; background-repeat: no-repeat; }
+.chilli.stage-11 { background: url(./midjourney-interpolated-vegetables/chilli_11.png); background-size: contain; background-repeat: no-repeat; }
+.chilli.stage-12 { background: url(./midjourney-interpolated-vegetables/chilli_12.png); background-size: contain; background-repeat: no-repeat; }
+.chilli.stage-13 { background: url(./midjourney-interpolated-vegetables/chilli_13.png); background-size: contain; background-repeat: no-repeat; }
+.chilli.stage-14 { background: url(./midjourney-interpolated-vegetables/chilli_14.png); background-size: contain; background-repeat: no-repeat; }
+.chilli.harvested-plant { background: url(./midjourney-interpolated-vegetables/chilli_harvested.png); background-size: contain; background-repeat: no-repeat; }
+
 .chili-icon{
   max-width: 100%;
   height: auto;
