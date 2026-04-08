@@ -22,12 +22,14 @@
 #generator-instructions{
   font-family: monospace;
   margin:5px;
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 10px);
 }
 
 .table-scroll {
-  max-height: 250px;
+  flex: 1;
   overflow-y: auto;
-  margin-top: 8px;
   scrollbar-width: none;
 }
 
@@ -71,6 +73,30 @@
 .key-instructions{
   font-size: 0.5rem;
   font-family: monospace;
+}
+
+.category-btn-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 6px;
+}
+
+.category-btn {
+  padding: 3px 8px;
+  font-size: 0.7rem;
+  font-family: monospace;
+  background: transparent;
+  color: var(--vscode-foreground, #ccc);
+  border: 1px solid rgba(255,255,255,0.25);
+  cursor: pointer;
+  border-radius: 2px;
+}
+
+.category-btn.selected {
+  background: rgba(255,255,255,0.15);
+  border-color: rgba(255,255,255,0.6);
+  font-weight: bold;
 }
 
 .instructions-bold{

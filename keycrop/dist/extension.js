@@ -42,14 +42,39 @@ var path = __toESM(require("path"));
 
 // src/instructionsWebViewProvider.ts
 var vscode = __toESM(require("vscode"));
+
+// src/keyMap.ts
+var KEY_MAP = [
+  { key: "ctrl+shift+p", category: "Using VSCode", capital_key: "CTRL+SHIFT+P", command: "command_palette", description: "Show command palette" },
+  { key: "ctrl+shift+k", category: "Editing", capital_key: "CTRL+SHIFT+K", command: "delete_current_line", description: "Delete current line" },
+  { key: "ctrl+shift+\\", category: "Navigating Code", capital_key: "CTRL+SHIFT+\\", command: "jump_to_bracket", description: "Jump to bracket" },
+  { key: "ctrl+t", category: "Navigating Code", capital_key: "CTRL+T", command: "show_all_symbols", description: "Show all symbols" },
+  { key: "ctrl+shift+o", category: "Navigating Code", capital_key: "CTRL+SHIFT+O", command: "go_to_symbol", description: "Go to symbol" },
+  { key: "ctrl+shift+m", category: "Debugging", capital_key: "CTRL+SHIFT+M", command: "view_problems", description: "View problems" },
+  { key: "ctrl+shift+l", category: "Multicursor", capital_key: "CTRL+SHIFT+L", command: "cursor_at_all_occurrences", description: "Add a cursor at all occurrences" },
+  { key: "ctrl+shift+space", category: "IntelliSense", capital_key: "CTRL+SHIFT+SPACE", command: "trigger_parameter_hints", description: "Trigger parameter hints" },
+  { key: "ctrl+\\", category: "Using VSCode", capital_key: "CTRL+\\", command: "split_editor", description: "Split editor" },
+  { key: "ctrl+shift+tab", category: "Using VSCode", capital_key: "CTRL+SHIFT+TAB", command: "open_last_used_editor_in_group", description: "Open last used editor in group" },
+  { key: "ctrl+`", category: "Terminal", capital_key: "CTRL+`", command: "toggle_terminal", description: "Toggle terminal" },
+  { key: "ctrl+shift+`", category: "Terminal", capital_key: "CTRL+SHIFT+`", command: "create_new_terminal", description: "Create new terminal" },
+  { key: "ctrl+g", category: "Navigating Code", capital_key: "CTRL+G", command: "go_to_line", description: "Go to line" },
+  // this is where I started adding new stuff
+  { key: "ctrl+.", category: "Navigating Code", capital_key: "CTRL+.", command: "quick_fix", description: "Quick Fix" },
+  { key: "ctrl+shift+s", category: "Using VSCode", capital_key: "CTRL+SHIFT+S", command: "save_file_as", description: "Save File As" },
+  { key: "alt+up", category: "Editing", capital_key: "ALT+UP", command: "move_line_up", description: "Move line up" },
+  { key: "alt+down", category: "Editing", capital_key: "ALT+DOWN", command: "move_line_down", description: "Move line down" },
+  { key: "ctrl+l", category: "Editing", capital_key: "CTRL+L", command: "select_line", description: "Select line" }
+];
+
+// src/instructionsWebViewProvider.ts
 var InstructionsWebViewProvider = class {
   constructor(context) {
     this.context = context;
   }
   static viewType = "instructions";
-  view;
+  _view;
   resolveWebviewView(webviewView, _context, _token) {
-    this.view = webviewView;
+    this._view = webviewView;
     const webview = webviewView.webview;
     webview.options = {
       enableScripts: true
@@ -59,7 +84,13 @@ var InstructionsWebViewProvider = class {
   getHtmlContent(webview) {
     const style = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, "src/media", "style.css"));
     const webviewJS = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, "dist/media", "webview.js"));
-    const iconsPath = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, "src/media/vegetables"));
+    const categories = [...new Set(KEY_MAP.map((k) => k.category))];
+    const categoryButtons = categories.map(
+      (cat) => `<button class="category-btn" data-category="${cat}">${cat}</button>`
+    ).join("\n        ");
+    const tableRows = KEY_MAP.map(
+      (k) => `<tr data-category="${k.category}"><td>${k.capital_key}</td><td>${k.description}</td></tr>`
+    ).join("\n                ");
     return `
       <!DOCTYPE html>
       <html lang="en">
@@ -71,7 +102,6 @@ var InstructionsWebViewProvider = class {
       </head>
       <body>
         <div id="generator-instructions">
-          <!-- how many plants to make it to the next level -->
           <div class="table-scroll">
             <table class="key-table">
               <thead>
@@ -81,23 +111,37 @@ var InstructionsWebViewProvider = class {
                 </tr>
               </thead>
               <tbody>
-                <tr><td>CTRL+SHIFT+SPACE</td><td>See function parameter hints.</td></tr>
-                <tr><td>CTRL+SHIFT+M</td><td>See warnings and errors in the Problems view.</td></tr>
-                <tr><td>CTRL+SHIFT+L</td><td>Multicursor-select all instances of a specific word.</td></tr>
-                <tr><td>CTRL+\\</td><td>Split editor.</td></tr>
-                <tr><td>CTRL+[</td><td>Outdent a line.</td></tr>
-                <tr><td>CTRL+SHIFT+P</td><td>Open command palette.</td></tr>
-                <tr><td>CTRL+SHIFT+K</td><td>Delete current line.</td></tr>
-                <tr><td>CTRL+SHIFT+\\</td><td>Jump to bracket.</td></tr>
-                <tr><td>CTRL+T</td><td>Show all symbols.</td></tr>
-                <tr><td>CTRL+SHIFT+O</td><td>Go to symbol in workspace.</td></tr>
-                <tr><td>CTRL+SHIFT+TAB</td><td>Open the last used editor.</td></tr>
-                <tr><td>CTRL+\`</td><td>Toggle terminal.</td></tr>
-                <tr><td>CTRL+SHIFT+\`</td><td>Create new terminal.</td></tr>
+                ${tableRows}
               </tbody>
             </table>
           </div>
+          <div class="category-btn-row">
+            ${categoryButtons}
+          </div>
         </div>
+        <script>
+          const buttons = document.querySelectorAll('.category-btn');
+          const rows = document.querySelectorAll('tbody tr');
+
+          let activeCategory = null;
+
+          buttons.forEach(btn => {
+            btn.addEventListener('click', () => {
+              const cat = btn.dataset.category;
+              if (activeCategory === cat) {
+                activeCategory = null;
+                buttons.forEach(b => b.classList.remove('selected'));
+                rows.forEach(r => r.style.display = '');
+              } else {
+                activeCategory = cat;
+                buttons.forEach(b => b.classList.toggle('selected', b.dataset.category === cat));
+                rows.forEach(r => {
+                  r.style.display = r.dataset.category === cat ? '' : 'none';
+                });
+              }
+            });
+          });
+        </script>
         <script src="${webviewJS}"></script>
       </body>
       </html>
@@ -313,7 +357,42 @@ function activate(context) {
       logKeyPress("create_new_terminal");
     }
   });
-  context.subscriptions.push(growCommandPalette, growJumpToBracket, growShowAllSymbols, growGoToSymbol, growViewProblems, growSelectAllOccurrences, growTriggerParameterHints, growSplitEditor, growOpenLastUsedEditorInGroup, growToggleTerminal, growCreateNewTerminal, growDeleteCurrentLine);
+  const growGoToLine = vscode2.commands.registerCommand("keycrop.growGoToLine", () => {
+    if (CURRENT_MODE === 0) {
+      growPlant("go_to_line");
+    } else {
+      logKeyPress("go_to_line");
+    }
+  });
+  const growQuickFix = vscode2.commands.registerCommand("keycrop.growQuickFix", () => {
+    if (CURRENT_MODE === 0) {
+      growPlant("quick_fix");
+    } else {
+      logKeyPress("quick_fix");
+    }
+  });
+  const growSaveFileAs = vscode2.commands.registerCommand("keycrop.growSaveFileAs", () => {
+    if (CURRENT_MODE === 0) {
+      growPlant("save_file_as");
+    } else {
+      logKeyPress("save_file_as");
+    }
+  });
+  const growMoveLineUp = vscode2.commands.registerCommand("keycrop.growMoveLineUp", () => {
+    if (CURRENT_MODE === 0) {
+      growPlant("move_line_up");
+    } else {
+      logKeyPress("move_line_up");
+    }
+  });
+  const growMoveLineDown = vscode2.commands.registerCommand("keycrop.growMoveLineDown", () => {
+    if (CURRENT_MODE === 0) {
+      growPlant("move_line_down");
+    } else {
+      logKeyPress("move_line_down");
+    }
+  });
+  context.subscriptions.push(growCommandPalette, growJumpToBracket, growShowAllSymbols, growGoToSymbol, growViewProblems, growSelectAllOccurrences, growTriggerParameterHints, growSplitEditor, growOpenLastUsedEditorInGroup, growToggleTerminal, growCreateNewTerminal, growDeleteCurrentLine, growGoToLine, growQuickFix, growSaveFileAs, growMoveLineUp, growMoveLineDown);
 }
 function deactivate() {
 }

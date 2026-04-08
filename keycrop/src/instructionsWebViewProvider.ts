@@ -1,14 +1,15 @@
 import * as vscode from 'vscode';
+import { KEY_MAP } from './keyMap';
 
 export class InstructionsWebViewProvider implements vscode.WebviewViewProvider {
 
   public static readonly viewType = 'instructions';
-  private view?: vscode.WebviewView;
+  private _view?: vscode.WebviewView;
 
   constructor(private readonly context: vscode.ExtensionContext) {}
 
   public resolveWebviewView(webviewView: vscode.WebviewView, _context: vscode.WebviewViewResolveContext, _token: vscode.CancellationToken): Thenable<void> | void {
-    this.view = webviewView;
+    this._view = webviewView;
 
     const webview = webviewView.webview;
 
@@ -23,7 +24,16 @@ export class InstructionsWebViewProvider implements vscode.WebviewViewProvider {
 
     const style = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'src/media', 'style.css'));
     const webviewJS = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'dist/media', 'webview.js'));
-    const iconsPath = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'src/media/vegetables'));
+
+    const categories = [...new Set(KEY_MAP.map(k => k.category))];
+
+    const categoryButtons = categories.map(cat =>
+      `<button class="category-btn" data-category="${cat}">${cat}</button>`
+    ).join('\n        ');
+
+    const tableRows = KEY_MAP.map(k =>
+      `<tr data-category="${k.category}"><td>${k.capital_key}</td><td>${k.description}</td></tr>`
+    ).join('\n                ');
 
     return `
       <!DOCTYPE html>
@@ -36,7 +46,6 @@ export class InstructionsWebViewProvider implements vscode.WebviewViewProvider {
       </head>
       <body>
         <div id="generator-instructions">
-          <!-- how many plants to make it to the next level -->
           <div class="table-scroll">
             <table class="key-table">
               <thead>
@@ -46,23 +55,37 @@ export class InstructionsWebViewProvider implements vscode.WebviewViewProvider {
                 </tr>
               </thead>
               <tbody>
-                <tr><td>CTRL+SHIFT+SPACE</td><td>See function parameter hints.</td></tr>
-                <tr><td>CTRL+SHIFT+M</td><td>See warnings and errors in the Problems view.</td></tr>
-                <tr><td>CTRL+SHIFT+L</td><td>Multicursor-select all instances of a specific word.</td></tr>
-                <tr><td>CTRL+\\</td><td>Split editor.</td></tr>
-                <tr><td>CTRL+[</td><td>Outdent a line.</td></tr>
-                <tr><td>CTRL+SHIFT+P</td><td>Open command palette.</td></tr>
-                <tr><td>CTRL+SHIFT+K</td><td>Delete current line.</td></tr>
-                <tr><td>CTRL+SHIFT+\\</td><td>Jump to bracket.</td></tr>
-                <tr><td>CTRL+T</td><td>Show all symbols.</td></tr>
-                <tr><td>CTRL+SHIFT+O</td><td>Go to symbol in workspace.</td></tr>
-                <tr><td>CTRL+SHIFT+TAB</td><td>Open the last used editor.</td></tr>
-                <tr><td>CTRL+\`</td><td>Toggle terminal.</td></tr>
-                <tr><td>CTRL+SHIFT+\`</td><td>Create new terminal.</td></tr>
+                ${tableRows}
               </tbody>
             </table>
           </div>
+          <div class="category-btn-row">
+            ${categoryButtons}
+          </div>
         </div>
+        <script>
+          const buttons = document.querySelectorAll('.category-btn');
+          const rows = document.querySelectorAll('tbody tr');
+
+          let activeCategory = null;
+
+          buttons.forEach(btn => {
+            btn.addEventListener('click', () => {
+              const cat = btn.dataset.category;
+              if (activeCategory === cat) {
+                activeCategory = null;
+                buttons.forEach(b => b.classList.remove('selected'));
+                rows.forEach(r => r.style.display = '');
+              } else {
+                activeCategory = cat;
+                buttons.forEach(b => b.classList.toggle('selected', b.dataset.category === cat));
+                rows.forEach(r => {
+                  r.style.display = r.dataset.category === cat ? '' : 'none';
+                });
+              }
+            });
+          });
+        </script>
         <script src="${webviewJS}"></script>
       </body>
       </html>

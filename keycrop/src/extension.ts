@@ -254,7 +254,42 @@ export function activate(context: vscode.ExtensionContext) {
       logKeyPress("create_new_terminal");
     }
   });
-  context.subscriptions.push(growCommandPalette, growJumpToBracket, growShowAllSymbols, growGoToSymbol, growViewProblems, growSelectAllOccurrences, growTriggerParameterHints, growSplitEditor, growOpenLastUsedEditorInGroup, growToggleTerminal, growCreateNewTerminal, growDeleteCurrentLine);
+  const growGoToLine = vscode.commands.registerCommand("keycrop.growGoToLine", () => {
+    if (CURRENT_MODE === 0 /* GAME */) {
+      growPlant("go_to_line");
+    } else {
+      logKeyPress("go_to_line");
+    }
+  });
+  const growQuickFix = vscode.commands.registerCommand("keycrop.growQuickFix", () => {
+    if (CURRENT_MODE === 0 /* GAME */) {
+      growPlant("quick_fix");
+    } else {
+      logKeyPress("quick_fix");
+    }
+  });
+  const growSaveFileAs = vscode.commands.registerCommand("keycrop.growSaveFileAs", () => {
+    if (CURRENT_MODE === 0 /* GAME */) {
+      growPlant("save_file_as");
+    } else {
+      logKeyPress("save_file_as");
+    }
+  });
+  const growMoveLineUp = vscode.commands.registerCommand("keycrop.growMoveLineUp", () => {
+    if (CURRENT_MODE === 0 /* GAME */) {
+      growPlant("move_line_up");
+    } else {
+      logKeyPress("move_line_up");
+    }
+  });
+  const growMoveLineDown = vscode.commands.registerCommand("keycrop.growMoveLineDown", () => {
+    if (CURRENT_MODE === 0 /* GAME */) {
+      growPlant("move_line_down");
+    } else {
+      logKeyPress("move_line_down");
+    }
+  });
+  context.subscriptions.push(growCommandPalette, growJumpToBracket, growShowAllSymbols, growGoToSymbol, growViewProblems, growSelectAllOccurrences, growTriggerParameterHints, growSplitEditor, growOpenLastUsedEditorInGroup, growToggleTerminal, growCreateNewTerminal, growDeleteCurrentLine, growGoToLine, growQuickFix, growSaveFileAs, growMoveLineUp, growMoveLineDown);
 
 }
 
