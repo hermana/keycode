@@ -353,5 +353,114 @@
                     "keycrop.growMoveLineDown"
                 ]
             }    
-    }, 
+    },
+    { "key": "ctrl+l",   
+        "command": "runCommands",
+            "args": {
+                "commands" :[
+                    {
+                        "command": "notebook.centerActiveCell",
+                        "when": "notebookEditorFocused" 
+                    },
+                    {
+                       "command": "workbench.action.browser.focusUrlInput",
+                        "when": "activeEditor == 'workbench.editor.browser'" 
+                    },
+                    {
+                        "command": "workbench.action.chat.newChat",
+                        "when": "chatIsEnabled && inChat && chatLocation == 'panel'"
+                    },
+                    {
+                        "command": "expandLineSelection",
+                        "when": "textInputFocus" 
+                    },
+                    "keycrop.growSelectCurrentLine"
+                ]
+            }    
+    },
+    { "key": "shift+alt+i",   
+        "command": "runCommands",
+            "args": {
+                "commands" :[
+                    {
+                        "command": "editor.action.insertCursorAtEndOfEachLineSelected",
+                        "when": "editorTextFocus" 
+                    },
+                    "keycrop.growInsertCursorAtEndOfEachLineSelected"
+                ]
+            }    
+    },
+    { "key": "ctrl+shift+up",   
+        "command": "runCommands",
+            "args": {
+                "commands" :[
+                    {
+                         "command": "editor.action.insertCursorAbove",
+                         "when": "editorTextFocus" 
+                    },
+                    {
+                        "command": "workbench.chat.action.focusLastFocused",
+                        "when": "chatCursorAtTop && inChatInput && !quickChatHasFocus"
+                    },
+                    {
+                        "command": "workbench.chat.action.focusLastFocused",
+                        "when": "chatCursorAtTop && inChatInput && !quickChatHasFocus"                   
+                    },
+                    {
+                        "command": "workbench.chat.action.focusLastFocused",
+                        "when": "inChatInput && isLinux && !quickChatHasFocus || inChatInput && isWindows && !quickChatHasFocus"
+                    },
+                    {
+                        "command": "notebook.cell.focusOutOutput",
+                        "when": "notebookEditorFocused && notebookOutputFocused"
+                    },
+                    {
+                        "command": "workbench.action.terminal.scrollUp",
+                        "when": "terminalFocusInAny && terminalHasBeenCreated && !terminalAltBufferActive || terminalFocusInAny && terminalProcessSupported && !terminalAltBufferActive" 
+                    },
+                    {
+                        "command": "workbench.action.terminal.selectToPreviousCommand",
+                        "when": "terminalFocus && terminalHasBeenCreated || terminalFocus && terminalProcessSupported"
+                    },
+                    "keycrop.growInsertCursorAbove"
+                ]
+            }    
+    },
+    {
+        "key": "ctrl+shift+down",
+        "command": "runCommands",
+        "args": {
+            "commands": [
+                {
+                    "command": "workbench.action.terminal.selectToNextCommand",
+                    "when": "terminalFocus && terminalHasBeenCreated || terminalFocus && terminalProcessSupported"    
+                },
+                {
+                     "command": "workbench.chat.action.focusLastFocused",
+                     "when": "inChat && inChatInput && quickChatHasFocus" 
+                },
+                {
+                    "command": "editor.action.insertCursorBelow",
+                    "when": "editorTextFocus" 
+                },
+                {
+                    "command": "notebook.cell.focusInOutput",
+                    "when": "activeEditor == 'workbench.editor.interactive' || activeEditor == 'workbench.editor.notebook' || activeEditor == 'workbench.editor.repl'" 
+                },
+                {
+                    "command": "workbench.action.terminal.scrollDown",
+                    "when": "terminalFocusInAny && terminalHasBeenCreated && !terminalAltBufferActive || terminalFocusInAny && terminalProcessSupported && !terminalAltBufferActive" 
+                },
+                "keycrop.growInsertCursorBelow"
+            ]
+        }
+    },
 ]
+
+
+
+
+
+
+
+
