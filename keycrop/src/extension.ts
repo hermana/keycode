@@ -370,12 +370,12 @@ export class InventoryWebViewProvider implements vscode.WebviewViewProvider {
   private view?: vscode.WebviewView;
 
   constructor(private readonly context: vscode.ExtensionContext){}
-
+  
   public postMessage(message: any) {
     this.view?.webview.postMessage(message);
   }
-
-  public resolveWebviewView(webviewView: vscode.WebviewView, context: vscode.WebviewViewResolveContext, token: vscode.CancellationToken): Thenable<void> | void {
+    
+    public resolveWebviewView(webviewView: vscode.WebviewView, context: vscode.WebviewViewResolveContext, token: vscode.CancellationToken): Thenable<void> | void {
       this.view = webviewView; //FIXME: do I need this?
 
       const webview = webviewView.webview; //FIXME: ditto
