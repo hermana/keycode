@@ -289,7 +289,49 @@ export function activate(context: vscode.ExtensionContext) {
       logKeyPress("move_line_down");
     }
   });
-  context.subscriptions.push(growCommandPalette, growJumpToBracket, growShowAllSymbols, growGoToSymbol, growViewProblems, growSelectAllOccurrences, growTriggerParameterHints, growSplitEditor, growOpenLastUsedEditorInGroup, growToggleTerminal, growCreateNewTerminal, growDeleteCurrentLine, growGoToLine, growQuickFix, growSaveFileAs, growMoveLineUp, growMoveLineDown);
+  const growSelectLine = vscode.commands.registerCommand("keycrop.growSelectLine", () => {
+    if (CURRENT_MODE === 0 /* GAME */) {
+      growPlant("select_line");
+    } else {
+      logKeyPress("select_line");
+    }
+  });
+  const growInsertCursorAtEndOfEachLineSelected = vscode.commands.registerCommand("keycrop.growInsertCursorAtEndOfEachLineSelected", () => {
+    if (CURRENT_MODE === 0 /* GAME */) {
+      growPlant("insert_cursor_at_end_of_each_line_selected");
+    } else {
+      logKeyPress("insert_cursor_at_end_of_each_line_selected");
+    }
+  });
+  const growAddCursorAbove = vscode.commands.registerCommand("keycrop.growAddCursorAbove", () => {
+    if (CURRENT_MODE === 0 /* GAME */) {
+      growPlant("add_cursor_above");
+    } else {
+      logKeyPress("add_cursor_above");
+    }
+  });
+  const growAddCursorBelow = vscode.commands.registerCommand("keycrop.growAddCursorBelow", () => {
+    if (CURRENT_MODE === 0 /* GAME */) {
+      growPlant("add_cursor_below");
+    } else {
+      logKeyPress("add_cursor_below");
+    }
+  });
+  const growTriggerSuggest = vscode.commands.registerCommand("keycrop.growTriggerSuggest", () => {
+    if (CURRENT_MODE === 0 /* GAME */) {
+      growPlant("trigger_suggest");
+    } else {
+      logKeyPress("trigger_suggest");
+    }
+  });
+  const growShowHover = vscode.commands.registerCommand("keycrop.growShowHover", () => {
+    if (CURRENT_MODE === 0 /* GAME */) {
+      growPlant("show_hover");
+    } else {
+      logKeyPress("show_hover");
+    }
+  });
+  context.subscriptions.push(growCommandPalette, growJumpToBracket, growShowAllSymbols, growGoToSymbol, growViewProblems, growSelectAllOccurrences, growTriggerParameterHints, growSplitEditor, growOpenLastUsedEditorInGroup, growToggleTerminal, growCreateNewTerminal, growDeleteCurrentLine, growGoToLine, growQuickFix, growSaveFileAs, growMoveLineUp, growMoveLineDown, growSelectLine, growInsertCursorAtEndOfEachLineSelected, growAddCursorAbove, growAddCursorBelow, growTriggerSuggest, growShowHover);
 
 }
 
