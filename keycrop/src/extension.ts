@@ -103,12 +103,29 @@ function growPlant(key: string) {
     // Remove any harvested plant tied to this key so it can be reassigned
     plants = plants.filter(p => p.key !== key || !p.harvested);
     const usedSpecies = new Set(plants.filter(p => !p.harvested).map(p => p.species));
+    const SPECIES_DESCRIPTIONS: Record<string, string> = {
+      'bean': "A humble unassuming legume.",
+      'tomato': 'This crop has a wide variety of culinary uses.',
+      'broccoli': 'Nutritious',
+      'chilli': 'Spicy and flavorful.',
+      'bulbino': 'A mysterious plant.',
+      'glowberry': 'Glowberries emit a soft bioluminescent hue.',
+      'ivy': 'A decorative ground cover.',
+      'jacaranda_tree': 'A tree with purple leaves.',
+      'lettuce': 'Great in salads',
+      'neon_mould': 'Radioactive mould.',
+      'poison_cabbage': 'Closely related to regular cabbage.',
+      'raspberry': 'A sweet and tart fruit.',
+      'rhubarb': 'The stalks are edible.',
+      'strawberry': 'A sweet and juicy fruit.',
+      'watermelon': 'Great with hotkeys in the summer.',
+    };
     const availableSpecies = ['bean', 'tomato', 'broccoli', 'chilli', 'bulbino', 'glowberry', 'ivy', 'jacaranda_tree', 'lettuce', 'neon_mould', 'poison_cabbage', 'raspberry', 'rhubarb', 'strawberry', 'watermelon'].filter(s => !usedSpecies.has(s));
-    const speciesItems = availableSpecies.map(s => ({ label: s.replace(/_/g, ' '), description: s }));
+    const speciesItems = availableSpecies.map(s => ({ label: s.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()), description: SPECIES_DESCRIPTIONS[s] }));
     vscode.window.showQuickPick(speciesItems, {
       placeHolder: 'Choose a species for your new plant'
     }).then(item => {
-      const species = item?.description;
+      const species = item?.label.toLowerCase().replace(/ /g, '_');
       if (species) {
         const displayName = species.replace(/_/g, ' ');
         vscode.window.showInformationMessage("A new " + displayName + " plant has sprouted in the greenhouse!");
@@ -399,7 +416,7 @@ export class GreenhouseWebViewProvider implements vscode.WebviewViewProvider {
             break;
           }
           case 'harvested': {
-            vscode.window.showInformationMessage("Your "+message.text+" plant has been harvested!");
+            vscode.window.showInformationMessage("Your " + message.text.replace(/_/g, ' ') + " plant has been harvested!");
             const harvestedPlant = plants.find(p => p.species === message.text && !p.harvested);
             if (harvestedPlant) {
               harvestedPlant.harvested = true;
