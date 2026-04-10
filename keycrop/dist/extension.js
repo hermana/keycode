@@ -170,17 +170,20 @@ function loadPlantsFile() {
   }
   if (fs.existsSync(plantsPath)) {
     try {
-      let savedPlants = JSON.parse(fs.readFileSync(plantsPath, "utf8"));
-      Object.entries(savedPlants).forEach((p) => {
+      const saved = JSON.parse(fs.readFileSync(plantsPath, "utf8"));
+      const savedPlants = saved.plants ?? saved;
+      const savedHarvested = saved.harvestedCounts ?? {};
+      harvestedCounts = new Map(Object.entries(savedHarvested));
+      savedPlants.forEach((p) => {
         greenhouse.postMessage({
           action: "load",
-          key: p[1].key,
-          species: p[1].species,
-          size: p[1].size,
-          harvested: p[1].harvested,
-          hotkey_uses: p[1].hotkey_uses
+          key: p.key,
+          species: p.species,
+          size: p.size,
+          harvested: p.harvested,
+          hotkey_uses: p.hotkey_uses
         });
-        plants.push({ key: p[1].key, species: p[1].species, size: p[1].size, harvested: p[1].harvested, hotkey_uses: p[1].hotkey_uses });
+        plants.push({ key: p.key, species: p.species, size: p.size, harvested: p.harvested, hotkey_uses: p.hotkey_uses });
       });
     } catch (e) {
       console.error("Saved plants could not be loaded");
@@ -192,25 +195,13 @@ function loadPlantsFile() {
   }
 }
 function loadPlantsToInventory() {
-  if (fs.existsSync(plantsPath)) {
-    try {
-      let savedPlants = JSON.parse(fs.readFileSync(plantsPath, "utf8"));
-      Object.entries(savedPlants).forEach((p) => {
-        if (p[1].harvested) {
-          inventory.postMessage({
-            action: "load",
-            key: p[1].key,
-            species: p[1].species,
-            size: p[1].size,
-            harvested: true,
-            hotkey_uses: p[1].hotkey_uses
-          });
-        }
-      });
-    } catch (e) {
-      console.error("Could not load plants for inventory");
-    }
-  }
+  harvestedCounts.forEach((count, species) => {
+    inventory.postMessage({
+      action: "load_harvested",
+      species,
+      count
+    });
+  });
 }
 function savePlants() {
   greenhouse.postMessage({
@@ -218,6 +209,7 @@ function savePlants() {
   });
 }
 var plants = new Array();
+var harvestedCounts = /* @__PURE__ */ new Map();
 function addPlant(plant) {
   greenhouse.postMessage({
     action: "add",
@@ -487,21 +479,25 @@ var GreenhouseWebViewProvider = class {
             });
           }
           break;
-        case "save_plants":
-          fs.writeFileSync(plantsPath, JSON.stringify(message.content));
+        case "save_plants": {
+          const saveData = {
+            plants: message.content,
+            harvestedCounts: Object.fromEntries(harvestedCounts)
+          };
+          fs.writeFileSync(plantsPath, JSON.stringify(saveData));
           break;
+        }
         case "harvested": {
           vscode2.window.showInformationMessage("Your " + message.text + " plant has been harvested!");
           const harvestedPlant = plants.find((p) => p.species === message.text && !p.harvested);
           if (harvestedPlant) {
             harvestedPlant.harvested = true;
+            const newCount = (harvestedCounts.get(harvestedPlant.species) ?? 0) + 1;
+            harvestedCounts.set(harvestedPlant.species, newCount);
             inventory.postMessage({
-              action: "load",
-              key: harvestedPlant.key,
+              action: "load_harvested",
               species: harvestedPlant.species,
-              size: "large",
-              harvested: true,
-              hotkey_uses: harvestedPlant.hotkey_uses
+              count: 1
             });
           }
           break;

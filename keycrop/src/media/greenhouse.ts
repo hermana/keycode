@@ -1,7 +1,9 @@
 import { Plant } from './plant';
+import { HarvestedPlant } from './harvestedPlant';
 
 export class Greenhouse {
   plants: Plant[] = [];
+  harvestedPlants: HarvestedPlant[] = [];
 
   constructor() {
   }
@@ -17,15 +19,19 @@ export class Greenhouse {
   }
 
   loadPlant(message: any, background: string | null): void {
-    const existing = this.plants.find(p => p.species === message.species);
-    if (existing) {
-      existing.incrementCount();
-      return;
-    }
     let p = new Plant(message.key, message.species);
     p.setSize(message.size);
     p.setIsHarvested(message.harvested, background);
     p.setHotKeyUses(message.hotkey_uses);
     this.plants.push(p);
+  }
+
+  loadHarvestedPlant(species: string, count: number): void {
+    const existing = this.harvestedPlants.find(p => p.species === species);
+    if (existing) {
+      existing.incrementCount();
+      return;
+    }
+    this.harvestedPlants.push(new HarvestedPlant(species, count));
   }
 }

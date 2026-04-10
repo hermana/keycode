@@ -63,11 +63,6 @@
     get num_mashes() {
       return this._num_mashes;
     }
-    _count = 1;
-    get count() {
-      return this._count;
-    }
-    _badge_element;
     init(key, species) {
       if (this._init) {
         return;
@@ -87,11 +82,6 @@
       element.classList.add(this.size);
       this._updateStageClass();
       this._updateTooltip();
-      const badge = document.createElement("div");
-      badge.classList.add("plant-count-badge");
-      badge.textContent = "1";
-      element.appendChild(badge);
-      this._badge_element = badge;
     }
     _updateStageClass() {
       const existing = Array.from(this._html_element.classList).find((c) => c.startsWith("stage-"));
@@ -141,10 +131,6 @@ Uses: ${this._num_hotkey_uses}`;
         this._num_mashes += 1;
       }
     }
-    incrementCount() {
-      this._count += 1;
-      this._badge_element.textContent = String(this._count);
-    }
     setSize(s) {
       this._size = s;
       this._html_element.classList.remove("start");
@@ -172,9 +158,44 @@ Uses: ${this._num_hotkey_uses}`;
     }
   };
 
+  // src/media/harvestedPlant.ts
+  var HarvestedPlant = class {
+    _species;
+    _count;
+    _html_element;
+    _badge_element;
+    get species() {
+      return this._species;
+    }
+    get count() {
+      return this._count;
+    }
+    constructor(species, count) {
+      this._species = species;
+      this._count = count;
+      const element = document.createElement("div");
+      document.getElementById("keycrop").appendChild(element);
+      this._html_element = element;
+      element.classList.add("harvested-plant");
+      element.classList.add(species);
+      const displaySpecies = species.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+      element.title = displaySpecies;
+      const badge = document.createElement("div");
+      badge.classList.add("plant-count-badge");
+      badge.textContent = String(count);
+      element.appendChild(badge);
+      this._badge_element = badge;
+    }
+    incrementCount() {
+      this._count += 1;
+      this._badge_element.textContent = String(this._count);
+    }
+  };
+
   // src/media/greenhouse.ts
   var Greenhouse = class {
     plants = [];
+    harvestedPlants = [];
     constructor() {
     }
     addPlant(key, species) {
@@ -188,16 +209,19 @@ Uses: ${this._num_hotkey_uses}`;
       });
     }
     loadPlant(message, background) {
-      const existing = this.plants.find((p2) => p2.species === message.species);
-      if (existing) {
-        existing.incrementCount();
-        return;
-      }
       let p = new Plant(message.key, message.species);
       p.setSize(message.size);
       p.setIsHarvested(message.harvested, background);
       p.setHotKeyUses(message.hotkey_uses);
       this.plants.push(p);
+    }
+    loadHarvestedPlant(species, count) {
+      const existing = this.harvestedPlants.find((p) => p.species === species);
+      if (existing) {
+        existing.incrementCount();
+        return;
+      }
+      this.harvestedPlants.push(new HarvestedPlant(species, count));
     }
   };
 
@@ -238,6 +262,9 @@ Uses: ${this._num_hotkey_uses}`;
       }
       case "load":
         game.greenhouse.loadPlant(message, game.div.getAttribute("background"));
+        break;
+      case "load_harvested":
+        game.greenhouse.loadHarvestedPlant(message.species, message.count);
         document.getElementById("empty-inventory-message")?.remove();
       case "scale":
         switch (message.value.toLowerCase()) {

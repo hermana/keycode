@@ -21,9 +21,6 @@ export class Plant {
   get last_key_use(): number { return this._last_key_use; }
   _num_mashes = 0;
   get num_mashes(): number { return this._num_mashes; }
-  _count = 1;
-  get count(): number { return this._count; }
-  _badge_element!: HTMLElement;
 
   init( key: string, species: string): void {
     //Already initialized
@@ -51,13 +48,6 @@ export class Plant {
     element.classList.add(this.size);
     this._updateStageClass();
     this._updateTooltip();
-
-    //Create count badge (hidden until count > 1)
-    const badge = document.createElement('div');
-    badge.classList.add('plant-count-badge');
-    badge.textContent = '1';
-    element.appendChild(badge);
-    this._badge_element = badge;
   }
 
   private _updateStageClass(): void {
@@ -111,11 +101,6 @@ export class Plant {
     } else {
       this._num_mashes += 1;
     }
-  }
-
-  incrementCount(): void {
-    this._count += 1;
-    this._badge_element.textContent = String(this._count);
   }
 
   setSize(s: string): void {

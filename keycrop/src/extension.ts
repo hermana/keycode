@@ -36,18 +36,21 @@ function loadPlantsFile() {
   if (fs.existsSync(plantsPath)) {
     try {
       //Try to read plants file
-      let savedPlants = JSON.parse(fs.readFileSync(plantsPath, 'utf8'));
-      Object.entries(savedPlants).forEach((p: any) => {
+      const saved = JSON.parse(fs.readFileSync(plantsPath, 'utf8'));
+      const savedPlants: any[] = saved.plants ?? saved;
+      const savedHarvested: Record<string, number> = saved.harvestedCounts ?? {};
+      harvestedCounts = new Map(Object.entries(savedHarvested));
+      savedPlants.forEach((p: any) => {
         //FIXME: do they need to be loaded one at a time? IDK
         greenhouse.postMessage({
           action: 'load',
-          key: p[1].key,
-          species: p[1].species,
-          size: p[1].size,
-          harvested: p[1].harvested,
-          hotkey_uses: p[1].hotkey_uses
+          key: p.key,
+          species: p.species,
+          size: p.size,
+          harvested: p.harvested,
+          hotkey_uses: p.hotkey_uses
         });
-        plants.push({key: p[1].key, species: p[1].species, size: p[1].size, harvested: p[1].harvested, hotkey_uses: p[1].hotkey_uses});
+        plants.push({key: p.key, species: p.species, size: p.size, harvested: p.harvested, hotkey_uses: p.hotkey_uses});
       });
     } catch (e) {
       //Failed -> Reset plants
@@ -61,25 +64,13 @@ function loadPlantsFile() {
 }
 
 function loadPlantsToInventory() {
-  if (fs.existsSync(plantsPath)) {
-    try {
-      let savedPlants = JSON.parse(fs.readFileSync(plantsPath, 'utf8'));
-      Object.entries(savedPlants).forEach((p: any) => {
-        if (p[1].harvested) {
-          inventory.postMessage({
-            action: 'load',
-            key: p[1].key,
-            species: p[1].species,
-            size: p[1].size,
-            harvested: true,
-            hotkey_uses: p[1].hotkey_uses
-          });
-        }
-      });
-    } catch (e) {
-      console.error('Could not load plants for inventory');
-    }
-  }
+  harvestedCounts.forEach((count, species) => {
+    inventory.postMessage({
+      action: 'load_harvested',
+      species,
+      count
+    });
+  });
 }
 
 function savePlants() {
@@ -89,6 +80,7 @@ function savePlants() {
 }
 
 let plants = new Array<Plant>();
+let harvestedCounts = new Map<string, number>();
 
 function addPlant(plant: Plant) {
   greenhouse.postMessage({
@@ -397,22 +389,26 @@ export class GreenhouseWebViewProvider implements vscode.WebviewViewProvider {
               });
             }
             break;
-          case 'save_plants':
-            // fs.writeFileSync(plantsStudyOutputPath, JSON.stringify(message.content));
-            fs.writeFileSync(plantsPath, JSON.stringify(message.content));
+          case 'save_plants': {
+            const saveData = {
+              plants: message.content,
+              harvestedCounts: Object.fromEntries(harvestedCounts)
+            };
+            // fs.writeFileSync(plantsStudyOutputPath, JSON.stringify(saveData));
+            fs.writeFileSync(plantsPath, JSON.stringify(saveData));
             break;
+          }
           case 'harvested': {
             vscode.window.showInformationMessage("Your "+message.text+" plant has been harvested!");
             const harvestedPlant = plants.find(p => p.species === message.text && !p.harvested);
             if (harvestedPlant) {
               harvestedPlant.harvested = true;
+              const newCount = (harvestedCounts.get(harvestedPlant.species) ?? 0) + 1;
+              harvestedCounts.set(harvestedPlant.species, newCount);
               inventory.postMessage({
-                action: 'load',
-                key: harvestedPlant.key,
+                action: 'load_harvested',
                 species: harvestedPlant.species,
-                size: 'large',
-                harvested: true,
-                hotkey_uses: harvestedPlant.hotkey_uses
+                count: 1
               });
             }
             break;

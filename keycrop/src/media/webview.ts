@@ -56,6 +56,9 @@ window.addEventListener('message', (event: MessageEvent) => {
     }
     case 'load':
       game.greenhouse.loadPlant(message, game.div.getAttribute('background'));
+      break;
+    case 'load_harvested':
+      game.greenhouse.loadHarvestedPlant(message.species, message.count);
       (document.getElementById('empty-inventory-message') as HTMLElement | null)?.remove();
     case 'scale':
       switch (message.value.toLowerCase()) {
