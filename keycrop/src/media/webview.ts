@@ -101,6 +101,7 @@ function getPlantsString(): object[] {
     currentPlants.forEach(plant => {
       const harvested = plant.html_element.classList.contains('harvested-plant');
       const plantString = {
+        'key': plant.key,
         'species': plant.species,
         'size': plant.size,
         'harvested': harvested,

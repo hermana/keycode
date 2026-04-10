@@ -63,7 +63,8 @@ export class Plant {
   private _updateTooltip(): void {
     const background = (document.getElementById('keycrop') as HTMLElement)?.getAttribute('background');
     const capitalKey = KEY_MAP.find(k => k.command === this._key)?.capital_key ?? this._key;
-    const capitalSpecies = this.species.charAt(0).toUpperCase() + this.species.slice(1);
+    const displaySpecies = this.species.replace(/_/g, ' ');
+    const capitalSpecies = displaySpecies.charAt(0).toUpperCase() + displaySpecies.slice(1);
     this._html_element.title = background === 'inventory'
       ? ''
       : `${capitalSpecies} (${capitalKey})\nUses: ${this._num_hotkey_uses}`;

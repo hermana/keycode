@@ -41,9 +41,10 @@ function loadPlantsFile() {
         //FIXME: do they need to be loaded one at a time? IDK
         greenhouse.postMessage({
           action: 'load',
+          key: p[1].key,
           species: p[1].species,
           size: p[1].size,
-          harvested: p[1].harvested, 
+          harvested: p[1].harvested,
           hotkey_uses: p[1].hotkey_uses
         });
         plants.push({key: p[1].key, species: p[1].species, size: p[1].size, harvested: p[1].harvested, hotkey_uses: p[1].hotkey_uses});
@@ -110,12 +111,15 @@ function growPlant(key: string) {
     );
   }else{
     const usedSpecies = new Set(plants.filter(p => !p.harvested).map(p => p.species));
-    const availableSpecies = ['bean', 'tomato', 'broccoli', 'chilli'].filter(s => !usedSpecies.has(s));
-    vscode.window.showQuickPick(availableSpecies, {
+    const availableSpecies = ['bean', 'tomato', 'broccoli', 'chilli', 'bulbino', 'cucumber', 'fiddlehead_fern', 'flame_lily', 'glowberry', 'grape', 'ivy', 'jacaranda_tree', 'lettuce', 'neon_mould', 'poison_cabbage', 'raspberry', 'rhubarb', 'strawberry', 'watermelon'].filter(s => !usedSpecies.has(s));
+    const speciesItems = availableSpecies.map(s => ({ label: s.replace(/_/g, ' '), description: s }));
+    vscode.window.showQuickPick(speciesItems, {
       placeHolder: 'Choose a species for your new plant'
-    }).then(species => {
+    }).then(item => {
+      const species = item?.description;
       if (species) {
-        vscode.window.showInformationMessage("A new " + species + " plant has sprouted in the greenhouse!");
+        const displayName = species.replace(/_/g, ' ');
+        vscode.window.showInformationMessage("A new " + displayName + " plant has sprouted in the greenhouse!");
         plants.push({ key: key, species: species, size: 'start', harvested: false, hotkey_uses: 0 });
         addPlant({ key: key, species: species, size: 'start', harvested: false, hotkey_uses: 0 });
       }
