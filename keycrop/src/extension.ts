@@ -99,17 +99,17 @@ function addPlant(plant: Plant) {
 }
 
 function growPlant(key: string) {
-  if(plants.some(p => p.key === key)){
-    let patch = plants.filter(p =>p.key === key);
-    patch.forEach( p => 
-    {
+  const existingPlant = plants.find(p => p.key === key);
+  if (existingPlant && !existingPlant.harvested) {
+    plants.filter(p => p.key === key).forEach(p => {
       greenhouse.postMessage({
-        action: 'grow', 
+        action: 'grow',
         species: p.species
       });
-    }
-    );
-  }else{
+    });
+  } else {
+    // Remove any harvested plant tied to this key so it can be reassigned
+    plants = plants.filter(p => p.key !== key || !p.harvested);
     const usedSpecies = new Set(plants.filter(p => !p.harvested).map(p => p.species));
     const availableSpecies = ['bean', 'tomato', 'broccoli', 'chilli', 'bulbino', 'glowberry', 'ivy', 'jacaranda_tree', 'lettuce', 'neon_mould', 'poison_cabbage', 'raspberry', 'rhubarb', 'strawberry', 'watermelon'].filter(s => !usedSpecies.has(s));
     const speciesItems = availableSpecies.map(s => ({ label: s.replace(/_/g, ' '), description: s }));

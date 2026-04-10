@@ -226,17 +226,16 @@ function addPlant(plant) {
   });
 }
 function growPlant(key) {
-  if (plants.some((p) => p.key === key)) {
-    let patch = plants.filter((p) => p.key === key);
-    patch.forEach(
-      (p) => {
-        greenhouse.postMessage({
-          action: "grow",
-          species: p.species
-        });
-      }
-    );
+  const existingPlant = plants.find((p) => p.key === key);
+  if (existingPlant && !existingPlant.harvested) {
+    plants.filter((p) => p.key === key).forEach((p) => {
+      greenhouse.postMessage({
+        action: "grow",
+        species: p.species
+      });
+    });
   } else {
+    plants = plants.filter((p) => p.key !== key || !p.harvested);
     const usedSpecies = new Set(plants.filter((p) => !p.harvested).map((p) => p.species));
     const availableSpecies = ["bean", "tomato", "broccoli", "chilli", "bulbino", "glowberry", "ivy", "jacaranda_tree", "lettuce", "neon_mould", "poison_cabbage", "raspberry", "rhubarb", "strawberry", "watermelon"].filter((s) => !usedSpecies.has(s));
     const speciesItems = availableSpecies.map((s) => ({ label: s.replace(/_/g, " "), description: s }));
