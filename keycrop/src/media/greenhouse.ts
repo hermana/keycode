@@ -17,6 +17,11 @@ export class Greenhouse {
   }
 
   loadPlant(message: any, background: string | null): void {
+    const existing = this.plants.find(p => p.species === message.species);
+    if (existing) {
+      existing.incrementCount();
+      return;
+    }
     let p = new Plant(message.key, message.species);
     p.setSize(message.size);
     p.setIsHarvested(message.harvested, background);

@@ -111,7 +111,7 @@ function growPlant(key: string) {
     );
   }else{
     const usedSpecies = new Set(plants.filter(p => !p.harvested).map(p => p.species));
-    const availableSpecies = ['bean', 'tomato', 'broccoli', 'chilli', 'bulbino', 'cucumber', 'fiddlehead_fern', 'flame_lily', 'glowberry', 'grape', 'ivy', 'jacaranda_tree', 'lettuce', 'neon_mould', 'poison_cabbage', 'raspberry', 'rhubarb', 'strawberry', 'watermelon'].filter(s => !usedSpecies.has(s));
+    const availableSpecies = ['bean', 'tomato', 'broccoli', 'chilli', 'bulbino', 'glowberry', 'ivy', 'jacaranda_tree', 'lettuce', 'neon_mould', 'poison_cabbage', 'raspberry', 'rhubarb', 'strawberry', 'watermelon'].filter(s => !usedSpecies.has(s));
     const speciesItems = availableSpecies.map(s => ({ label: s.replace(/_/g, ' '), description: s }));
     vscode.window.showQuickPick(speciesItems, {
       placeHolder: 'Choose a species for your new plant'

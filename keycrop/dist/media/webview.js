@@ -63,6 +63,11 @@
     get num_mashes() {
       return this._num_mashes;
     }
+    _count = 1;
+    get count() {
+      return this._count;
+    }
+    _badge_element;
     init(key, species) {
       if (this._init) {
         return;
@@ -82,6 +87,11 @@
       element.classList.add(this.size);
       this._updateStageClass();
       this._updateTooltip();
+      const badge = document.createElement("div");
+      badge.classList.add("plant-count-badge");
+      badge.textContent = "1";
+      element.appendChild(badge);
+      this._badge_element = badge;
     }
     _updateStageClass() {
       const existing = Array.from(this._html_element.classList).find((c) => c.startsWith("stage-"));
@@ -131,6 +141,10 @@ Uses: ${this._num_hotkey_uses}`;
         this._num_mashes += 1;
       }
     }
+    incrementCount() {
+      this._count += 1;
+      this._badge_element.textContent = String(this._count);
+    }
     setSize(s) {
       this._size = s;
       this._html_element.classList.remove("start");
@@ -144,6 +158,8 @@ Uses: ${this._num_hotkey_uses}`;
         this._html_element.classList.remove("plant");
         this._html_element.classList.add("harvested-plant");
         this._html_element.hidden = background === "inventory" ? false : true;
+        const displaySpecies = this.species.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+        this._html_element.title = displaySpecies;
       } else {
         this._html_element.classList.remove("harvested-plant");
         this._html_element.classList.add("plant");
@@ -172,6 +188,11 @@ Uses: ${this._num_hotkey_uses}`;
       });
     }
     loadPlant(message, background) {
+      const existing = this.plants.find((p2) => p2.species === message.species);
+      if (existing) {
+        existing.incrementCount();
+        return;
+      }
       let p = new Plant(message.key, message.species);
       p.setSize(message.size);
       p.setIsHarvested(message.harvested, background);
