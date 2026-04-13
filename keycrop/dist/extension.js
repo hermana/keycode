@@ -185,6 +185,7 @@ function loadPlantsFile() {
         });
         plants.push({ key: p.key, species: p.species, size: p.size, harvested: p.harvested, hotkey_uses: p.hotkey_uses });
       });
+      loadPlantsToInventory();
     } catch (e) {
       console.error("Saved plants could not be loaded");
       console.error(e);
@@ -244,26 +245,20 @@ function growPlant(key) {
     });
   } else {
     plants = plants.filter((p) => p.key !== key || !p.harvested);
-    if (existingPlant && existingPlant.harvested && harvestedCounts.has(existingPlant.species)) {
-      const species = existingPlant.species;
-      plants.push({ key, species, size: "start", harvested: false, hotkey_uses: 0 });
-      addPlant({ key, species, size: "start", harvested: false, hotkey_uses: 0 });
-    } else {
-      const usedSpecies = new Set(plants.filter((p) => !p.harvested).map((p) => p.species));
-      const availableSpecies = ALL_SPECIES.filter((s) => !usedSpecies.has(s));
-      const speciesItems = availableSpecies.map((s) => ({ label: s.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()), description: SPECIES_DESCRIPTIONS[s] }));
-      vscode2.window.showQuickPick(speciesItems, {
-        placeHolder: "Choose a species for your new plant"
-      }).then((item) => {
-        const species = item?.label.toLowerCase().replace(/ /g, "_");
-        if (species) {
-          const displayName = species.replace(/_/g, " ");
-          vscode2.window.showInformationMessage("A new " + displayName + " plant has sprouted in the greenhouse!");
-          plants.push({ key, species, size: "start", harvested: false, hotkey_uses: 0 });
-          addPlant({ key, species, size: "start", harvested: false, hotkey_uses: 0 });
-        }
-      });
-    }
+    const usedSpecies = new Set(plants.filter((p) => !p.harvested).map((p) => p.species));
+    const availableSpecies = ALL_SPECIES.filter((s) => !usedSpecies.has(s));
+    const speciesItems = availableSpecies.map((s) => ({ label: s.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()), description: SPECIES_DESCRIPTIONS[s] }));
+    vscode2.window.showQuickPick(speciesItems, {
+      placeHolder: "Choose a species for your new plant"
+    }).then((item) => {
+      const species = item?.label.toLowerCase().replace(/ /g, "_");
+      if (species) {
+        const displayName = species.replace(/_/g, " ");
+        vscode2.window.showInformationMessage("A new " + displayName + " plant has sprouted in the greenhouse!");
+        plants.push({ key, species, size: "start", harvested: false, hotkey_uses: 0 });
+        addPlant({ key, species, size: "start", harvested: false, hotkey_uses: 0 });
+      }
+    });
   }
   savePlants();
 }
