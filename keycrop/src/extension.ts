@@ -82,6 +82,25 @@ function savePlants() {
 let plants = new Array<Plant>();
 let harvestedCounts = new Map<string, number>();
 
+const SPECIES_DESCRIPTIONS: Record<string, string> = {
+  'bean': "A humble unassuming legume.",
+  'tomato': 'This crop has a wide variety of culinary uses.',
+  'broccoli': 'Nutritious',
+  'chili': 'Spicy and flavorful.',
+  'bulbino': 'A mysterious plant.',
+  'glowberry': 'Glowberries emit a soft bioluminescent hue.',
+  'ivy': 'A decorative ground cover.',
+  'jacaranda_tree': 'A tree with purple leaves.',
+  'lettuce': 'Great in salads',
+  'neon_mould': 'Radioactive mould.',
+  'poison_cabbage': 'Closely related to regular cabbage.',
+  'raspberry': 'A sweet and tart fruit.',
+  'rhubarb': 'The stalks are edible.',
+  'strawberry': 'A sweet and juicy fruit.',
+  'watermelon': 'Great with hotkeys in the summer.',
+};
+const ALL_SPECIES = ['bean', 'tomato', 'broccoli', 'chili', 'bulbino', 'glowberry', 'ivy', 'jacaranda_tree', 'lettuce', 'neon_mould', 'poison_cabbage', 'raspberry', 'rhubarb', 'strawberry', 'watermelon'];
+
 function addPlant(plant: Plant) {
   greenhouse.postMessage({
     action: 'add',
@@ -93,34 +112,15 @@ function addPlant(plant: Plant) {
 function growPlant(key: string) {
   const existingPlant = plants.find(p => p.key === key);
   if (existingPlant && !existingPlant.harvested) {
-    plants.filter(p => p.key === key).forEach(p => {
-      greenhouse.postMessage({
-        action: 'grow',
-        species: p.species
-      });
+    greenhouse.postMessage({
+      action: 'grow',
+      species: existingPlant.species
     });
   } else {
     // Remove any harvested plant tied to this key so it can be reassigned
     plants = plants.filter(p => p.key !== key || !p.harvested);
     const usedSpecies = new Set(plants.filter(p => !p.harvested).map(p => p.species));
-    const SPECIES_DESCRIPTIONS: Record<string, string> = {
-      'bean': "A humble unassuming legume.",
-      'tomato': 'This crop has a wide variety of culinary uses.',
-      'broccoli': 'Nutritious',
-      'chilli': 'Spicy and flavorful.',
-      'bulbino': 'A mysterious plant.',
-      'glowberry': 'Glowberries emit a soft bioluminescent hue.',
-      'ivy': 'A decorative ground cover.',
-      'jacaranda_tree': 'A tree with purple leaves.',
-      'lettuce': 'Great in salads',
-      'neon_mould': 'Radioactive mould.',
-      'poison_cabbage': 'Closely related to regular cabbage.',
-      'raspberry': 'A sweet and tart fruit.',
-      'rhubarb': 'The stalks are edible.',
-      'strawberry': 'A sweet and juicy fruit.',
-      'watermelon': 'Great with hotkeys in the summer.',
-    };
-    const availableSpecies = ['bean', 'tomato', 'broccoli', 'chilli', 'bulbino', 'glowberry', 'ivy', 'jacaranda_tree', 'lettuce', 'neon_mould', 'poison_cabbage', 'raspberry', 'rhubarb', 'strawberry', 'watermelon'].filter(s => !usedSpecies.has(s));
+    const availableSpecies = ALL_SPECIES.filter(s => !usedSpecies.has(s));
     const speciesItems = availableSpecies.map(s => ({ label: s.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()), description: SPECIES_DESCRIPTIONS[s] }));
     vscode.window.showQuickPick(speciesItems, {
       placeHolder: 'Choose a species for your new plant'
@@ -470,11 +470,10 @@ export class InventoryWebViewProvider implements vscode.WebviewViewProvider {
   }
     
     public resolveWebviewView(webviewView: vscode.WebviewView, context: vscode.WebviewViewResolveContext, token: vscode.CancellationToken): Thenable<void> | void {
-      this.view = webviewView; //FIXME: do I need this?
+      this.view = webviewView;
 
-      const webview = webviewView.webview; //FIXME: ditto
+      const webview = webviewView.webview;
 
-      //ditto
       webview.options = {
         enableScripts: true
       };

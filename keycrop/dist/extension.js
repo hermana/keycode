@@ -210,6 +210,24 @@ function savePlants() {
 }
 var plants = new Array();
 var harvestedCounts = /* @__PURE__ */ new Map();
+var SPECIES_DESCRIPTIONS = {
+  "bean": "A humble unassuming legume.",
+  "tomato": "This crop has a wide variety of culinary uses.",
+  "broccoli": "Nutritious",
+  "chili": "Spicy and flavorful.",
+  "bulbino": "A mysterious plant.",
+  "glowberry": "Glowberries emit a soft bioluminescent hue.",
+  "ivy": "A decorative ground cover.",
+  "jacaranda_tree": "A tree with purple leaves.",
+  "lettuce": "Great in salads",
+  "neon_mould": "Radioactive mould.",
+  "poison_cabbage": "Closely related to regular cabbage.",
+  "raspberry": "A sweet and tart fruit.",
+  "rhubarb": "The stalks are edible.",
+  "strawberry": "A sweet and juicy fruit.",
+  "watermelon": "Great with hotkeys in the summer."
+};
+var ALL_SPECIES = ["bean", "tomato", "broccoli", "chili", "bulbino", "glowberry", "ivy", "jacaranda_tree", "lettuce", "neon_mould", "poison_cabbage", "raspberry", "rhubarb", "strawberry", "watermelon"];
 function addPlant(plant) {
   greenhouse.postMessage({
     action: "add",
@@ -220,33 +238,14 @@ function addPlant(plant) {
 function growPlant(key) {
   const existingPlant = plants.find((p) => p.key === key);
   if (existingPlant && !existingPlant.harvested) {
-    plants.filter((p) => p.key === key).forEach((p) => {
-      greenhouse.postMessage({
-        action: "grow",
-        species: p.species
-      });
+    greenhouse.postMessage({
+      action: "grow",
+      species: existingPlant.species
     });
   } else {
     plants = plants.filter((p) => p.key !== key || !p.harvested);
     const usedSpecies = new Set(plants.filter((p) => !p.harvested).map((p) => p.species));
-    const SPECIES_DESCRIPTIONS = {
-      "bean": "A humble unassuming legume.",
-      "tomato": "This crop has a wide variety of culinary uses.",
-      "broccoli": "Nutritious",
-      "chilli": "Spicy and flavorful.",
-      "bulbino": "A mysterious plant.",
-      "glowberry": "Glowberries emit a soft bioluminescent hue.",
-      "ivy": "A decorative ground cover.",
-      "jacaranda_tree": "A tree with purple leaves.",
-      "lettuce": "Great in salads",
-      "neon_mould": "Radioactive mould.",
-      "poison_cabbage": "Closely related to regular cabbage.",
-      "raspberry": "A sweet and tart fruit.",
-      "rhubarb": "The stalks are edible.",
-      "strawberry": "A sweet and juicy fruit.",
-      "watermelon": "Great with hotkeys in the summer."
-    };
-    const availableSpecies = ["bean", "tomato", "broccoli", "chilli", "bulbino", "glowberry", "ivy", "jacaranda_tree", "lettuce", "neon_mould", "poison_cabbage", "raspberry", "rhubarb", "strawberry", "watermelon"].filter((s) => !usedSpecies.has(s));
+    const availableSpecies = ALL_SPECIES.filter((s) => !usedSpecies.has(s));
     const speciesItems = availableSpecies.map((s) => ({ label: s.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()), description: SPECIES_DESCRIPTIONS[s] }));
     vscode2.window.showQuickPick(speciesItems, {
       placeHolder: "Choose a species for your new plant"

@@ -204,19 +204,19 @@ background: url(./vegetables/broccoli_large.png);
 }
 
 .mango.small {
-  background: url(./vegetables/chilli_small.png);
+  background: url(./vegetables/chili_small.png);
 }
 
 .mango.medium {
-  background: url(./vegetables/chilli_medium.png);
+  background: url(./vegetables/chili_medium.png);
 }
 
 .mango.large {
-background: url(./vegetables/chilli_large.png);
+background: url(./vegetables/chili_large.png);
 }
 
 .mango.harvested-plant {
-  background: url(./vegetables/chilli_harvested.png);
+  background: url(./vegetables/chili_harvested.png);
   }  
 
 .poppy.start {
@@ -451,21 +451,21 @@ background: url(./vegetables/watermelon_large.png);
 .broccoli.stage-14 { background: url(./midjourney-interpolated-vegetables/broccoli_14.png); background-size: contain; background-repeat: no-repeat; }
 .broccoli.harvested-plant { background: url(./midjourney-interpolated-vegetables/broccoli_harvested.png); background-size: contain; background-repeat: no-repeat; }
 
-.chilli.stage-1  { background: url(./midjourney-interpolated-vegetables/chilli_1.png); background-size: contain; background-repeat: no-repeat; }
-.chilli.stage-2  { background: url(./midjourney-interpolated-vegetables/chilli_2.png); background-size: contain; background-repeat: no-repeat; }
-.chilli.stage-3  { background: url(./midjourney-interpolated-vegetables/chilli_3.png); background-size: contain; background-repeat: no-repeat; }
-.chilli.stage-4  { background: url(./midjourney-interpolated-vegetables/chilli_4.png); background-size: contain; background-repeat: no-repeat; }
-.chilli.stage-5  { background: url(./midjourney-interpolated-vegetables/chilli_5.png); background-size: contain; background-repeat: no-repeat; }
-.chilli.stage-6  { background: url(./midjourney-interpolated-vegetables/chilli_6.png); background-size: contain; background-repeat: no-repeat; }
-.chilli.stage-7  { background: url(./midjourney-interpolated-vegetables/chilli_7.png); background-size: contain; background-repeat: no-repeat; }
-.chilli.stage-8  { background: url(./midjourney-interpolated-vegetables/chilli_8.png); background-size: contain; background-repeat: no-repeat; }
-.chilli.stage-9  { background: url(./midjourney-interpolated-vegetables/chilli_9.png); background-size: contain; background-repeat: no-repeat; }
-.chilli.stage-10 { background: url(./midjourney-interpolated-vegetables/chilli_10.png); background-size: contain; background-repeat: no-repeat; }
-.chilli.stage-11 { background: url(./midjourney-interpolated-vegetables/chilli_11.png); background-size: contain; background-repeat: no-repeat; }
-.chilli.stage-12 { background: url(./midjourney-interpolated-vegetables/chilli_12.png); background-size: contain; background-repeat: no-repeat; }
-.chilli.stage-13 { background: url(./midjourney-interpolated-vegetables/chilli_13.png); background-size: contain; background-repeat: no-repeat; }
-.chilli.stage-14 { background: url(./midjourney-interpolated-vegetables/chilli_14.png); background-size: contain; background-repeat: no-repeat; }
-.chilli.harvested-plant { background: url(./midjourney-interpolated-vegetables/chilli_harvested.png); background-size: contain; background-repeat: no-repeat; }
+.chili.stage-1  { background: url(./midjourney-interpolated-vegetables/chili_1.png); background-size: contain; background-repeat: no-repeat; }
+.chili.stage-2  { background: url(./midjourney-interpolated-vegetables/chili_2.png); background-size: contain; background-repeat: no-repeat; }
+.chili.stage-3  { background: url(./midjourney-interpolated-vegetables/chili_3.png); background-size: contain; background-repeat: no-repeat; }
+.chili.stage-4  { background: url(./midjourney-interpolated-vegetables/chili_4.png); background-size: contain; background-repeat: no-repeat; }
+.chili.stage-5  { background: url(./midjourney-interpolated-vegetables/chili_5.png); background-size: contain; background-repeat: no-repeat; }
+.chili.stage-6  { background: url(./midjourney-interpolated-vegetables/chili_6.png); background-size: contain; background-repeat: no-repeat; }
+.chili.stage-7  { background: url(./midjourney-interpolated-vegetables/chili_7.png); background-size: contain; background-repeat: no-repeat; }
+.chili.stage-8  { background: url(./midjourney-interpolated-vegetables/chili_8.png); background-size: contain; background-repeat: no-repeat; }
+.chili.stage-9  { background: url(./midjourney-interpolated-vegetables/chili_9.png); background-size: contain; background-repeat: no-repeat; }
+.chili.stage-10 { background: url(./midjourney-interpolated-vegetables/chili_10.png); background-size: contain; background-repeat: no-repeat; }
+.chili.stage-11 { background: url(./midjourney-interpolated-vegetables/chili_11.png); background-size: contain; background-repeat: no-repeat; }
+.chili.stage-12 { background: url(./midjourney-interpolated-vegetables/chili_12.png); background-size: contain; background-repeat: no-repeat; }
+.chili.stage-13 { background: url(./midjourney-interpolated-vegetables/chili_13.png); background-size: contain; background-repeat: no-repeat; }
+.chili.stage-14 { background: url(./midjourney-interpolated-vegetables/chili_14.png); background-size: contain; background-repeat: no-repeat; }
+.chili.harvested-plant { background: url(./midjourney-interpolated-vegetables/chili_harvested.png); background-size: contain; background-repeat: no-repeat; }
 
 .bulbino.stage-1  { background: url(./midjourney-interpolated-vegetables/bulbino_1.png); background-size: contain; background-repeat: no-repeat; }
 .bulbino.stage-2  { background: url(./midjourney-interpolated-vegetables/bulbino_2.png); background-size: contain; background-repeat: no-repeat; }
@@ -710,7 +710,7 @@ background: url(./vegetables/watermelon_large.png);
 .chili-icon{
   max-width: 100%;
   height: auto;
-  background: url(./vegetables/chilli_harvested.png);
+  background: url(./vegetables/chili_harvested.png);
   height:20px;
   width:20px;
   display:block;
