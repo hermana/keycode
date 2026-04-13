@@ -251,8 +251,9 @@ function growPlant(key) {
       action: "grow",
       species: existingPlant.species
     });
+    savePlants();
   } else {
-    plants = plants.filter((p) => p.key !== key || !p.harvested);
+    plants = plants.filter((p) => p.key !== key);
     const usedSpecies = new Set(plants.filter((p) => !p.harvested).map((p) => p.species));
     const availableSpecies = ALL_SPECIES.filter((s) => !usedSpecies.has(s));
     const speciesItems = availableSpecies.map((s) => ({ label: s.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()), description: SPECIES_DESCRIPTIONS[s] }));
@@ -268,9 +269,7 @@ function growPlant(key) {
         savePlants();
       }
     });
-    return;
   }
-  savePlants();
 }
 function logKeyPress(plant) {
   keyTrackingString.push({
@@ -508,13 +507,8 @@ var GreenhouseWebViewProvider = class {
           }
           break;
         case "save_plants": {
-          const webviewPlants = message.content;
-          const mergedPlants = plants.map((p) => {
-            const fromWebview = webviewPlants.find((wp) => wp.key === p.key);
-            return fromWebview ?? p;
-          });
           const saveData = {
-            plants: mergedPlants,
+            plants: message.content,
             harvestedCounts: Object.fromEntries(harvestedCounts)
           };
           fs.writeFileSync(plantsPath, JSON.stringify(saveData));

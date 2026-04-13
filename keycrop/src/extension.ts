@@ -121,10 +121,10 @@ function growPlant(key: string) {
       action: 'grow',
       species: existingPlant.species
     });
+    savePlants();
   } else {
-    // Remove any harvested plant tied to this key so it can be reassigned
-    plants = plants.filter(p => p.key !== key || !p.harvested);
-
+    // No plant for this key, or it has been harvested — free the key and let user pick
+    plants = plants.filter(p => p.key !== key);
     const usedSpecies = new Set(plants.filter(p => !p.harvested).map(p => p.species));
     const availableSpecies = ALL_SPECIES.filter(s => !usedSpecies.has(s));
     const speciesItems = availableSpecies.map(s => ({ label: s.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()), description: SPECIES_DESCRIPTIONS[s] }));
@@ -140,9 +140,7 @@ function growPlant(key: string) {
         savePlants();
       }
     });
-    return;
   }
-  savePlants();
 }
 
 function logKeyPress(plant: string) {
@@ -417,17 +415,8 @@ export class GreenhouseWebViewProvider implements vscode.WebviewViewProvider {
             }
             break;
           case 'save_plants': {
-            // Merge webview state (accurate size/hotkey_uses) with extension's plants array
-            // (source of truth for which plants exist). If the webview hasn't loaded a plant
-            // yet (race condition: hotkey fired before webview init), fall back to the
-            // extension's record so plants are never dropped from disk.
-            const webviewPlants: any[] = message.content;
-            const mergedPlants = plants.map(p => {
-              const fromWebview = webviewPlants.find((wp: any) => wp.key === p.key);
-              return fromWebview ?? p;
-            });
             const saveData = {
-              plants: mergedPlants,
+              plants: message.content,
               harvestedCounts: Object.fromEntries(harvestedCounts)
             };
             // fs.writeFileSync(plantsStudyOutputPath, JSON.stringify(saveData));

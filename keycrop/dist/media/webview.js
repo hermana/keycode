@@ -206,7 +206,7 @@ Uses: ${this._num_hotkey_uses}`;
     }
     grow(species, vscode2) {
       this.plants.forEach((plant) => {
-        if (plant.species === species) {
+        if (plant.species === species && !plant.html_element.classList.contains("harvested-plant")) {
           plant.grow(vscode2);
         }
       });

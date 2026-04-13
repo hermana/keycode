@@ -14,7 +14,9 @@ export class Greenhouse {
 
   grow(species: string, vscode: { postMessage(msg: unknown): void }): void {
     this.plants.forEach(plant => {
-      if (plant.species === species) { plant.grow(vscode); }
+      if (plant.species === species && !plant.html_element.classList.contains('harvested-plant')) {
+        plant.grow(vscode);
+      }
     });
   }
 
