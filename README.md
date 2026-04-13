@@ -1,45 +1,42 @@
 # Keycrop
 
-## Study Instructions
+## How to get the plugin
 
-### Day One:
-1. Fill out the [consent form](https://www.surveymonkey.ca/r/QYYXZXZ), followed by the [Pre-Survey](https://www.surveymonkey.ca/r/QYY7RZG).
-2. Follow the setup instructions in the below "Setting Up" section below to start up Keycrop in VSCode. 
-2. Switch your branch of Keycrop to `866-study` using `git checkout 866-study` or your preferred Git GUI.
-3. Check that your personal `keybindings.json` file, which you edited as part of the setup, matches the one in `player-resources/keybindings.json`.  
-4. Re-run `yarn run compile`. 
-5. Repeat Steps 4&5 of the "Setting up" instructions, that is, run the development version of VSCode. 
-6. In the development version of VSCode, with Keycrop running, open the folder called `study-tasks`.
-7. In the study-tasks folder, run `pip install pygame`. 
-8. You will see five tasks. Each is a simple game written in python, but none of them are in a working state. Try to use the hotkeys suggested by Keycrop to debug the games. You can search each file for the word "HINT" for additional clues. 
-9. While it is theoretically possible to complete Level One of Keycrop by debugging the games, please keep in mind that you are under no pressure to do so as a study participant. Also, you are encouraged to attempt to debug each script, but it is fine if you do not get all the games working.
-10. The game will create a file called `output/plants.json`. Please email this file to `ashley.herman@usask.ca`.
+### 1. Getting the code:
 
-### Day Two:
-1. At some point on the second day, fill out this [Memory Test](https://www.surveymonkey.ca/r/JZSBPYC). 
+If you are familiar with git, you can clone this repo
 
-### Day Three:
-1. Switch your branch of Keycrop to `866-study-nongame-mode` using `git checkout 866-study-nongame-mode` or your preferred Git GUI. 
-2. Re-run `yarn run compile`. 
-3. Repeat Steps 4&5 of the Setup Instructions, that is, run the development version of VSCode. You will still see the VSCode Panel, but it should be blacked out and the game should not be visible. 
-4. Repeat the study tasks in the Development version of VSCode. Debug each of the five games. The games, and their bugs, will be the same as the first day.
-5. Keycrop will create a file called `output/keytracking.json` in the background. Please email this file to `ashley.herman@usask.ca`. I will reply to schedule your Playtesting Interview.
+``
+git clone https://github.com/hermana/keycode.git
+``
 
-### Playtesting Interview
-1. This interview will take place over Zoom. You will be asked open-ended questions about Keycrop and have an opportunity to provide suggestions as well as discuss any thoughts you have that were not covered by the surveys. 
+and checkout this branch:
 
-## Setting up
+``
+git checkout test-keycrop
+``
 
-1. Before playing the game, you will need to customize your VSCode `keybindings.json` file. You can find this file in VSCode using **cmd+shift+p** and searching for "Preferences: Open Keyboard Shortcuts (JSON)". You can also go to the file directly: on mac, you can find the file at `~/Library/Application Support/Code/User/keybindings.json`, and on Linux, you can find it at `~/.config/Code/User/keybindings.json`. 
+If you are not familiar with git, click on the green "<> Code" button and select "Download ZIP". This branch of the codebase should download as a zip file. Unzip the file and open it in VSCode. 
 
-2. Replace the contents of the file with the contents of the `player_resources/keybindings.json` file in this repo.  
+### 2. Setting up the keybindings file: 
 
-### Setting up in the VSCode Extension Development Environment ##
+1. In VSCode, CTRL+SHIFT+P and search "Keyboard" (or similar)
+2. Select "Preferences: Open keyboard shortcuts". This should open your keybindings file. 
+3. Save your custom keybindings to another file, if you have any, so you can put them back when you are done testing. 
+4. In the codebase, `keycrop->player_resources` contains json files with custom keybindings used to play the game. If you are on Windows or Linux, copy the contents of `keybindings.json` and put them in your personal keybindings file. If you are on Mac, copy the contents of `mac-keybindings.json` and put them in your custom keybindings file. 
 
-3. Clone this repository and open it in VSCode. In the `keycrop/` directory, run `yarn install` (The project was developed using yarn, but `npm install` may also work).
+### 3. Running the plugin in development mode:
 
-4. Run `yarn run compile`.
+1. Open the keycrop codebase in VSCode, if you haven't already. 
+2. Navigate to kecrop->src->extension.ts. 
+3. In your terminal, `cd` into the `keycrop` directory. 
+4. Run `yarn install` or `npm install`.
+5. Run `yarn compile` or `npm run compile`. 
+6. Select "Run and Debug" (CTRL+SHIFT+D). 
+7. Click "Run and Debug".
+8. You may have to select "VSCode Extension Development" from the Command Palette menu. 
+9. A new window of VSCode should open. To test the plugin, you will use the new window. 
 
-5. Open `src/extension.ts`. Select the debugger arrow from the side panel and then clicking the "Run and Debug" button, or use **cmd+shift+p** and search for "Debug: Start debugging". The first time you do this, you will be prompted to select a debugging environment - choose "VSCode Extension Development (preview)". 
+### Testing:
 
-6. A new, development-version of VSCode should now pop-up. Keycrop should appear as a collapsable view in the side panel. 
+Please do whatever you want. The game is obviously unfinished, all you can do is grow plants. Nothing is preventing you from mashing keys, this is so that you can try things out quickly if you prefer.  
