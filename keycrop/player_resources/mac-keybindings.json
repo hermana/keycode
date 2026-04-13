@@ -1,54 +1,78 @@
+
 [
     {
-        "key": "cmd+shift+m",
+        "key": "cmd+shift+p",
         "command": "runCommands",
         "args": {
             "commands": [
                 {
-                    "command": "workbench.actions.view.problems",
-                    "when": "workbench.panel.markers.view.active" 
+                    "command": "workbench.action.showCommands"
                 },
-                "keycrop.growBean"
+                "keycrop.growCommandPalette"
             ]
         }
     },
     {
-        "key": "cmd+shift+space",
+        "key": "cmd+shift+k",
         "command": "runCommands",
         "args": {
             "commands": [
                 {
-                    "command": "editor.action.triggerParameterHints",
-                    "when": "editorHasSignatureHelpProvider && editorTextFocus"
+                    "command": "editor.action.deleteLines",
+                    "when": "textInputFocus && !editorReadonly" 
                 },
-                "keycrop.growChili"
+                "keycrop.growDeleteCurrentLine"
             ]
         }
     },
     {
-        "key": "cmd+/",
+        "key": "cmd+shift+\\",
         "command": "runCommands",
         "args": {
             "commands": [
                 {
-                    "command": "editor.action.commentLine",
-                    "when": "editorTextFocus && !editorReadonly"
+                    "command": "editor.action.jumpToBracket",
+                    "when": "editorTextFocus" 
                 },
-                "keycrop.growLettuce"
+                "keycrop.growJumpToBracket"
             ]
         }
     },
-    { "key": "cmd+[",         
+    {
+        "key": "cmd+t",
         "command": "runCommands",
         "args": {
             "commands": [
                 {
-                "command": "editor.action.outdentLines",
-                "when": "editorTextFocus && !editorReadonly" 
+                    "command": "workbench.action.showAllSymbols"
+                },
+                "keycrop.growShowAllSymbols"
+            ]
+        }
+    },
+    { "key": "cmd+shift+o",         
+        "command": "runCommands",
+        "args": {
+            "commands": [
+                {
+                    "command": "workbench.action.gotoSymbol",
+                    "when": "!accessibilityHelpIsShown && !accessibleViewIsShown" 
             },
-            "keycrop.growBroccoli"
+                "keycrop.growGoToSymbol"
             ]
         }       
+    },
+    { "key": "cmd+shift+m",   
+        "command": "runCommands",
+            "args": {
+                "commands" :[
+                    {
+                        "command": "workbench.actions.view.problems",
+                        "when": "workbench.panel.markers.view.active" 
+                    },
+                    "keycrop.growViewProblems"
+                ]
+            }    
     },
     { "key": "cmd+shift+l",   
         "command": "runCommands",
@@ -56,18 +80,451 @@
                 "commands" :[
                     {
                         "command": "editor.action.selectHighlights",
-                        "when": "editorFocus"
+                        "when": "editorFocus" 
                     },
                     {
+                    "command": "addCursorsAtSearchResults",
+                        "when": "fileMatchOrMatchFocus && searchViewletVisible"
+                    },
+                    {
+                        "command": "notebook.selectAllFindMatches",
+                        "when": "config.notebook.multiCursor.enabled && notebookFindWidgetFocused || config.notebook.multiCursor.enabled && notebookCellEditorFocused && activeEditor == 'workbench.editor.notebook'"  
+                    },
+                    {   
                         "command": "selectAllSearchEditorMatches",
                         "when": "inSearchEditor"
                     },
-                    {
-                        "command": "addCursorsAtSearchResults",
-                        "when": "fileMatchOrMatchFocus && searchViewletVisible"
-                    },
-                    "keycrop.growTomato"
+                    "keycrop.growCursorAtAllOccurrences"
                 ]
             }    
-        }  
+    },
+    { "key": "cmd+shift+space",   
+        "command": "runCommands",
+            "args": {
+                "commands" :[
+                    {
+                         "command": "editor.action.triggerParameterHints",
+                         "when": "editorHasSignatureHelpProvider && editorTextFocus"
+                    },
+                    "keycrop.growTriggerParameterHints"
+                ]
+            }    
+    }, 
+    { "key": "cmd+\\",   
+        "command": "runCommands",
+            "args": {
+                "commands" :[
+                    {
+                         "command": "workbench.action.splitEditor"
+                    },
+                    "keycrop.growSplitEditor"
+                ]
+            }    
+    }, 
+    { "key": "cmd+shift+tab",   
+        "command": "runCommands",
+            "args": {
+                "commands" :[
+                    {
+                        "command": "workbench.action.quickOpenLeastRecentlyUsedEditorInGroup",
+                        "when": "!activeEditorGroupEmpty"
+                    },
+                    "keycrop.growOpenLastUsedEditorInGroup"
+                ]
+            }    
+    }, 
+    { "key": "cmd+`",   
+        "command": "runCommands",
+            "args": {
+                "commands" :[
+                    {
+                        "command": "workbench.action.terminal.toggleTerminal",
+                        "when": "terminal.active"
+                    },
+                    "keycrop.growToggleTerminal"
+                ]
+            }    
+    }, 
+    { "key": "cmd+shift+`",   
+        "command": "runCommands",
+            "args": {
+                "commands" :[
+                    {
+                        "command": "workbench.action.terminal.new",
+                        "when": "terminalProcessSupported || terminalWebExtensionContributedProfile"
+                    },
+                    "keycrop.growCreateNewTerminal"
+                ]
+            }    
+    }, 
+    { "key": "cmd+g",   
+        "command": "runCommands",
+            "args": {
+                "commands" :[
+                    {
+                        "command": "workbench.action.gotoLine"
+                    },
+                    {
+                        "command": "workbench.action.terminal.goToRecentDirectory",
+                        "when": "terminalFocus && terminalHasBeenCreated || terminalFocus && terminalProcessSupported" 
+                    },
+                    "keycrop.growGoToLine"
+                ]
+            }    
+    }, 
+    { "key": "cmd+.",   
+        "command": "runCommands",
+            "args": {
+                "commands" :[
+                    {
+                        "command": "acceptSelectedCodeAction",
+                        "when": "codeActionMenuVisible" 
+                    },
+                    {
+                        "command": "editor.action.quickFix",
+                        "when": "editorHasCodeActionsProvider && textInputFocus && !editorReadonly" 
+                    },
+                    {
+                        "command": "editor.changeDropType",
+                            "when": "dropWidgetVisible" 
+                    },
+                    {
+                        "command": "editor.changePasteType",
+                        "when": "pasteWidgetVisible"
+                    },
+                    {
+                         "command": "editor.removeManualFoldingRanges",
+                         "when": "editorTextFocus && foldingEnabled"
+                    },
+                    {
+                        "command": "workbench.action.chat.openModePicker",
+                        "when": "chatIsEnabled && inChatInput && chatLocation == 'panel'" 
+                    },
+                    {
+                        "command": "notebook.cell.openFailureActions",
+                        "when": "notebookCellFocused && notebookCellHasErrorDiagnostics && !notebookCellEditorFocused" 
+                    },
+                    {
+                        "command": "problems.action.showQuickFixes",
+                        "when": "problemFocus" 
+                    },
+                    {
+                         "command": "workbench.action.terminal.showQuickFixes",
+                         "when": "terminalFocus" 
+                    },
+                    {
+                        "command": "acceptSelectedCodeAction",
+                        "when": "codeActionMenuVisible" 
+                    },
+                    "keycrop.growQuickFix"
+                ]
+            }    
+    }, 
+    { "key": "cmd+shift+s",   
+        "command": "runCommands",
+            "args": {
+                "commands" :[
+                    {
+                        "command":"workbench.action.files.saveAs"
+                    },
+                    {
+                       "command": "workbench.action.files.saveLocalFile",
+                       "when": "remoteFileDialogVisible" 
+                    },
+                    "keycrop.growSaveFileAs"
+                ]
+            }    
+    }, 
+    { "key": "alt+up",   
+        "command": "runCommands",
+            "args": {
+                "commands" :[
+                    {
+                        "command": "editor.action.moveLinesUpAction",
+                        "when": "editorTextFocus && !editorReadonly" 
+                    },
+                    {
+                        "command": "editor.action.pageUpHover",
+                        "when": "editorHoverFocused" 
+                    },
+                    {
+                        "command": "showPrevParameterHint",
+                        "when": "editorFocus && parameterHintsMultipleSignatures && parameterHintsVisible" 
+                    },
+                    {
+                        "command": "history.showPrevious",
+                        "when": "historyNavigationBackwardsEnabled && historyNavigationWidgetFocus && !isComposing && !suggestWidgetVisible"
+                    },
+                    {
+                        "command": "list.focusAnyUp",
+                        "when": "listFocus && !inputFocus && !treestickyScrollFocused"
+                    },
+                    {       
+                        "command": "notebook.cell.moveUp",
+                        "when": "notebookEditorFocused && !inputFocus" 
+                    },
+                    {   "command": "quickInput.previousSeparatorWithQuickAccessFallback",
+                        "when": "inQuickInput && quickInputType == 'quickPick' || inQuickInput && quickInputType == 'quickTree'" 
+                    },
+                    {
+                        "command": "scm.forceViewPreviousCommit",
+                        "when": "scmRepository" 
+                    },
+                    {
+                        "command": "workbench.action.terminal.sendSequence",
+                        "when": "terminalFocus",
+                        "args": {"text":"\u001b[1;5A"}
+                    },
+                    {
+                         "command": "workbench.action.terminal.focusPreviousPane",
+                         "when": "terminalFocus && terminalHasBeenCreated && terminalSplitPaneActive || terminalFocus && terminalProcessSupported && terminalSplitPaneActive" 
+                    },
+                    {
+                        "command": "workbench.action.terminal.accessibleBufferGoToPreviousCommand",
+                        "when": "accessibleViewIsShown && terminalHasBeenCreated && accessibleViewCurrentProviderId == 'terminal' || accessibleViewIsShown && terminalProcessSupported && accessibleViewCurrentProviderId == 'terminal'" 
+                    },
+                    {
+                        "command": "workbench.action.navigateModalEditorPrevious",
+                        "when": "editorPartModal && editorPartModalNavigation" 
+
+                    },
+                                    
+                    "keycrop.growMoveLineUp"
+                ]
+            }    
+    }, 
+    { "key": "alt+down",   
+        "command": "runCommands",
+            "args": {
+                "commands" :[
+                    {
+                        "command": "editor.action.moveLinesDownAction",
+                        "when": "editorTextFocus && !editorReadonly" 
+                    },
+                    {
+                       "command": "editor.action.pageDownHover",
+                       "when": "editorHoverFocused" 
+                    },
+                    {
+                        "command": "showNextParameterHint",
+                        "when": "editorFocus && parameterHintsMultipleSignatures && parameterHintsVisible" 
+                    },
+                    {
+                        "command": "history.showNext",
+                        "when": "historyNavigationForwardsEnabled && historyNavigationWidgetFocus && !isComposing && !suggestWidgetVisible" 
+                    },
+                    {   
+                        "command": "list.focusAnyDown",
+                        "when": "listFocus && !inputFocus && !treestickyScrollFocused" 
+                    },
+                    {
+                       "command": "notebook.cell.moveDown",
+                       "when": "notebookEditorFocused && !inputFocus"
+                    },
+                    {
+                        "command": "quickInput.nextSeparatorWithQuickAccessFallback",
+                        "when": "inQuickInput && quickInputType == 'quickPick' || inQuickInput && quickInputType == 'quickTree'"
+                    },
+                    {
+                        "command": "scm.forceViewNextCommit",
+                        "when": "scmRepository" 
+                    },
+                    {
+                        "command": "workbench.action.chat.nextUserPrompt",
+                        "when": "chatIsEnabled && inChat" 
+                    },
+                    {
+                         "command": "workbench.action.terminal.sendSequence",
+                         "when": "terminalFocus",
+                         "args": {"text":"\u001b[1;5B"} 
+                    },
+                    {
+                        "command": "workbench.action.terminal.focusNextPane",
+                        "when": "terminalFocus && terminalHasBeenCreated && terminalSplitPaneActive || terminalFocus && terminalProcessSupported && terminalSplitPaneActive"
+                    },
+                    {
+                        "command": "workbench.action.terminal.accessibleBufferGoToNextCommand",
+                        "when": "accessibleViewIsShown && accessibleViewCurrentProviderId == 'terminal' || accessibleViewIsShown && terminalHasBeenCreated && accessibleViewCurrentProviderId == 'terminal' || accessibleViewIsShown && terminalProcessSupported && accessibleViewCurrentProviderId == 'terminal'"
+                    },
+                    {
+                        "command": "workbench.action.navigateModalEditorNext",
+                        "when": "editorPartModal && editorPartModalNavigation"
+                    },
+                    "keycrop.growMoveLineDown"
+                ]
+            }    
+    },
+    { "key": "cmd+l",   
+        "command": "runCommands",
+            "args": {
+                "commands" :[
+                    {
+                        "command": "notebook.centerActiveCell",
+                        "when": "notebookEditorFocused" 
+                    },
+                    {
+                       "command": "workbench.action.browser.focusUrlInput",
+                        "when": "activeEditor == 'workbench.editor.browser'" 
+                    },
+                    {
+                        "command": "workbench.action.chat.newChat",
+                        "when": "chatIsEnabled && inChat && chatLocation == 'panel'"
+                    },
+                    {
+                        "command": "expandLineSelection",
+                        "when": "textInputFocus" 
+                    },
+                    "keycrop.growSelectCurrentLine"
+                ]
+            }    
+    },
+    { "key": "shift+alt+i",   
+        "command": "runCommands",
+            "args": {
+                "commands" :[
+                    {
+                        "command": "editor.action.insertCursorAtEndOfEachLineSelected",
+                        "when": "editorTextFocus" 
+                    },
+                    "keycrop.growInsertCursorAtEndOfEachLineSelected"
+                ]
+            }    
+    },
+    { "key": "cmd+shift+up",   
+        "command": "runCommands",
+            "args": {
+                "commands" :[
+                    {
+                         "command": "editor.action.insertCursorAbove",
+                         "when": "editorTextFocus" 
+                    },
+                    {
+                        "command": "workbench.chat.action.focusLastFocused",
+                        "when": "chatCursorAtTop && inChatInput && !quickChatHasFocus"
+                    },
+                    {
+                        "command": "workbench.chat.action.focusLastFocused",
+                        "when": "chatCursorAtTop && inChatInput && !quickChatHasFocus"                   
+                    },
+                    {
+                        "command": "workbench.chat.action.focusLastFocused",
+                        "when": "inChatInput && isLinux && !quickChatHasFocus || inChatInput && isWindows && !quickChatHasFocus"
+                    },
+                    {
+                        "command": "notebook.cell.focusOutOutput",
+                        "when": "notebookEditorFocused && notebookOutputFocused"
+                    },
+                    {
+                        "command": "workbench.action.terminal.scrollUp",
+                        "when": "terminalFocusInAny && terminalHasBeenCreated && !terminalAltBufferActive || terminalFocusInAny && terminalProcessSupported && !terminalAltBufferActive" 
+                    },
+                    {
+                        "command": "workbench.action.terminal.selectToPreviousCommand",
+                        "when": "terminalFocus && terminalHasBeenCreated || terminalFocus && terminalProcessSupported"
+                    },
+                    "keycrop.growInsertCursorAbove"
+                ]
+            }    
+    },
+    {
+        "key": "cmd+shift+down",
+        "command": "runCommands",
+        "args": {
+            "commands": [
+                {
+                    "command": "workbench.action.terminal.selectToNextCommand",
+                    "when": "terminalFocus && terminalHasBeenCreated || terminalFocus && terminalProcessSupported"    
+                },
+                {
+                     "command": "workbench.chat.action.focusLastFocused",
+                     "when": "inChat && inChatInput && quickChatHasFocus" 
+                },
+                {
+                    "command": "editor.action.insertCursorBelow",
+                    "when": "editorTextFocus" 
+                },
+                {
+                    "command": "notebook.cell.focusInOutput",
+                    "when": "activeEditor == 'workbench.editor.interactive' || activeEditor == 'workbench.editor.notebook' || activeEditor == 'workbench.editor.repl'" 
+                },
+                {
+                    "command": "workbench.action.terminal.scrollDown",
+                    "when": "terminalFocusInAny && terminalHasBeenCreated && !terminalAltBufferActive || terminalFocusInAny && terminalProcessSupported && !terminalAltBufferActive" 
+                },
+                "keycrop.growInsertCursorBelow"
+            ]
+        }
+    },
+    { "key": "cmd+space",         
+        "command": "runCommands",
+        "args": {
+            "commands": [
+                {
+                    "command": "editor.action.triggerSuggest",
+                    "when": "editorHasCompletionItemProvider && textInputFocus && !editorReadonly && !suggestWidgetVisible" 
+                },
+                {
+                    "command": "focusSuggestion",
+                    "when": "suggestWidgetVisible && textInputFocus && !suggestWidgetHasFocusedSuggestion" 
+                },
+                {
+                    "command": "toggleSuggestionDetails",
+                    "when": "suggestWidgetHasFocusedSuggestion && suggestWidgetVisible && textInputFocus" 
+                },
+                {
+                    "command": "quickInput.toggleHover",
+                    "when": "inQuickInput && quickInputType == 'quickPick' || inQuickInput && quickInputType == 'quickTree'" 
+                },
+                {
+                    "command": "workbench.action.terminal.sendSequence",
+                        "when": "config.terminal.integrated.enableWin32InputMode && terminalFocus && terminalShellIntegrationEnabled && !accessibilityModeEnabled && terminalShellType == 'pwsh'",
+                        "args": {"text":"\u001b[24~a"} 
+                },
+                {
+                    "command": "workbench.action.terminal.triggerSuggest",
+                    "when": "config.terminal.integrated.suggest.enabled && terminalFocus && terminalProcessSupported && !terminalSuggestWidgetVisible" 
+                },
+                {
+                     "command": "workbench.action.terminal.suggestToggleDetails",
+                     "when": "simpleSuggestWidgetHasFocusedSuggestion && terminalFocus && terminalHasBeenCreated && terminalIsOpen && terminalSuggestWidgetVisible || simpleSuggestWidgetHasFocusedSuggestion && terminalFocus && terminalIsOpen && terminalProcessSupported && terminalSuggestWidgetVisible" 
+                },
+                "keycrop.growTriggerSuggestions"
+            ]
+        }       
+    },
+    { "key": "cmd+k cmd+i",   
+        "command": "runCommands",
+            "args": {
+                "commands" :[
+                    {
+                       "command": "workbench.action.showHover" 
+                    },
+                    {
+                        "command": "editor.action.showHover",
+                        "when": "editorTextFocus"
+                    },
+                    {
+                        "command": "editor.debug.action.showDebugHover",
+                        "when": "editorTextFocus && inDebugMode" 
+                    },
+                    {
+                        "command": "list.showHover",
+                        "when": "listFocus && !inputFocus && !treestickyScrollFocused" 
+                    },
+                    {
+                        "command": "workbench.action.terminal.focusHover",
+                        "when": "terminalFocus && terminalHasBeenCreated || terminalFocus && terminalIsOpen || terminalFocus && terminalProcessSupported || terminalHasBeenCreated && terminalTabsFocus || terminalIsOpen && terminalTabsFocus || terminalProcessSupported && terminalTabsFocus" 
+                    },
+                    "keycrop.growShowHover"
+                ]
+            }    
+    }
 ]
+
+
+
+
+
+
+
+
