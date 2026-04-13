@@ -244,20 +244,26 @@ function growPlant(key) {
     });
   } else {
     plants = plants.filter((p) => p.key !== key || !p.harvested);
-    const usedSpecies = new Set(plants.filter((p) => !p.harvested).map((p) => p.species));
-    const availableSpecies = ALL_SPECIES.filter((s) => !usedSpecies.has(s));
-    const speciesItems = availableSpecies.map((s) => ({ label: s.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()), description: SPECIES_DESCRIPTIONS[s] }));
-    vscode2.window.showQuickPick(speciesItems, {
-      placeHolder: "Choose a species for your new plant"
-    }).then((item) => {
-      const species = item?.label.toLowerCase().replace(/ /g, "_");
-      if (species) {
-        const displayName = species.replace(/_/g, " ");
-        vscode2.window.showInformationMessage("A new " + displayName + " plant has sprouted in the greenhouse!");
-        plants.push({ key, species, size: "start", harvested: false, hotkey_uses: 0 });
-        addPlant({ key, species, size: "start", harvested: false, hotkey_uses: 0 });
-      }
-    });
+    if (existingPlant && existingPlant.harvested && harvestedCounts.has(existingPlant.species)) {
+      const species = existingPlant.species;
+      plants.push({ key, species, size: "start", harvested: false, hotkey_uses: 0 });
+      addPlant({ key, species, size: "start", harvested: false, hotkey_uses: 0 });
+    } else {
+      const usedSpecies = new Set(plants.filter((p) => !p.harvested).map((p) => p.species));
+      const availableSpecies = ALL_SPECIES.filter((s) => !usedSpecies.has(s));
+      const speciesItems = availableSpecies.map((s) => ({ label: s.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()), description: SPECIES_DESCRIPTIONS[s] }));
+      vscode2.window.showQuickPick(speciesItems, {
+        placeHolder: "Choose a species for your new plant"
+      }).then((item) => {
+        const species = item?.label.toLowerCase().replace(/ /g, "_");
+        if (species) {
+          const displayName = species.replace(/_/g, " ");
+          vscode2.window.showInformationMessage("A new " + displayName + " plant has sprouted in the greenhouse!");
+          plants.push({ key, species, size: "start", harvested: false, hotkey_uses: 0 });
+          addPlant({ key, species, size: "start", harvested: false, hotkey_uses: 0 });
+        }
+      });
+    }
   }
   savePlants();
 }
@@ -504,9 +510,9 @@ var GreenhouseWebViewProvider = class {
           break;
         }
         case "harvested": {
-          vscode2.window.showInformationMessage("Your " + message.text.replace(/_/g, " ") + " plant has been harvested!");
           const harvestedPlant = plants.find((p) => p.species === message.text && !p.harvested);
           if (harvestedPlant) {
+            const alreadyInInventory = harvestedCounts.has(harvestedPlant.species);
             harvestedPlant.harvested = true;
             const newCount = (harvestedCounts.get(harvestedPlant.species) ?? 0) + 1;
             harvestedCounts.set(harvestedPlant.species, newCount);
@@ -515,6 +521,9 @@ var GreenhouseWebViewProvider = class {
               species: harvestedPlant.species,
               count: 1
             });
+            if (!alreadyInInventory) {
+              vscode2.window.showInformationMessage("Your " + message.text.replace(/_/g, " ") + " plant has been harvested!");
+            }
           }
           break;
         }
