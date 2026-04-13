@@ -103,6 +103,10 @@ export class Plant {
     }
   }
 
+  remove(): void {
+    this._html_element.remove();
+  }
+
   setSize(s: string): void {
     this._size = s; //FIXME: am I really doing anything with this?
     this._html_element.classList.remove('start');

@@ -4,7 +4,7 @@ export const KEY_MAP: { key: string; category: string; capital_key: string; comm
   { key: 'ctrl+shift+\\', category: 'Navigating Code', capital_key: "CTRL+SHIFT+\\", command: 'jump_to_bracket', description: "Jump to bracket" },
   { key: 'ctrl+t', category: 'Navigating Code', capital_key: "CTRL+T", command: 'show_all_symbols', description: "Show all symbols" },
   { key: 'ctrl+shift+o', category: 'Navigating Code', capital_key: "CTRL+SHIFT+O", command: 'go_to_symbol', description: "Go to symbol" },
-  // { key: 'ctrl+shift+m', category: 'Debugging', capital_key: "CTRL+SHIFT+M", command: 'view_problems', description: "View problems" },
+  { key: 'ctrl+shift+m', category: 'Debugging', capital_key: "CTRL+SHIFT+M", command: 'view_problems', description: "View problems" },
   { key: 'ctrl+shift+l', category: 'Multicursor', capital_key: "CTRL+SHIFT+L", command: 'cursor_at_all_occurrences', description: "Add a cursor at all occurrences" },
   { key: 'ctrl+shift+space', category: 'IntelliSense', capital_key: "CTRL+SHIFT+SPACE", command: 'trigger_parameter_hints', description: "Trigger parameter hints" },
   { key: 'ctrl+\\',          category: 'Using VSCode', capital_key: "CTRL+\\",          command: 'split_editor', description: "Split editor" },

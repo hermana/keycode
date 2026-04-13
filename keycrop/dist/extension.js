@@ -50,7 +50,7 @@ var KEY_MAP = [
   { key: "ctrl+shift+\\", category: "Navigating Code", capital_key: "CTRL+SHIFT+\\", command: "jump_to_bracket", description: "Jump to bracket" },
   { key: "ctrl+t", category: "Navigating Code", capital_key: "CTRL+T", command: "show_all_symbols", description: "Show all symbols" },
   { key: "ctrl+shift+o", category: "Navigating Code", capital_key: "CTRL+SHIFT+O", command: "go_to_symbol", description: "Go to symbol" },
-  // { key: 'ctrl+shift+m', category: 'Debugging', capital_key: "CTRL+SHIFT+M", command: 'view_problems', description: "View problems" },
+  { key: "ctrl+shift+m", category: "Debugging", capital_key: "CTRL+SHIFT+M", command: "view_problems", description: "View problems" },
   { key: "ctrl+shift+l", category: "Multicursor", capital_key: "CTRL+SHIFT+L", command: "cursor_at_all_occurrences", description: "Add a cursor at all occurrences" },
   { key: "ctrl+shift+space", category: "IntelliSense", capital_key: "CTRL+SHIFT+SPACE", command: "trigger_parameter_hints", description: "Trigger parameter hints" },
   { key: "ctrl+\\", category: "Using VSCode", capital_key: "CTRL+\\", command: "split_editor", description: "Split editor" },
@@ -164,7 +164,7 @@ var extensionStorageFolder = "";
 var plantsPath;
 var keyTrackingPath;
 var keyTrackingString = [];
-function loadPlantsFile() {
+function readPlantsFromDisk() {
   if (!fs.existsSync(extensionStorageFolder)) {
     fs.mkdirSync(extensionStorageFolder, { recursive: true });
   }
@@ -174,18 +174,14 @@ function loadPlantsFile() {
       const savedPlants = saved.plants ?? saved;
       const savedHarvested = saved.harvestedCounts ?? {};
       harvestedCounts = new Map(Object.entries(savedHarvested));
-      savedPlants.forEach((p) => {
-        greenhouse.postMessage({
-          action: "load",
-          key: p.key,
-          species: p.species,
-          size: p.size,
-          harvested: p.harvested,
-          hotkey_uses: p.hotkey_uses
-        });
-        plants.push({ key: p.key, species: p.species, size: p.size, harvested: p.harvested, hotkey_uses: p.hotkey_uses });
-      });
-      loadPlantsToInventory();
+      const seen = /* @__PURE__ */ new Map();
+      for (const p of savedPlants) {
+        const existing = seen.get(p.key);
+        if (!existing || !p.harvested && existing.harvested) {
+          seen.set(p.key, { key: p.key, species: p.species, size: p.size, harvested: p.harvested, hotkey_uses: p.hotkey_uses });
+        }
+      }
+      plants = Array.from(seen.values());
     } catch (e) {
       console.error("Saved plants could not be loaded");
       console.error(e);
@@ -194,6 +190,18 @@ function loadPlantsFile() {
   } else {
     plants = new Array();
   }
+}
+function loadPlantsFile() {
+  plants.forEach((p) => {
+    greenhouse.postMessage({
+      action: "load",
+      key: p.key,
+      species: p.species,
+      size: p.size,
+      harvested: p.harvested,
+      hotkey_uses: p.hotkey_uses
+    });
+  });
 }
 function loadPlantsToInventory() {
   harvestedCounts.forEach((count, species) => {
@@ -257,8 +265,10 @@ function growPlant(key) {
         vscode2.window.showInformationMessage("A new " + displayName + " plant has sprouted in the greenhouse!");
         plants.push({ key, species, size: "start", harvested: false, hotkey_uses: 0 });
         addPlant({ key, species, size: "start", harvested: false, hotkey_uses: 0 });
+        savePlants();
       }
     });
+    return;
   }
   savePlants();
 }
@@ -273,6 +283,7 @@ function activate(context) {
   extensionStorageFolder = context.globalStorageUri.path.substring(1);
   plantsPath = path.join(extensionStorageFolder, "plants.json");
   keyTrackingPath = path.join(extensionStorageFolder, "keytracking.json");
+  readPlantsFromDisk();
   instructions = new InstructionsWebViewProvider(context);
   context.subscriptions.push(vscode2.window.registerWebviewViewProvider(InstructionsWebViewProvider.viewType, instructions));
   if (CURRENT_MODE === 0 /* GAME */) {
@@ -423,14 +434,14 @@ function activate(context) {
       logKeyPress("insert_cursor_at_end_of_each_line_selected");
     }
   });
-  const growAddCursorAbove = vscode2.commands.registerCommand("keycrop.growAddCursorAbove", () => {
+  const growAddCursorAbove = vscode2.commands.registerCommand("keycrop.growInsertCursorAbove", () => {
     if (CURRENT_MODE === 0) {
       growPlant("add_cursor_above");
     } else {
       logKeyPress("add_cursor_above");
     }
   });
-  const growAddCursorBelow = vscode2.commands.registerCommand("keycrop.growAddCursorBelow", () => {
+  const growAddCursorBelow = vscode2.commands.registerCommand("keycrop.growInsertCursorBelow", () => {
     if (CURRENT_MODE === 0) {
       growPlant("add_cursor_below");
     } else {
@@ -497,8 +508,13 @@ var GreenhouseWebViewProvider = class {
           }
           break;
         case "save_plants": {
+          const webviewPlants = message.content;
+          const mergedPlants = plants.map((p) => {
+            const fromWebview = webviewPlants.find((wp) => wp.key === p.key);
+            return fromWebview ?? p;
+          });
           const saveData = {
-            plants: message.content,
+            plants: mergedPlants,
             harvestedCounts: Object.fromEntries(harvestedCounts)
           };
           fs.writeFileSync(plantsPath, JSON.stringify(saveData));
@@ -509,6 +525,7 @@ var GreenhouseWebViewProvider = class {
           if (harvestedPlant) {
             const alreadyInInventory = harvestedCounts.has(harvestedPlant.species);
             harvestedPlant.harvested = true;
+            const sizeBefore = harvestedCounts.size;
             const newCount = (harvestedCounts.get(harvestedPlant.species) ?? 0) + 1;
             harvestedCounts.set(harvestedPlant.species, newCount);
             inventory.postMessage({
@@ -516,8 +533,12 @@ var GreenhouseWebViewProvider = class {
               species: harvestedPlant.species,
               count: 1
             });
-            if (!alreadyInInventory) {
+            if (alreadyInInventory) {
               vscode2.window.showInformationMessage("Your " + message.text.replace(/_/g, " ") + " plant has been harvested!");
+            }
+            if (sizeBefore < ALL_SPECIES.length && harvestedCounts.size === ALL_SPECIES.length) {
+              vscode2.window.showInformationMessage("Achievement unlocked: you've grown one of every plant!");
+              inventory.postMessage({ action: "achievement" });
             }
           }
           break;

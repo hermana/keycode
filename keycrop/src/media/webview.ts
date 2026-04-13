@@ -57,6 +57,9 @@ window.addEventListener('message', (event: MessageEvent) => {
     case 'load':
       game.greenhouse.loadPlant(message, game.div.getAttribute('background'));
       break;
+    case 'achievement':
+      launchConfetti();
+      break;
     case 'load_harvested':
       game.greenhouse.loadHarvestedPlant(message.species, message.count);
       (document.getElementById('empty-inventory-message') as HTMLElement | null)?.remove();
@@ -82,6 +85,23 @@ window.addEventListener('message', (event: MessageEvent) => {
 
 function checkAcheivements(): void {
 
+}
+
+function launchConfetti(): void {
+  const colors = ['#f44336', '#e91e63', '#9c27b0', '#3f51b5', '#2196f3', '#4caf50', '#ffeb3b', '#ff9800'];
+  const count = 80;
+  for (let i = 0; i < count; i++) {
+    const piece = document.createElement('div');
+    piece.classList.add('confetti-piece');
+    piece.style.left = Math.random() * 100 + 'vw';
+    piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+    piece.style.animationDuration = (1.5 + Math.random() * 2) + 's';
+    piece.style.animationDelay = (Math.random() * 1.5) + 's';
+    piece.style.width = (6 + Math.random() * 6) + 'px';
+    piece.style.height = (6 + Math.random() * 6) + 'px';
+    document.body.appendChild(piece);
+    piece.addEventListener('animationend', () => piece.remove());
+  }
 }
 
 function hideGameElements(): void {

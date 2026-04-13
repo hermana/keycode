@@ -26,35 +26,26 @@ type Plant = {
   hotkey_uses: number
 }
 
-function loadPlantsFile() {
-  //Storage folder does not exist
+function readPlantsFromDisk() {
   if (!fs.existsSync(extensionStorageFolder)){
     fs.mkdirSync(extensionStorageFolder, { recursive: true });
-  } 
-
-  //Read plants file
+  }
   if (fs.existsSync(plantsPath)) {
     try {
-      //Try to read plants file
       const saved = JSON.parse(fs.readFileSync(plantsPath, 'utf8'));
       const savedPlants: any[] = saved.plants ?? saved;
       const savedHarvested: Record<string, number> = saved.harvestedCounts ?? {};
       harvestedCounts = new Map(Object.entries(savedHarvested));
-      savedPlants.forEach((p: any) => {
-        //FIXME: do they need to be loaded one at a time? IDK
-        greenhouse.postMessage({
-          action: 'load',
-          key: p.key,
-          species: p.species,
-          size: p.size,
-          harvested: p.harvested,
-          hotkey_uses: p.hotkey_uses
-        });
-        plants.push({key: p.key, species: p.species, size: p.size, harvested: p.harvested, hotkey_uses: p.hotkey_uses});
-      });
-      loadPlantsToInventory();
+      // Deduplicate by key — prefer non-harvested if there are conflicting entries
+      const seen = new Map<string, Plant>();
+      for (const p of savedPlants) {
+        const existing = seen.get(p.key);
+        if (!existing || (!p.harvested && existing.harvested)) {
+          seen.set(p.key, {key: p.key, species: p.species, size: p.size, harvested: p.harvested, hotkey_uses: p.hotkey_uses});
+        }
+      }
+      plants = Array.from(seen.values());
     } catch (e) {
-      //Failed -> Reset plants
       console.error('Saved plants could not be loaded');
       console.error(e);
       plants = new Array<Plant>();
@@ -62,6 +53,19 @@ function loadPlantsFile() {
   } else {
     plants = new Array<Plant>();
   }
+}
+
+function loadPlantsFile() {
+  plants.forEach(p => {
+    greenhouse.postMessage({
+      action: 'load',
+      key: p.key,
+      species: p.species,
+      size: p.size,
+      harvested: p.harvested,
+      hotkey_uses: p.hotkey_uses
+    });
+  });
 }
 
 function loadPlantsToInventory() {
@@ -133,8 +137,10 @@ function growPlant(key: string) {
         vscode.window.showInformationMessage("A new " + displayName + " plant has sprouted in the greenhouse!");
         plants.push({ key: key, species: species, size: 'start', harvested: false, hotkey_uses: 0 });
         addPlant({ key: key, species: species, size: 'start', harvested: false, hotkey_uses: 0 });
+        savePlants();
       }
     });
+    return;
   }
   savePlants();
 }
@@ -159,6 +165,8 @@ export function activate(context: vscode.ExtensionContext) {
   // if (!fs.existsSync(studyOutputPath)){
   //   fs.mkdirSync(studyOutputPath, { recursive: true });
   // } 
+
+  readPlantsFromDisk();
 
   instructions = new InstructionsWebViewProvider(context);
 	context.subscriptions.push(vscode.window.registerWebviewViewProvider(InstructionsWebViewProvider.viewType, instructions));
@@ -318,14 +326,14 @@ export function activate(context: vscode.ExtensionContext) {
       logKeyPress("insert_cursor_at_end_of_each_line_selected");
     }
   });
-  const growAddCursorAbove = vscode.commands.registerCommand("keycrop.growAddCursorAbove", () => {
+  const growAddCursorAbove = vscode.commands.registerCommand("keycrop.growInsertCursorAbove", () => {
     if (CURRENT_MODE === 0 /* GAME */) {
       growPlant("add_cursor_above");
     } else {
       logKeyPress("add_cursor_above");
     }
   });
-  const growAddCursorBelow = vscode.commands.registerCommand("keycrop.growAddCursorBelow", () => {
+  const growAddCursorBelow = vscode.commands.registerCommand("keycrop.growInsertCursorBelow", () => {
     if (CURRENT_MODE === 0 /* GAME */) {
       growPlant("add_cursor_below");
     } else {
@@ -409,8 +417,17 @@ export class GreenhouseWebViewProvider implements vscode.WebviewViewProvider {
             }
             break;
           case 'save_plants': {
+            // Merge webview state (accurate size/hotkey_uses) with extension's plants array
+            // (source of truth for which plants exist). If the webview hasn't loaded a plant
+            // yet (race condition: hotkey fired before webview init), fall back to the
+            // extension's record so plants are never dropped from disk.
+            const webviewPlants: any[] = message.content;
+            const mergedPlants = plants.map(p => {
+              const fromWebview = webviewPlants.find((wp: any) => wp.key === p.key);
+              return fromWebview ?? p;
+            });
             const saveData = {
-              plants: message.content,
+              plants: mergedPlants,
               harvestedCounts: Object.fromEntries(harvestedCounts)
             };
             // fs.writeFileSync(plantsStudyOutputPath, JSON.stringify(saveData));
@@ -422,6 +439,7 @@ export class GreenhouseWebViewProvider implements vscode.WebviewViewProvider {
             if (harvestedPlant) {
               const alreadyInInventory = harvestedCounts.has(harvestedPlant.species);
               harvestedPlant.harvested = true;
+              const sizeBefore = harvestedCounts.size;
               const newCount = (harvestedCounts.get(harvestedPlant.species) ?? 0) + 1;
               harvestedCounts.set(harvestedPlant.species, newCount);
               inventory.postMessage({
@@ -429,8 +447,12 @@ export class GreenhouseWebViewProvider implements vscode.WebviewViewProvider {
                 species: harvestedPlant.species,
                 count: 1
               });
-              if (!alreadyInInventory) {
+              if (alreadyInInventory) {
                 vscode.window.showInformationMessage("Your " + message.text.replace(/_/g, ' ') + " plant has been harvested!");
+              }
+              if (sizeBefore < ALL_SPECIES.length && harvestedCounts.size === ALL_SPECIES.length) {
+                vscode.window.showInformationMessage("Achievement unlocked: you've grown one of every plant!");
+                inventory.postMessage({ action: 'achievement' });
               }
             }
             break;

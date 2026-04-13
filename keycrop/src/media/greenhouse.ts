@@ -19,6 +19,12 @@ export class Greenhouse {
   }
 
   loadPlant(message: any, background: string | null): void {
+    // Remove any existing plant for this key so reloads don't accumulate duplicates
+    const existingIndex = this.plants.findIndex(p => p.key === message.key);
+    if (existingIndex !== -1) {
+      this.plants[existingIndex].remove();
+      this.plants.splice(existingIndex, 1);
+    }
     let p = new Plant(message.key, message.species);
     p.setSize(message.size);
     p.setIsHarvested(message.harvested, background);

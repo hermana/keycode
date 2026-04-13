@@ -7,7 +7,7 @@
     { key: "ctrl+shift+\\", category: "Navigating Code", capital_key: "CTRL+SHIFT+\\", command: "jump_to_bracket", description: "Jump to bracket" },
     { key: "ctrl+t", category: "Navigating Code", capital_key: "CTRL+T", command: "show_all_symbols", description: "Show all symbols" },
     { key: "ctrl+shift+o", category: "Navigating Code", capital_key: "CTRL+SHIFT+O", command: "go_to_symbol", description: "Go to symbol" },
-    // { key: 'ctrl+shift+m', category: 'Debugging', capital_key: "CTRL+SHIFT+M", command: 'view_problems', description: "View problems" },
+    { key: "ctrl+shift+m", category: "Debugging", capital_key: "CTRL+SHIFT+M", command: "view_problems", description: "View problems" },
     { key: "ctrl+shift+l", category: "Multicursor", capital_key: "CTRL+SHIFT+L", command: "cursor_at_all_occurrences", description: "Add a cursor at all occurrences" },
     { key: "ctrl+shift+space", category: "IntelliSense", capital_key: "CTRL+SHIFT+SPACE", command: "trigger_parameter_hints", description: "Trigger parameter hints" },
     { key: "ctrl+\\", category: "Using VSCode", capital_key: "CTRL+\\", command: "split_editor", description: "Split editor" },
@@ -131,6 +131,9 @@ Uses: ${this._num_hotkey_uses}`;
         this._num_mashes += 1;
       }
     }
+    remove() {
+      this._html_element.remove();
+    }
     setSize(s) {
       this._size = s;
       this._html_element.classList.remove("start");
@@ -209,6 +212,11 @@ Uses: ${this._num_hotkey_uses}`;
       });
     }
     loadPlant(message, background) {
+      const existingIndex = this.plants.findIndex((p2) => p2.key === message.key);
+      if (existingIndex !== -1) {
+        this.plants[existingIndex].remove();
+        this.plants.splice(existingIndex, 1);
+      }
       let p = new Plant(message.key, message.species);
       p.setSize(message.size);
       p.setIsHarvested(message.harvested, background);
@@ -263,6 +271,9 @@ Uses: ${this._num_hotkey_uses}`;
       case "load":
         game.greenhouse.loadPlant(message, game.div.getAttribute("background"));
         break;
+      case "achievement":
+        launchConfetti();
+        break;
       case "load_harvested":
         game.greenhouse.loadHarvestedPlant(message.species, message.count);
         document.getElementById("empty-inventory-message")?.remove();
@@ -285,6 +296,22 @@ Uses: ${this._num_hotkey_uses}`;
     }
   });
   function checkAcheivements() {
+  }
+  function launchConfetti() {
+    const colors = ["#f44336", "#e91e63", "#9c27b0", "#3f51b5", "#2196f3", "#4caf50", "#ffeb3b", "#ff9800"];
+    const count = 80;
+    for (let i = 0; i < count; i++) {
+      const piece = document.createElement("div");
+      piece.classList.add("confetti-piece");
+      piece.style.left = Math.random() * 100 + "vw";
+      piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+      piece.style.animationDuration = 1.5 + Math.random() * 2 + "s";
+      piece.style.animationDelay = Math.random() * 1.5 + "s";
+      piece.style.width = 6 + Math.random() * 6 + "px";
+      piece.style.height = 6 + Math.random() * 6 + "px";
+      document.body.appendChild(piece);
+      piece.addEventListener("animationend", () => piece.remove());
+    }
   }
   function hideGameElements() {
     document.getElementById("generator-button").hidden = true;
