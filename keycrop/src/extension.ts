@@ -55,7 +55,17 @@ function readPlantsFromDisk() {
   }
 }
 
-function loadPlantsFile() {
+function writePlantsToDisk() {
+  if (!fs.existsSync(extensionStorageFolder)){
+    fs.mkdirSync(extensionStorageFolder, { recursive: true });
+  }
+  fs.writeFileSync(plantsPath, JSON.stringify({
+    plants: plants,
+    harvestedCounts: Object.fromEntries(harvestedCounts)
+  }));
+}
+
+function sendPlantsToWebview() {
   plants.forEach(p => {
     greenhouse.postMessage({
       action: 'load',
@@ -78,7 +88,7 @@ function loadPlantsToInventory() {
   });
 }
 
-function savePlants() {
+function requestWebviewSave() {
   greenhouse.postMessage({
     action: 'save_plants'
   });
@@ -121,7 +131,7 @@ function growPlant(key: string) {
       action: 'grow',
       species: existingPlant.species
     });
-    savePlants();
+    requestWebviewSave();
   } else {
     // No plant for this key, or it has been harvested — free the key and let user pick
     plants = plants.filter(p => p.key !== key);
@@ -135,9 +145,10 @@ function growPlant(key: string) {
       if (species) {
         const displayName = species.replace(/_/g, ' ');
         vscode.window.showInformationMessage("A new " + displayName + " plant has sprouted in the greenhouse!");
-        plants.push({ key: key, species: species, size: 'start', harvested: false, hotkey_uses: 0 });
-        addPlant({ key: key, species: species, size: 'start', harvested: false, hotkey_uses: 0 });
-        savePlants();
+        plants.push({ key: key, species: species, size: 'start', harvested: false, hotkey_uses: 1 });
+        addPlant({ key: key, species: species, size: 'start', harvested: false, hotkey_uses: 1 });
+        writePlantsToDisk();
+        requestWebviewSave();
       }
     });
   }
@@ -401,13 +412,14 @@ export class GreenhouseWebViewProvider implements vscode.WebviewViewProvider {
   
           case 'init':
             if(CURRENT_MODE === MODE.GAME){
+              readPlantsFromDisk();
               //Send background
               webview.postMessage({
                 action: 'background',
                 value: 'dirt'
               });
               //Load existing plants array
-              loadPlantsFile();
+              sendPlantsToWebview();
             }else{
               webview.postMessage({
                 action: 'key-tracking-mode'
@@ -415,12 +427,14 @@ export class GreenhouseWebViewProvider implements vscode.WebviewViewProvider {
             }
             break;
           case 'save_plants': {
-            const saveData = {
+            plants = (message.content as any[]).map(p => ({
+              key: p.key, species: p.species, size: p.size,
+              harvested: p.harvested, hotkey_uses: p.hotkey_uses
+            }));
+            fs.writeFileSync(plantsPath, JSON.stringify({
               plants: message.content,
               harvestedCounts: Object.fromEntries(harvestedCounts)
-            };
-            // fs.writeFileSync(plantsStudyOutputPath, JSON.stringify(saveData));
-            fs.writeFileSync(plantsPath, JSON.stringify(saveData));
+            }));
             break;
           }
           case 'harvested': {
