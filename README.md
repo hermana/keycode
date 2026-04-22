@@ -21,7 +21,7 @@ If you are not familiar with git, click on the green "<> Code" button and select
 ### 2. Setting up the keybindings file: 
 
 1. In VSCode, CTRL+SHIFT+P and search "Keyboard" (or similar)
-2. Select "Preferences: Open keyboard shortcuts". This should open your keybindings file. 
+2. Select "Preferences: Open keyboard shortcuts (JSON)". This should open your keybindings file. 
 3. Save your custom keybindings to another file, if you have any, so you can put them back when you are done testing. 
 4. In the codebase, `keycrop->player_resources` contains json files with custom keybindings used to play the game. If you are on Windows or Linux, copy the contents of `keybindings.json` and put them in your personal keybindings file. If you are on Mac, copy the contents of `mac-keybindings.json` and put them in your custom keybindings file. 
 
