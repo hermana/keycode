@@ -490,7 +490,7 @@ export class GreenhouseWebViewProvider implements vscode.WebviewViewProvider {
 
 export class InventoryWebViewProvider implements vscode.WebviewViewProvider {
 
-  public static readonly viewType = "inventory"
+  public static readonly viewType = "inventory";
   private view?: vscode.WebviewView;
 
   constructor(private readonly context: vscode.ExtensionContext){}
