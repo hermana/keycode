@@ -720,14 +720,37 @@ background: url(./vegetables/watermelon_large.png);
 .watermelon.stage-14 { background: url(./midjourney-interpolated-vegetables/watermelon_14.png); background-size: contain; background-repeat: no-repeat; }
 .watermelon.harvested-plant { background: url(./midjourney-interpolated-vegetables/watermelon_harvested.png); background-size: contain; background-repeat: no-repeat; }
 
-.inventory-pot {
+.inventory-pot-wrapper {
   position: fixed;
   bottom: 0;
   right: 0;
+  cursor: pointer;
+  display: inline-block;
+}
+
+.inventory-pot {
   width: 64px;
   height: 64px;
   image-rendering: pixelated;
+  display: block;
   pointer-events: none;
+}
+
+.inventory-pot-overlay {
+  position: absolute;
+  bottom: 6px;
+  right: 6px;
+  font-size: 10px;
+  font-family: monospace;
+  font-weight: bold;
+  color: #fff;
+  text-shadow: 1px 1px 2px #000;
+  pointer-events: none;
+}
+
+.harvested-plant.highlighted .plant-count-badge {
+  background: #f5c400;
+  color: #000;
 }
 
 .chili-icon{

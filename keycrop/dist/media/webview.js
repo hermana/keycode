@@ -199,6 +199,7 @@ Uses: ${this._num_hotkey_uses}`;
   var Greenhouse = class {
     plants = [];
     harvestedPlants = [];
+    NUM_ITEMS_PER_RECIPE = 2;
     constructor() {
     }
     addPlant(key, species) {
@@ -345,6 +346,20 @@ Uses: ${this._num_hotkey_uses}`;
       onResize();
     }
     game.frames++;
+  }
+  var potWrapper = document.getElementById("inventory-pot-wrapper");
+  if (potWrapper) {
+    const overlay = potWrapper.querySelector(".inventory-pot-overlay");
+    let potActive = false;
+    potWrapper.addEventListener("click", () => {
+      potActive = !potActive;
+      const harvestedEls = document.querySelectorAll("#keycrop .harvested-plant");
+      overlay.hidden = !potActive;
+      if (potActive) {
+        overlay.textContent = `0/${game.greenhouse.NUM_ITEMS_PER_RECIPE}`;
+      }
+      harvestedEls.forEach((p) => p.classList.toggle("highlighted", potActive));
+    });
   }
   var timer = setInterval(update, 1e3 / game.fps);
   vscode.postMessage({ type: "init" });

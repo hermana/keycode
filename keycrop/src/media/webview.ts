@@ -146,6 +146,21 @@ function update(): void {
 }
 
 
+const potWrapper = document.getElementById('inventory-pot-wrapper');
+if (potWrapper) {
+  const overlay = potWrapper.querySelector('.inventory-pot-overlay') as HTMLElement;
+  let potActive = false;
+  potWrapper.addEventListener('click', () => {
+    potActive = !potActive;
+    const harvestedEls = document.querySelectorAll('#keycrop .harvested-plant');
+    overlay.hidden = !potActive;
+    if (potActive) {
+      overlay.textContent = `0/${game.greenhouse.NUM_ITEMS_PER_RECIPE}`;
+    }
+    harvestedEls.forEach(p => p.classList.toggle('highlighted', potActive));
+  });
+}
+
 //Start loop
 const timer = setInterval(update, 1000 / game.fps);
 

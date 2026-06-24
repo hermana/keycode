@@ -5,6 +5,8 @@ export class Greenhouse {
   plants: Plant[] = [];
   harvestedPlants: HarvestedPlant[] = [];
 
+  NUM_ITEMS_PER_RECIPE = 2;
+
   constructor() {
   }
 
