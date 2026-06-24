@@ -6,6 +6,7 @@ export class Greenhouse {
   harvestedPlants: HarvestedPlant[] = [];
 
   NUM_ITEMS_PER_RECIPE = 2;
+  COOK_DURATION_MS = 5000;
 
   constructor() {
   }

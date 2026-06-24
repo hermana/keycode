@@ -200,6 +200,7 @@ Uses: ${this._num_hotkey_uses}`;
     plants = [];
     harvestedPlants = [];
     NUM_ITEMS_PER_RECIPE = 2;
+    COOK_DURATION_MS = 5e3;
     constructor() {
     }
     addPlant(key, species) {
@@ -415,6 +416,8 @@ Uses: ${this._num_hotkey_uses}`;
       }
       refreshHighlights();
     });
+    const progressWrapper = document.getElementById("cook-progress-wrapper");
+    const progressBar = document.getElementById("cook-progress-bar");
     cookBtn?.addEventListener("click", () => {
       if (potContents.length < game.greenhouse.NUM_ITEMS_PER_RECIPE) {
         return;
@@ -443,10 +446,24 @@ Uses: ${this._num_hotkey_uses}`;
             updateOverlay();
             updateCookButton();
             refreshHighlights();
-            if (cookBtn) {
-              cookBtn.disabled = false;
-            }
             potWrapper.style.pointerEvents = "";
+            if (cookBtn) {
+              cookBtn.hidden = true;
+            }
+            if (progressWrapper && progressBar) {
+              progressWrapper.hidden = false;
+              progressBar.style.transition = "none";
+              progressBar.style.width = "100%";
+              requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                  progressBar.style.transition = `width ${game.greenhouse.COOK_DURATION_MS}ms linear`;
+                  progressBar.style.width = "0%";
+                });
+              });
+              progressBar.addEventListener("transitionend", () => {
+                progressWrapper.hidden = true;
+              }, { once: true });
+            }
           }
         }, { once: true });
       });

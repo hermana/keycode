@@ -215,6 +215,9 @@ if (potWrapper) {
     refreshHighlights();
   });
 
+  const progressWrapper = document.getElementById('cook-progress-wrapper') as HTMLElement | null;
+  const progressBar = document.getElementById('cook-progress-bar') as HTMLElement | null;
+
   cookBtn?.addEventListener('click', () => {
     if (potContents.length < game.greenhouse.NUM_ITEMS_PER_RECIPE) { return; }
 
@@ -243,8 +246,23 @@ if (potWrapper) {
           updateOverlay();
           updateCookButton();
           refreshHighlights();
-          if (cookBtn) { cookBtn.disabled = false; }
           potWrapper.style.pointerEvents = '';
+
+          if (cookBtn) { cookBtn.hidden = true; }
+          if (progressWrapper && progressBar) {
+            progressWrapper.hidden = false;
+            progressBar.style.transition = 'none';
+            progressBar.style.width = '100%';
+            requestAnimationFrame(() => {
+              requestAnimationFrame(() => {
+                progressBar.style.transition = `width ${game.greenhouse.COOK_DURATION_MS}ms linear`;
+                progressBar.style.width = '0%';
+              });
+            });
+            progressBar.addEventListener('transitionend', () => {
+              progressWrapper.hidden = true;
+            }, { once: true });
+          }
         }
       }, { once: true });
     });

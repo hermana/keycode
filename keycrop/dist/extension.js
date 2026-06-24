@@ -638,6 +638,9 @@ var InventoryWebViewProvider = class {
               <span class="inventory-pot-overlay" hidden></span>
             </div>
             <button id="cook-btn" hidden>Cook</button>
+            <div id="cook-progress-wrapper" hidden>
+              <div id="cook-progress-bar"></div>
+            </div>
           </div>
           <script src="${webviewJS}"></script>
         </body>
