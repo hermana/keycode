@@ -351,6 +351,10 @@ Uses: ${this._num_hotkey_uses}`;
   if (potWrapper) {
     let updateOverlay = function() {
       overlay.textContent = `${potContents.length}/${game.greenhouse.NUM_ITEMS_PER_RECIPE}`;
+    }, updateCookButton = function() {
+      if (cookBtn) {
+        cookBtn.hidden = potContents.length < game.greenhouse.NUM_ITEMS_PER_RECIPE;
+      }
     }, refreshHighlights = function() {
       document.querySelectorAll("#keycrop .harvested-plant").forEach((p) => {
         const canAdd = !p.classList.contains("in-pot") && potContents.length < game.greenhouse.NUM_ITEMS_PER_RECIPE;
@@ -372,6 +376,7 @@ Uses: ${this._num_hotkey_uses}`;
       tray.appendChild(slot);
       potContents.push({ plant, slot });
       updateOverlay();
+      updateCookButton();
       refreshHighlights();
     }, removeFromPot = function(plant, slot) {
       const idx = potContents.findIndex((entry) => entry.plant === plant);
@@ -381,10 +386,12 @@ Uses: ${this._num_hotkey_uses}`;
       slot.remove();
       plant.classList.remove("in-pot");
       updateOverlay();
+      updateCookButton();
       refreshHighlights();
     };
-    updateOverlay2 = updateOverlay, refreshHighlights2 = refreshHighlights, addToPot2 = addToPot, removeFromPot2 = removeFromPot;
+    updateOverlay2 = updateOverlay, updateCookButton2 = updateCookButton, refreshHighlights2 = refreshHighlights, addToPot2 = addToPot, removeFromPot2 = removeFromPot;
     const overlay = potWrapper.querySelector(".inventory-pot-overlay");
+    const cookBtn = document.getElementById("cook-btn");
     let potActive = false;
     const potContents = [];
     const tray = document.createElement("div");
@@ -408,8 +415,45 @@ Uses: ${this._num_hotkey_uses}`;
       }
       refreshHighlights();
     });
+    cookBtn?.addEventListener("click", () => {
+      if (potContents.length < game.greenhouse.NUM_ITEMS_PER_RECIPE) {
+        return;
+      }
+      const potImg = potWrapper.querySelector(".inventory-pot");
+      if (cookBtn) {
+        cookBtn.disabled = true;
+      }
+      potWrapper.style.pointerEvents = "none";
+      const entries = [...potContents];
+      let completed = 0;
+      entries.forEach(({ slot }, i) => {
+        slot.style.animationDelay = `${i * 80}ms`;
+        slot.classList.add("falling");
+        slot.addEventListener("animationend", () => {
+          completed++;
+          if (completed === entries.length) {
+            entries.forEach(({ plant: p, slot: s }) => {
+              s.remove();
+              p.classList.remove("in-pot");
+            });
+            potContents.length = 0;
+            potImg.src = potImg.dataset.closedSrc;
+            potActive = false;
+            overlay.hidden = true;
+            updateOverlay();
+            updateCookButton();
+            refreshHighlights();
+            if (cookBtn) {
+              cookBtn.disabled = false;
+            }
+            potWrapper.style.pointerEvents = "";
+          }
+        }, { once: true });
+      });
+    });
   }
   var updateOverlay2;
+  var updateCookButton2;
   var refreshHighlights2;
   var addToPot2;
   var removeFromPot2;

@@ -618,6 +618,7 @@ var InventoryWebViewProvider = class {
     const style = webview.asWebviewUri(vscode2.Uri.joinPath(this.context.extensionUri, "src/media", "style.css"));
     const webviewJS = webview.asWebviewUri(vscode2.Uri.joinPath(this.context.extensionUri, "dist/media", "webview.js"));
     const openPot = webview.asWebviewUri(vscode2.Uri.joinPath(this.context.extensionUri, "src/media/recipes", "open_pot.png"));
+    const closedPot = webview.asWebviewUri(vscode2.Uri.joinPath(this.context.extensionUri, "src/media/recipes", "closed_pot.png"));
     return `
         <!DOCTYPE html>
         <html lang="en">
@@ -631,9 +632,12 @@ var InventoryWebViewProvider = class {
           <div id="keycrop">
           </div>
           <div id="empty-inventory-message" class="instructions">You currently don't have anything in your inventory.</div>
-          <div id="inventory-pot-wrapper" class="inventory-pot-wrapper">
-            <img src="${openPot}" class="inventory-pot" />
-            <span class="inventory-pot-overlay" hidden></span>
+          <div id="inventory-bottom-right">
+            <div id="inventory-pot-wrapper" class="inventory-pot-wrapper">
+              <img src="${openPot}" data-open-src="${openPot}" data-closed-src="${closedPot}" class="inventory-pot" />
+              <span class="inventory-pot-overlay" hidden></span>
+            </div>
+            <button id="cook-btn" hidden>Cook</button>
           </div>
           <script src="${webviewJS}"></script>
         </body>

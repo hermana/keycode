@@ -149,6 +149,7 @@ function update(): void {
 const potWrapper = document.getElementById('inventory-pot-wrapper');
 if (potWrapper) {
   const overlay = potWrapper.querySelector('.inventory-pot-overlay') as HTMLElement;
+  const cookBtn = document.getElementById('cook-btn') as HTMLButtonElement | null;
   let potActive = false;
   const potContents: { plant: HTMLElement; slot: HTMLElement }[] = [];
 
@@ -158,6 +159,12 @@ if (potWrapper) {
 
   function updateOverlay(): void {
     overlay.textContent = `${potContents.length}/${game.greenhouse.NUM_ITEMS_PER_RECIPE}`;
+  }
+
+  function updateCookButton(): void {
+    if (cookBtn) {
+      cookBtn.hidden = potContents.length < game.greenhouse.NUM_ITEMS_PER_RECIPE;
+    }
   }
 
   function refreshHighlights(): void {
@@ -180,6 +187,7 @@ if (potWrapper) {
     tray.appendChild(slot);
     potContents.push({ plant, slot });
     updateOverlay();
+    updateCookButton();
     refreshHighlights();
   }
 
@@ -189,6 +197,7 @@ if (potWrapper) {
     slot.remove();
     plant.classList.remove('in-pot');
     updateOverlay();
+    updateCookButton();
     refreshHighlights();
   }
 
@@ -204,6 +213,41 @@ if (potWrapper) {
     overlay.hidden = !potActive;
     if (potActive) { updateOverlay(); }
     refreshHighlights();
+  });
+
+  cookBtn?.addEventListener('click', () => {
+    if (potContents.length < game.greenhouse.NUM_ITEMS_PER_RECIPE) { return; }
+
+    const potImg = potWrapper.querySelector('.inventory-pot') as HTMLImageElement;
+    if (cookBtn) { cookBtn.disabled = true; }
+    potWrapper.style.pointerEvents = 'none';
+
+    const entries = [...potContents];
+    let completed = 0;
+
+    entries.forEach(({ slot }, i) => {
+      slot.style.animationDelay = `${i * 80}ms`;
+      slot.classList.add('falling');
+      slot.addEventListener('animationend', () => {
+        completed++;
+        if (completed === entries.length) {
+          entries.forEach(({ plant: p, slot: s }) => {
+            s.remove();
+            p.classList.remove('in-pot');
+          });
+          potContents.length = 0;
+
+          potImg.src = potImg.dataset.closedSrc!;
+          potActive = false;
+          overlay.hidden = true;
+          updateOverlay();
+          updateCookButton();
+          refreshHighlights();
+          if (cookBtn) { cookBtn.disabled = false; }
+          potWrapper.style.pointerEvents = '';
+        }
+      }, { once: true });
+    });
   });
 }
 
