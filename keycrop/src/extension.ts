@@ -539,6 +539,7 @@ export class InventoryWebViewProvider implements vscode.WebviewViewProvider {
 
       const style = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'src/media', 'style.css'));
       const webviewJS = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'dist/media', 'webview.js'));
+      const openPot = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'src/media/recipes', 'open_pot.png'));
 
       return `
         <!DOCTYPE html>
@@ -553,6 +554,7 @@ export class InventoryWebViewProvider implements vscode.WebviewViewProvider {
           <div id="keycrop">
           </div>
           <div id="empty-inventory-message" class="instructions">You currently don't have anything in your inventory.</div>
+          <img src="${openPot}" class="inventory-pot" />
           <script src="${webviewJS}"></script>
         </body>
         </html>
