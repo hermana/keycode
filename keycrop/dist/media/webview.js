@@ -349,18 +349,70 @@ Uses: ${this._num_hotkey_uses}`;
   }
   var potWrapper = document.getElementById("inventory-pot-wrapper");
   if (potWrapper) {
+    let updateOverlay = function() {
+      overlay.textContent = `${potContents.length}/${game.greenhouse.NUM_ITEMS_PER_RECIPE}`;
+    }, refreshHighlights = function() {
+      document.querySelectorAll("#keycrop .harvested-plant").forEach((p) => {
+        const canAdd = !p.classList.contains("in-pot") && potContents.length < game.greenhouse.NUM_ITEMS_PER_RECIPE;
+        ;
+        p.classList.toggle("highlighted", potActive && canAdd);
+      });
+    }, addToPot = function(plant) {
+      if (potContents.length >= game.greenhouse.NUM_ITEMS_PER_RECIPE) {
+        return;
+      }
+      plant.classList.add("in-pot");
+      const slot = document.createElement("div");
+      slot.className = "pot-tray-slot";
+      slot.style.backgroundImage = window.getComputedStyle(plant).backgroundImage;
+      slot.addEventListener("click", (e) => {
+        e.stopPropagation();
+        removeFromPot(plant, slot);
+      });
+      tray.appendChild(slot);
+      potContents.push({ plant, slot });
+      updateOverlay();
+      refreshHighlights();
+    }, removeFromPot = function(plant, slot) {
+      const idx = potContents.findIndex((entry) => entry.plant === plant);
+      if (idx !== -1) {
+        potContents.splice(idx, 1);
+      }
+      slot.remove();
+      plant.classList.remove("in-pot");
+      updateOverlay();
+      refreshHighlights();
+    };
+    updateOverlay2 = updateOverlay, refreshHighlights2 = refreshHighlights, addToPot2 = addToPot, removeFromPot2 = removeFromPot;
     const overlay = potWrapper.querySelector(".inventory-pot-overlay");
     let potActive = false;
+    const potContents = [];
+    const tray = document.createElement("div");
+    tray.className = "pot-tray";
+    potWrapper.appendChild(tray);
+    game.div.addEventListener("click", (e) => {
+      if (!potActive) {
+        return;
+      }
+      const plant = e.target.closest(".harvested-plant");
+      if (!plant || plant.classList.contains("in-pot")) {
+        return;
+      }
+      addToPot(plant);
+    });
     potWrapper.addEventListener("click", () => {
       potActive = !potActive;
-      const harvestedEls = document.querySelectorAll("#keycrop .harvested-plant");
       overlay.hidden = !potActive;
       if (potActive) {
-        overlay.textContent = `0/${game.greenhouse.NUM_ITEMS_PER_RECIPE}`;
+        updateOverlay();
       }
-      harvestedEls.forEach((p) => p.classList.toggle("highlighted", potActive));
+      refreshHighlights();
     });
   }
+  var updateOverlay2;
+  var refreshHighlights2;
+  var addToPot2;
+  var removeFromPot2;
   var timer = setInterval(update, 1e3 / game.fps);
   vscode.postMessage({ type: "init" });
 })();

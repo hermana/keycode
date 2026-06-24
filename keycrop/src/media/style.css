@@ -753,6 +753,36 @@ background: url(./vegetables/watermelon_large.png);
   color: #000;
 }
 
+.harvested-plant.in-pot {
+  display: none;
+}
+
+.pot-tray {
+  position: absolute;
+  bottom: 64px;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  padding-bottom: 4px;
+}
+
+.pot-tray-slot {
+  width: 36px;
+  height: 36px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  image-rendering: pixelated;
+  cursor: pointer;
+  opacity: 0.95;
+}
+
+.pot-tray-slot:hover {
+  opacity: 0.5;
+}
+
 .chili-icon{
   max-width: 100%;
   height: auto;

@@ -150,14 +150,60 @@ const potWrapper = document.getElementById('inventory-pot-wrapper');
 if (potWrapper) {
   const overlay = potWrapper.querySelector('.inventory-pot-overlay') as HTMLElement;
   let potActive = false;
+  const potContents: { plant: HTMLElement; slot: HTMLElement }[] = [];
+
+  const tray = document.createElement('div');
+  tray.className = 'pot-tray';
+  potWrapper.appendChild(tray);
+
+  function updateOverlay(): void {
+    overlay.textContent = `${potContents.length}/${game.greenhouse.NUM_ITEMS_PER_RECIPE}`;
+  }
+
+  function refreshHighlights(): void {
+    document.querySelectorAll<HTMLElement>('#keycrop .harvested-plant').forEach(p => {
+      const canAdd = !p.classList.contains('in-pot') && potContents.length < game.greenhouse.NUM_ITEMS_PER_RECIPE;;
+      p.classList.toggle('highlighted', potActive && canAdd);
+    });
+  }
+
+  function addToPot(plant: HTMLElement): void {
+    if (potContents.length >= game.greenhouse.NUM_ITEMS_PER_RECIPE) { return; }
+    plant.classList.add('in-pot');
+    const slot = document.createElement('div');
+    slot.className = 'pot-tray-slot';
+    slot.style.backgroundImage = window.getComputedStyle(plant).backgroundImage;
+    slot.addEventListener('click', (e) => {
+      e.stopPropagation();
+      removeFromPot(plant, slot);
+    });
+    tray.appendChild(slot);
+    potContents.push({ plant, slot });
+    updateOverlay();
+    refreshHighlights();
+  }
+
+  function removeFromPot(plant: HTMLElement, slot: HTMLElement): void {
+    const idx = potContents.findIndex(entry => entry.plant === plant);
+    if (idx !== -1) { potContents.splice(idx, 1); }
+    slot.remove();
+    plant.classList.remove('in-pot');
+    updateOverlay();
+    refreshHighlights();
+  }
+
+  game.div.addEventListener('click', (e) => {
+    if (!potActive) { return; }
+    const plant = (e.target as HTMLElement).closest('.harvested-plant') as HTMLElement | null;
+    if (!plant || plant.classList.contains('in-pot')) { return; }
+    addToPot(plant);
+  });
+
   potWrapper.addEventListener('click', () => {
     potActive = !potActive;
-    const harvestedEls = document.querySelectorAll('#keycrop .harvested-plant');
     overlay.hidden = !potActive;
-    if (potActive) {
-      overlay.textContent = `0/${game.greenhouse.NUM_ITEMS_PER_RECIPE}`;
-    }
-    harvestedEls.forEach(p => p.classList.toggle('highlighted', potActive));
+    if (potActive) { updateOverlay(); }
+    refreshHighlights();
   });
 }
 
