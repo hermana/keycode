@@ -73,11 +73,15 @@ var KEY_MAP = [
 
 // src/instructionsWebViewProvider.ts
 var InstructionsWebViewProvider = class {
-  constructor(context) {
+  constructor(context, getHotkeyCounts2) {
     this.context = context;
+    this.getHotkeyCounts = getHotkeyCounts2;
   }
   static viewType = "instructions";
   _view;
+  postMessage(message) {
+    this._view?.webview.postMessage(message);
+  }
   resolveWebviewView(webviewView, _context, _token) {
     this._view = webviewView;
     const webview = webviewView.webview;
@@ -85,16 +89,20 @@ var InstructionsWebViewProvider = class {
       enableScripts: true
     };
     webview.html = this.getHtmlContent(webview);
+    webview.onDidReceiveMessage((message) => {
+      if (message.type === "init") {
+        webview.postMessage({ action: "update_counts", counts: this.getHotkeyCounts() });
+      }
+    });
   }
   getHtmlContent(webview) {
     const style = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, "src/media", "style.css"));
-    const webviewJS = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, "dist/media", "webview.js"));
     const categories = [...new Set(KEY_MAP.map((k) => k.category))];
     const categoryButtons = categories.map(
       (cat) => `<button class="category-btn" data-category="${cat}">${cat}</button>`
     ).join("\n        ");
     const tableRows = KEY_MAP.map(
-      (k) => `<tr data-category="${k.category}"><td>${k.capital_key}</td><td>${k.description}</td></tr>`
+      (k) => `<tr data-category="${k.category}" data-command="${k.command}"><td>${k.capital_key}</td><td>${k.description}</td><td class="use-count">0</td></tr>`
     ).join("\n                ");
     return `
       <!DOCTYPE html>
@@ -113,6 +121,7 @@ var InstructionsWebViewProvider = class {
                 <tr>
                   <th>Hotkey</th>
                   <th>Description</th>
+                  <th>Uses</th>
                 </tr>
               </thead>
               <tbody>
@@ -125,6 +134,19 @@ var InstructionsWebViewProvider = class {
           </div>
         </div>
         <script>
+          const vscode = acquireVsCodeApi();
+          vscode.postMessage({ type: 'init' });
+
+          window.addEventListener('message', (event) => {
+            const message = event.data;
+            if (message.action === 'update_counts') {
+              Object.entries(message.counts).forEach(([cmd, count]) => {
+                const row = document.querySelector('tr[data-command="' + cmd + '"]');
+                if (row) { row.querySelector('.use-count').textContent = String(count); }
+              });
+            }
+          });
+
           const buttons = document.querySelectorAll('.category-btn');
           const rows = document.querySelectorAll('tbody tr');
 
@@ -147,7 +169,6 @@ var InstructionsWebViewProvider = class {
             });
           });
         </script>
-        <script src="${webviewJS}"></script>
       </body>
       </html>
     `;
@@ -263,6 +284,15 @@ var plants = new Array();
 var harvestedCounts = /* @__PURE__ */ new Map();
 var cookedFoodCounts = /* @__PURE__ */ new Map();
 var playerMoney = 0;
+function getHotkeyCounts() {
+  const counts = {};
+  for (const plant of plants) {
+    if (plant.key) {
+      counts[plant.key] = (counts[plant.key] ?? 0) + plant.hotkey_uses;
+    }
+  }
+  return counts;
+}
 var SPECIES_DESCRIPTIONS = {
   "bean": "A humble unassuming legume.",
   "tomato": "This crop has a wide variety of culinary uses.",
@@ -357,7 +387,7 @@ function activate(context) {
   plantsPath = path.join(extensionStorageFolder, "plants.json");
   keyTrackingPath = path.join(extensionStorageFolder, "keytracking.json");
   readPlantsFromDisk();
-  instructions = new InstructionsWebViewProvider(context);
+  instructions = new InstructionsWebViewProvider(context, getHotkeyCounts);
   context.subscriptions.push(vscode2.window.registerWebviewViewProvider(InstructionsWebViewProvider.viewType, instructions));
   if (CURRENT_MODE === 0 /* GAME */) {
     greenhouse = new GreenhouseWebViewProvider(context);
@@ -595,6 +625,7 @@ var GreenhouseWebViewProvider = class {
             cookedFoodCounts: Object.fromEntries(cookedFoodCounts),
             playerMoney
           }));
+          instructions.postMessage({ action: "update_counts", counts: getHotkeyCounts() });
           break;
         }
         case "harvested": {

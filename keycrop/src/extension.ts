@@ -115,6 +115,16 @@ let harvestedCounts = new Map<string, number>();
 let cookedFoodCounts = new Map<string, number>();
 let playerMoney = 0;
 
+function getHotkeyCounts(): Record<string, number> {
+  const counts: Record<string, number> = {};
+  for (const plant of plants) {
+    if (plant.key) {
+      counts[plant.key] = (counts[plant.key] ?? 0) + plant.hotkey_uses;
+    }
+  }
+  return counts;
+}
+
 const SPECIES_DESCRIPTIONS: Record<string, string> = {
   'bean': "A humble unassuming legume.",
   'tomato': 'This crop has a wide variety of culinary uses.',
@@ -227,7 +237,7 @@ export function activate(context: vscode.ExtensionContext) {
 
   readPlantsFromDisk();
 
-  instructions = new InstructionsWebViewProvider(context);
+  instructions = new InstructionsWebViewProvider(context, getHotkeyCounts);
 	context.subscriptions.push(vscode.window.registerWebviewViewProvider(InstructionsWebViewProvider.viewType, instructions));
 
 	if (CURRENT_MODE === MODE.GAME) {
@@ -487,6 +497,7 @@ export class GreenhouseWebViewProvider implements vscode.WebviewViewProvider {
               cookedFoodCounts: Object.fromEntries(cookedFoodCounts),
               playerMoney
             }));
+            instructions.postMessage({ action: 'update_counts', counts: getHotkeyCounts() });
             break;
           }
           case 'harvested': {
