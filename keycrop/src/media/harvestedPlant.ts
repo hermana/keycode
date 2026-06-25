@@ -17,6 +17,7 @@ export class HarvestedPlant {
 
     element.classList.add('harvested-plant');
     element.classList.add(species);
+    element.dataset.species = species;
 
     const displaySpecies = species.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
     element.title = displaySpecies;

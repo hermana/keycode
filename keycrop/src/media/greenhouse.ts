@@ -1,9 +1,11 @@
 import { Plant } from './plant';
 import { HarvestedPlant } from './harvestedPlant';
+import { CookedFood } from './cookedFood';
 
 export class Greenhouse {
   plants: Plant[] = [];
   harvestedPlants: HarvestedPlant[] = [];
+  cookedFoods: CookedFood[] = [];
 
   NUM_ITEMS_PER_RECIPE = 2;
   COOK_DURATION_MS = 5000;
@@ -44,5 +46,14 @@ export class Greenhouse {
       return;
     }
     this.harvestedPlants.push(new HarvestedPlant(species, count));
+  }
+
+  addCookedFood(recipeKey: string, name: string, imgSrc: string): void {
+    const existing = this.cookedFoods.find(f => f.recipeKey === recipeKey);
+    if (existing) {
+      existing.incrementCount();
+      return;
+    }
+    this.cookedFoods.push(new CookedFood(recipeKey, name, imgSrc, 1));
   }
 }

@@ -152,6 +152,30 @@
   position: relative;
 }
 
+#food-row {
+  clear: both;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 8px 0 4px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin-top: 8px;
+}
+
+.cooked-food {
+  position: relative;
+  width: 50px;
+  height: 50px;
+}
+
+.cooked-food-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  image-rendering: pixelated;
+  display: block;
+}
+
 .plant-count-badge {
   position: absolute;
   top: -8px;

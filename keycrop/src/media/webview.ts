@@ -1,4 +1,5 @@
 import { Greenhouse } from './greenhouse';
+import { RECIPES } from './recipes';
 
 interface VsCodeApi {
   postMessage(msg: unknown): void;
@@ -234,6 +235,10 @@ if (potWrapper) {
       slot.addEventListener('animationend', () => {
         completed++;
         if (completed === entries.length) {
+          const species1 = entries[0].plant.dataset.species ?? '';
+          const species2 = entries[1].plant.dataset.species ?? '';
+          const recipeKey = [species1, species2].sort().join('+');
+
           entries.forEach(({ plant: p, slot: s }) => {
             s.remove();
             p.classList.remove('in-pot');
@@ -261,6 +266,15 @@ if (potWrapper) {
             });
             progressBar.addEventListener('transitionend', () => {
               progressWrapper.hidden = true;
+              if (cookBtn) { cookBtn.disabled = false; }
+              potImg.src = potImg.dataset.openSrc!;
+              const recipe = RECIPES[recipeKey];
+              if (recipe) {
+                const foodBase = document.getElementById('inventory-bottom-right')?.dataset.foodBase ?? '';
+                const foodRow = document.getElementById('food-row');
+                if (foodRow) { foodRow.hidden = false; }
+                game.greenhouse.addCookedFood(recipeKey, recipe.name, `${foodBase}/${recipe.filename}`);
+              }
             }, { once: true });
           }
         }

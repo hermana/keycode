@@ -181,8 +181,46 @@ Uses: ${this._num_hotkey_uses}`;
       this._html_element = element;
       element.classList.add("harvested-plant");
       element.classList.add(species);
+      element.dataset.species = species;
       const displaySpecies = species.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
       element.title = displaySpecies;
+      const badge = document.createElement("div");
+      badge.classList.add("plant-count-badge");
+      badge.textContent = String(count);
+      element.appendChild(badge);
+      this._badge_element = badge;
+    }
+    incrementCount() {
+      this._count += 1;
+      this._badge_element.textContent = String(this._count);
+    }
+  };
+
+  // src/media/cookedFood.ts
+  var CookedFood = class {
+    _recipeKey;
+    _name;
+    _count;
+    _badge_element;
+    get recipeKey() {
+      return this._recipeKey;
+    }
+    get count() {
+      return this._count;
+    }
+    constructor(recipeKey, name, imgSrc, count) {
+      this._recipeKey = recipeKey;
+      this._name = name;
+      this._count = count;
+      const container = document.getElementById("food-row");
+      const element = document.createElement("div");
+      element.classList.add("cooked-food");
+      element.title = name;
+      container.appendChild(element);
+      const img = document.createElement("img");
+      img.src = imgSrc;
+      img.classList.add("cooked-food-img");
+      element.appendChild(img);
       const badge = document.createElement("div");
       badge.classList.add("plant-count-badge");
       badge.textContent = String(count);
@@ -199,6 +237,7 @@ Uses: ${this._num_hotkey_uses}`;
   var Greenhouse = class {
     plants = [];
     harvestedPlants = [];
+    cookedFoods = [];
     NUM_ITEMS_PER_RECIPE = 2;
     COOK_DURATION_MS = 5e3;
     constructor() {
@@ -233,6 +272,121 @@ Uses: ${this._num_hotkey_uses}`;
       }
       this.harvestedPlants.push(new HarvestedPlant(species, count));
     }
+    addCookedFood(recipeKey, name, imgSrc) {
+      const existing = this.cookedFoods.find((f) => f.recipeKey === recipeKey);
+      if (existing) {
+        existing.incrementCount();
+        return;
+      }
+      this.cookedFoods.push(new CookedFood(recipeKey, name, imgSrc, 1));
+    }
+  };
+
+  // src/media/recipes.ts
+  var RECIPES = {
+    "bean+broccoli": { filename: "bean_broccoli.png", name: "Bean & Broccoli Stir Fry" },
+    "bean+bulbino": { filename: "bean_bulbino.png", name: "Bulbino Bean Stew" },
+    "bean+chili": { filename: "chili_bean.png", name: "Chili Beans" },
+    "bean+glowberry": { filename: "glowberry_beans.png", name: "Glowing Bean Salad" },
+    "bean+ivy": { filename: "beans_ivy.png", name: "Ivy Bean Wrap" },
+    "bean+jacaranda_tree": { filename: "bean_jacaranda.png", name: "Jacaranda Bean Dish" },
+    "bean+neon_mould": { filename: "bean_neon_mould.png", name: "Neon Bean Mould" },
+    "bean+poison_cabbage": { filename: "bean_poison_cabbage.png", name: "Daring Bean Slaw" },
+    "bean+raspberry": { filename: "bean_raspberry.png", name: "Berry Bean Bowl" },
+    "bean+rhubarb": { filename: "bean_rhubarb.png", name: "Rhubarb Bean Tart" },
+    "bean+strawberry": { filename: "bean_strawberry.png", name: "Strawberry Bean Compote" },
+    "bean+tomato": { filename: "bean-tomato.png", name: "Classic Tomato Beans" },
+    "bean+watermelon": { filename: "bean_watermelon.png", name: "Watermelon Bean Salsa" },
+    "broccoli+bulbino": { filename: "broccoli_bulbino.png", name: "Bulbino Broccoli Bake" },
+    "broccoli+chili": { filename: "broccoli_chili.png", name: "Chili Broccoli Saut\xE9" },
+    "broccoli+glowberry": { filename: "broccoli_glowberry.png", name: "Glowberry Broccoli Salad" },
+    "broccoli+ivy": { filename: "broccoli_ivy.png", name: "Ivy Broccoli Tangle" },
+    "broccoli+jacaranda_tree": { filename: "jacaranda_broccoli.png", name: "Jacaranda Broccoli Float" },
+    "broccoli+lettuce": { filename: "lettuce_broccoli.png", name: "Garden Green Bowl" },
+    "broccoli+neon_mould": { filename: "broccoli_neon_mould.png", name: "Neon Broccoli Spores" },
+    "broccoli+poison_cabbage": { filename: "broccoli_poison_cabbage.png", name: "Hazard Greens" },
+    "broccoli+raspberry": { filename: "broccoli_raspberry.png", name: "Raspberry Broccoli Crumble" },
+    "broccoli+rhubarb": { filename: "broccoli_rhubarb.png", name: "Rhubarb Broccoli Bake" },
+    "broccoli+strawberry": { filename: "broccoli_strawberries.png", name: "Strawberry Broccoli Drizzle" },
+    "broccoli+tomato": { filename: "broccoli_tomato.png", name: "Tomato Broccoli Pasta" },
+    "broccoli+watermelon": { filename: "broccoli_watermelon.png", name: "Watermelon Broccoli Splash" },
+    "bulbino+chili": { filename: "chili_bulbino.png", name: "Spicy Bulbino Curry" },
+    "bulbino+glowberry": { filename: "glowberry_bulbino.png", name: "Glowing Bulbino Brew" },
+    "bulbino+ivy": { filename: "bulbino_ivy.png", name: "Bulbino Ivy Wrap" },
+    "bulbino+jacaranda_tree": { filename: "bulbino_jacaranda.png", name: "Jacaranda Bulbino Stew" },
+    "bulbino+lettuce": { filename: "bulbino_lettuce.png", name: "Bulbino Lettuce Cup" },
+    "bulbino+neon_mould": { filename: "bulbino_neon_mould.png", name: "Neon Bulbino Fungus" },
+    "bulbino+poison_cabbage": { filename: "bulbino_poison_cabbage.png", name: "Dangerous Bulbino Slaw" },
+    "bulbino+rhubarb": { filename: "bulbino_rhubarb.png", name: "Bulbino Rhubarb Crumble" },
+    "bulbino+strawberry": { filename: "bulbino_strawberry.png", name: "Bulbino Strawberry Jam" },
+    "bulbino+tomato": { filename: "bulbino_tomato.png", name: "Bulbino Tomato Soup" },
+    "bulbino+watermelon": { filename: "bulbino_watermelon.png", name: "Bulbino Watermelon Punch" },
+    "chili+glowberry": { filename: "chili_glowberry.png", name: "Fire & Glow Salsa" },
+    "chili+ivy": { filename: "chili_ivy.png", name: "Ivy Chili Tangle" },
+    "chili+jacaranda_tree": { filename: "chili_jacaranda.png", name: "Jacaranda Chili Sauce" },
+    "chili+lettuce": { filename: "chili_lettuce.png", name: "Chili Lettuce Crunch" },
+    "chili+neon_mould": { filename: "chili_neon_mould.png", name: "Radioactive Chili" },
+    "chili+poison_cabbage": { filename: "chili_poison_cabbage.png", name: "Double Danger Slaw" },
+    "chili+raspberry": { filename: "chili_raspberry.png", name: "Chili Raspberry Jam" },
+    "chili+rhubarb": { filename: "chili_rhubarb.png", name: "Chili Rhubarb Compote" },
+    "chili+strawberry": { filename: "chili_strawberry.png", name: "Chili Strawberry Salsa" },
+    "chili+tomato": { filename: "tomato_chili.png", name: "Spicy Tomato Sauce" },
+    "chili+watermelon": { filename: "chili_watermelon.png", name: "Chili Watermelon Rind" },
+    "glowberry+ivy": { filename: "glowerry_ivy.png", name: "Glowing Ivy Brew" },
+    "glowberry+jacaranda_tree": { filename: "glowberry_jacaranda.png", name: "Luminous Jacaranda Tonic" },
+    "glowberry+lettuce": { filename: "lettuce_glowberry.png", name: "Glowing Garden Salad" },
+    "glowberry+neon_mould": { filename: "glowberry_neon_mould.png", name: "Radioactive Glow Mould" },
+    "glowberry+poison_cabbage": { filename: "glowberry_poison_cabbage.png", name: "Toxic Glow Slaw" },
+    "glowberry+raspberry": { filename: "raspberry_glowberry.png", name: "Glow Raspberry Juice" },
+    "glowberry+rhubarb": { filename: "glowberry_rhubarb.png", name: "Glowing Rhubarb Crumble" },
+    "glowberry+strawberry": { filename: "glowberry_strawberry.png", name: "Glowing Strawberry Jam" },
+    "glowberry+tomato": { filename: "tomato_glowberry.png", name: "Glowing Tomato Sauce" },
+    "glowberry+watermelon": { filename: "watermelon_glowberry.png", name: "Glowing Watermelon Punch" },
+    "ivy+jacaranda_tree": { filename: "jacaranda_ivy.png", name: "Jacaranda Ivy Tea" },
+    "ivy+lettuce": { filename: "lettuce_ivy.png", name: "Ivy Lettuce Wrap" },
+    "ivy+neon_mould": { filename: "neon_mould_ivy.png", name: "Neon Ivy Spores" },
+    "ivy+poison_cabbage": { filename: "ivy_poison_cabbage.png", name: "Toxic Ivy Slaw" },
+    "ivy+raspberry": { filename: "ivy_raspberry.png", name: "Ivy Raspberry Tart" },
+    "ivy+rhubarb": { filename: "ivy_rhubarb.png", name: "Ivy Rhubarb Stalk" },
+    "ivy+strawberry": { filename: "ivy_strawberry.png", name: "Ivy Strawberry Preserve" },
+    "ivy+tomato": { filename: "tomato_ivy.png", name: "Ivy Tomato Broth" },
+    "ivy+watermelon": { filename: "watermelon_ivy.png", name: "Ivy Watermelon Slush" },
+    "jacaranda_tree+lettuce": { filename: "lettuce_jacaranda.png", name: "Jacaranda Lettuce Roll" },
+    "jacaranda_tree+neon_mould": { filename: "jacaranda_neon_mould.png", name: "Radioactive Jacaranda Pudding" },
+    "jacaranda_tree+poison_cabbage": { filename: "poison_cabbage_jacaranda.png", name: "Jacaranda Poison Rolls" },
+    "jacaranda_tree+raspberry": { filename: "raspberry_jacaranda.png", name: "Jacaranda Raspberry Fizz" },
+    "jacaranda_tree+rhubarb": { filename: "rhubarb_jacaranda.png", name: "Jacaranda Rhubarb Tart" },
+    "jacaranda_tree+strawberry": { filename: "strawberry_jacaranda.png", name: "Jacaranda Strawberry Delight" },
+    "jacaranda_tree+tomato": { filename: "tomato_jacaranda.png", name: "Jacaranda Tomato Stew" },
+    "jacaranda_tree+watermelon": { filename: "jacaranda_watermelon.png", name: "Jacaranda Watermelon Ice" },
+    "lettuce+neon_mould": { filename: "neon_mould_lettuce.png", name: "Radioactive Lettuce Salad" },
+    "lettuce+poison_cabbage": { filename: "poison_cabbage_lettuce.png", name: "Danger Greens Bowl" },
+    "lettuce+raspberry": { filename: "raspberry_lettuce.png", name: "Raspberry Lettuce Salad" },
+    "lettuce+rhubarb": { filename: "lettuce_rhubarb.png", name: "Rhubarb Lettuce Wrap" },
+    "lettuce+strawberry": { filename: "strawberry_lettuce.png", name: "Strawberry Lettuce Salad" },
+    "lettuce+tomato": { filename: "tomato_lettuce.png", name: "Classic Tomato Salad" },
+    "lettuce+watermelon": { filename: "lettuce_watermelon.png", name: "Watermelon Lettuce Wrap" },
+    "neon_mould+poison_cabbage": { filename: "neon_mould_poison_cabbage.png", name: "Doubly Toxic Mould" },
+    "neon_mould+raspberry": { filename: "neon_mould_raspberry.png", name: "Radioactive Raspberry Jam" },
+    "neon_mould+rhubarb": { filename: "neon_mould_rhubarb.png", name: "Neon Rhubarb Surprise" },
+    "neon_mould+strawberry": { filename: "neon_mould_strawberry.png", name: "Glowing Strawberry Mould" },
+    "neon_mould+tomato": { filename: "tomato_neon_mould.png", name: "Neon Tomato Sauce" },
+    "neon_mould+watermelon": { filename: "neon_mould_watermelon.png", name: "Radioactive Watermelon Rind" },
+    "poison_cabbage+raspberry": { filename: "raspberry_poison_cabbage.png", name: "Poisoned Raspberry Jam" },
+    "poison_cabbage+rhubarb": { filename: "rhubarb_poison_cabbage.png", name: "Toxic Rhubarb Compote" },
+    "poison_cabbage+strawberry": { filename: "strawberry_cabbage.png", name: "Daring Strawberry Slaw" },
+    "poison_cabbage+tomato": { filename: "tomato_poison_cabbage.png", name: "Toxic Tomato Soup" },
+    "poison_cabbage+watermelon": { filename: "watermelon_poison_cabbage.png", name: "Toxic Watermelon Slush" },
+    "raspberry+rhubarb": { filename: "raspberry_rhubarb.png", name: "Raspberry Rhubarb Crumble" },
+    "raspberry+strawberry": { filename: "raspberry_strawberry.png", name: "Berry Mix Jam" },
+    "raspberry+tomato": { filename: "tomato_raspberry.png", name: "Tomato Raspberry Sauce" },
+    "raspberry+watermelon": { filename: "raspberry_watermelon.png", name: "Raspberry Watermelon Slush" },
+    "rhubarb+strawberry": { filename: "strawberry_rhubarb.png", name: "Strawberry Rhubarb Tart" },
+    "rhubarb+tomato": { filename: "tomato_rhubarb.png", name: "Tomato Rhubarb Chutney" },
+    "rhubarb+watermelon": { filename: "watermelon_rhubarb.png", name: "Rhubarb Watermelon Cooler" },
+    "strawberry+tomato": { filename: "tomato_strawberry.png", name: "Strawberry Tomato Bruschetta" },
+    "strawberry+watermelon": { filename: "strawberry_watermelon.png", name: "Strawberry Watermelon Punch" },
+    "tomato+watermelon": { filename: "tomato_watermelon.png", name: "Watermelon Tomato Gazpacho" }
   };
 
   // src/media/webview.ts
@@ -435,6 +589,9 @@ Uses: ${this._num_hotkey_uses}`;
         slot.addEventListener("animationend", () => {
           completed++;
           if (completed === entries.length) {
+            const species1 = entries[0].plant.dataset.species ?? "";
+            const species2 = entries[1].plant.dataset.species ?? "";
+            const recipeKey = [species1, species2].sort().join("+");
             entries.forEach(({ plant: p, slot: s }) => {
               s.remove();
               p.classList.remove("in-pot");
@@ -462,6 +619,19 @@ Uses: ${this._num_hotkey_uses}`;
               });
               progressBar.addEventListener("transitionend", () => {
                 progressWrapper.hidden = true;
+                if (cookBtn) {
+                  cookBtn.disabled = false;
+                }
+                potImg.src = potImg.dataset.openSrc;
+                const recipe = RECIPES[recipeKey];
+                if (recipe) {
+                  const foodBase = document.getElementById("inventory-bottom-right")?.dataset.foodBase ?? "";
+                  const foodRow = document.getElementById("food-row");
+                  if (foodRow) {
+                    foodRow.hidden = false;
+                  }
+                  game.greenhouse.addCookedFood(recipeKey, recipe.name, `${foodBase}/${recipe.filename}`);
+                }
               }, { once: true });
             }
           }
