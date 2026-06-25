@@ -1,16 +1,16 @@
 # ACKNOWLEDGEMENT: THIS SCRIPT WAS WRITTEN BY @andrewthederp ON GITHUB HERE: https://github.com/andrewthederp/Games/blob/main/snake.py
 
-
+# HINT: everything starting with a dot needs to use pygame, i.e. "pygame.display" instead of ".display"
 
 import sys, pygame, random
 
-screen = pygame.display.set_mode(size:=(500,500))
-pygame.display.set_caption("Snake!")
+screen = .display.set_mode(size:=(500,500))
+.display.set_caption("Snake!")
 
-clock = pygame.time.Clock()
+clock = .time.Clock()
 
-snakes = [pygame.Rect((size[0]//2-10, size[1]//2-10),(20,20))]
-apple = pygame.Rect((random.randint(0, size[0]-20), random.randint(0, size[1]-20)),(20,20))
+snakes = [.Rect((size[0]//2-10, size[1]//2-10),(20,20))]
+apple = .Rect((random.randint(0, size[0]-20), random.randint(0, size[1]-20)),(20,20))
 length = 1
 UP = (0, -5)
 LEFT = (-5, 0)
@@ -42,13 +42,13 @@ def move_snake(snakes, length, direction, apple):
 	elif pos[1] > size[1]:
 		pos[1] = 0
 
-	rect = pygame.Rect(tuple(pos),(20,20))
+	rect = .Rect(tuple(pos),(20,20))
 	if rect.collidelist(snakes) != -1:
 		return False, False, False
 	if rect.colliderect(apple):
-		apple = pygame.Rect((random.randint(0, size[0]-20), random.randint(0, size[1]-20)),(20,20))
+		apple = .Rect((random.randint(0, size[0]-20), random.randint(0, size[1]-20)),(20,20))
 		while apple.collidelist(snakes) != -1:
-			apple = pygame.Rect((random.randint(0, size[0]-20), random.randint(0, size[1]-20)),(20,20))
+			apple = .Rect((random.randint(0, size[0]-20), random.randint(0, size[1]-20)),(20,20))
 		length += 1
 	else:
 		apple = None
@@ -56,32 +56,32 @@ def move_snake(snakes, length, direction, apple):
 	return snakes, apple, length
 
 while True:
-	for event in pygame.event.get():
-		if event.type == pygame.QUIT:
-			pygame.quit()
+	for event in .event.get():
+		if event.type == .QUIT:
+			.quit()
 			sys.exit()
-		if event.type == pygame.KEYDOWN:
-			if event.key == pygame.K_UP:
+		if event.type == .KEYDOWN:
+			if event.key == .K_UP:
 				direction = change_dir(snakes, direction, UP)
-			if event.key == pygame.K_LEFT:
+			if event.key == .K_LEFT:
 				direction = change_dir(snakes, direction, LEFT)
-			if event.key == pygame.K_RIGHT:
+			if event.key == .K_RIGHT:
 				direction = change_dir(snakes, direction, RIGHT)
-			if event.key == pygame.K_DOWN:
+			if event.key == .K_DOWN:
 				direction = change_dir(snakes, direction, DOWN)
 
 	snakes, aple, length = move_snake(snakes, length, direction, apple)
 	if not snakes:
-		pygame.quit()
+		.quit()
 		sys.exit()
 	if aple:
 		apple = aple
 
 	screen.fill((255,255,255))
 	for snake in snakes:
-		pygame.draw.rect(screen, (255,212,69), snake)
-		pygame.draw.rect(screen, (0,0,0), snake, 1)
-	pygame.draw.rect(screen, (255,0,0), apple)
-	pygame.draw.rect(screen, (0,0,0), apple,1)
-	pygame.display.update()
+		.draw.rect(screen, (255,212,69), snake)
+		.draw.rect(screen, (0,0,0), snake, 1)
+	.draw.rect(screen, (255,0,0), apple)
+	.draw.rect(screen, (0,0,0), apple,1)
+	.display.update()
 	clock.tick(5+len(snakes)//2 if 5+len(snakes)//2 <= 15 else 15)

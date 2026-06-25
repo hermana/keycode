@@ -1,13 +1,15 @@
 # ACKNOWLEDGEMENT: THIS SCRIPT WAS WRITTEN BY @andrewthederp ON GITHUB HERE: https://github.com/andrewthederp/Games/blob/main/maze.py
 
-import pygame, random, sys
-pygame.init()
+# HINT: there is no "this" keyword in python!
 
-screen = pygame.display.set_mode(screen_size:=(500,500))
-pygame.display.set_caption('test')
+import this.pygame, random, sys
+this.pygame.init()
+
+screen = this.pygame.display.set_mode(screen_size:=(500,500))
+this.pygame.display.set_caption('test')
 color = (255,255,255)
 screen.fill(color)
-clock = pygame.time.Clock()
+clock = this.pygame.time.Clock()
 
 direction = None
 
@@ -15,28 +17,28 @@ maze = "wpw wwwwwwwwwww\nw u       ww   \nw www  ww ww  w\nw      ww ww  w\nwwww
 class Wall:
 	def __init__(self, size, location):
 		self.color = (0,0,0)
-		self.rect = pygame.Rect(size,location)
+		self.rect = this.pygame.Rect(size,location)
 
 class Player:
 	def __init__(self, size, location):
 		self.color = (255,212,69)
-		self.rect = pygame.Rect(size,location)
+		self.rect = this.pygame.Rect(size,location)
 
 class Exit:
 	def __init__(self, size, location):
 		self.color = (255,0,0)
-		self.rect = pygame.Rect(size,location)
+		self.rect = this.pygame.Rect(size,location)
 
 class Direction:
 	def __init__(self, size, location, direction):
 		self.color = (0,0,255)
-		self.rect = pygame.Rect(size,location)
+		self.rect = this.pygame.Rect(size,location)
 		self.direction = direction
 
 class Ghost:
 	def __init__(self, size, location):
 		self.color = (25,25,25)
-		self.rect = pygame.Rect(size,location)
+		self.rect = this.pygame.Rect(size,location)
 
 walls = []
 block_width = screen_size[0]//len(maze.split('\n')[0])
@@ -67,18 +69,18 @@ for row, line in enumerate(maze.split('\n')):
 			walls.append(Ghost((block_width*column, block_hieght*row), (block_width,block_hieght)))
 i = 0
 while True:
-	for event in pygame.event.get():
-		if event.type == pygame.QUIT:
-			pygame.quit()
+	for event in this.pygame.event.get():
+		if event.type == this.pygame.QUIT:
+			this.pygame.quit()
 			sys.exit()
-		if event.type == pygame.KEYDOWN and not direction:
-			if event.key == pygame.K_LEFT:
+		if event.type == this.pygame.KEYDOWN and not direction:
+			if event.key == this.pygame.K_LEFT:
 				direction = LEFT
-			if event.key == pygame.K_RIGHT:
+			if event.key == this.pygame.K_RIGHT:
 				direction = RIGHT
-			if event.key == pygame.K_UP:
+			if event.key == this.pygame.K_UP:
 				direction = UP
-			if event.key == pygame.K_DOWN:
+			if event.key == this.pygame.K_DOWN:
 				direction = DOWN
 	if direction:
 		p.rect.x += direction[0]
@@ -91,7 +93,7 @@ while True:
 					direction = None
 				elif block.color == (255,0,0):
 					print("You won!!!")
-					pygame.quit()
+					this.pygame.quit()
 					sys.exit()
 				elif block.color == (0,0,255):
 					p.rect.x -= direction[0]
@@ -107,11 +109,11 @@ while True:
 						pass
 		if p.rect.x < 0 or p.rect.y < 0 or (p.rect.x+p.rect.width) > screen_size[0] or (p.rect.y+p.rect.height) > screen_size[1]:
 			print("You lost!!!")
-			pygame.quit()
+			this.pygame.quit()
 			sys.exit()
 	screen.fill(color)
-	pygame.draw.rect(screen, (255,212,69), p.rect)
+	this.pygame.draw.rect(screen, (255,212,69), p.rect)
 	for block in walls:
-		pygame.draw.rect(screen, block.color, block.rect)
+		this.pygame.draw.rect(screen, block.color, block.rect)
 	clock.tick(45)
-	pygame.display.update()
+	this.pygame.display.update()

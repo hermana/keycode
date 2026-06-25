@@ -1,12 +1,8 @@
 
 import pygame, sys, random
 
-# Colors
-BLACK = (0,0,0)
-YELLOW = (255,212,69)
-WHITE = (255,255,255)
-GRAY = (108, 100, 96)
-LIGHT_GRAY = (200,200,200)
+
+# HINT: try looking at the bottom of the file or viewing the problems tab. 
 
 pygame.init()
 pygame.font.init()
@@ -119,3 +115,12 @@ while True:
 	draw_score()
 	pygame.display.update()
 	clock.tick(60)
+
+
+
+# Colors
+BLACK = (0,0,0)
+YELLOW = (255,212,69)
+WHITE = (255,255,255)
+GRAY = (108, 100, 96)
+LIGHT_GRAY = (200,200,200)
