@@ -179,6 +179,12 @@ if (potWrapper) {
     }
   }
 
+  function syncPotUI(): void {
+    updateOverlay();
+    updateCookButton();
+    refreshHighlights();
+  }
+
   function refreshHighlights(): void {
     document.querySelectorAll<HTMLElement>('#keycrop .harvested-plant').forEach(p => {
       const canAdd = !p.classList.contains('in-pot') && potContents.length < game.greenhouse.NUM_ITEMS_PER_RECIPE;;
@@ -198,9 +204,7 @@ if (potWrapper) {
     });
     tray.appendChild(slot);
     potContents.push({ plant, slot });
-    updateOverlay();
-    updateCookButton();
-    refreshHighlights();
+    syncPotUI();
   }
 
   function removeFromPot(plant: HTMLElement, slot: HTMLElement): void {
@@ -208,9 +212,7 @@ if (potWrapper) {
     if (idx !== -1) { potContents.splice(idx, 1); }
     slot.remove();
     plant.classList.remove('in-pot');
-    updateOverlay();
-    updateCookButton();
-    refreshHighlights();
+    syncPotUI();
   }
 
   game.div.addEventListener('click', (e) => {
@@ -259,9 +261,7 @@ if (potWrapper) {
           potImg.src = potImg.dataset.closedSrc!;
           potActive = false;
           overlay.hidden = true;
-          updateOverlay();
-          updateCookButton();
-          refreshHighlights();
+          syncPotUI();
           potWrapper.style.pointerEvents = '';
 
           if (cookBtn) { cookBtn.hidden = true; }

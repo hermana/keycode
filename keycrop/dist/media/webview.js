@@ -161,21 +161,39 @@ Uses: ${this._num_hotkey_uses}`;
     }
   };
 
-  // src/media/harvestedPlant.ts
-  var HarvestedPlant = class {
-    _species;
+  // src/media/inventoryItem.ts
+  var InventoryItem = class {
     _count;
-    _html_element;
     _badge_element;
-    get species() {
-      return this._species;
-    }
     get count() {
       return this._count;
     }
-    constructor(species, count) {
-      this._species = species;
+    constructor(count) {
       this._count = count;
+    }
+    createBadge(parent) {
+      const badge = document.createElement("div");
+      badge.classList.add("plant-count-badge");
+      badge.textContent = String(this._count);
+      parent.appendChild(badge);
+      this._badge_element = badge;
+    }
+    incrementCount() {
+      this._count += 1;
+      this._badge_element.textContent = String(this._count);
+    }
+  };
+
+  // src/media/harvestedPlant.ts
+  var HarvestedPlant = class extends InventoryItem {
+    _species;
+    _html_element;
+    get species() {
+      return this._species;
+    }
+    constructor(species, count) {
+      super(count);
+      this._species = species;
       const element = document.createElement("div");
       document.getElementById("keycrop").appendChild(element);
       this._html_element = element;
@@ -184,15 +202,7 @@ Uses: ${this._num_hotkey_uses}`;
       element.dataset.species = species;
       const displaySpecies = species.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
       element.title = displaySpecies;
-      const badge = document.createElement("div");
-      badge.classList.add("plant-count-badge");
-      badge.textContent = String(count);
-      element.appendChild(badge);
-      this._badge_element = badge;
-    }
-    incrementCount() {
-      this._count += 1;
-      this._badge_element.textContent = String(this._count);
+      this.createBadge(element);
     }
     useOne() {
       this._count -= 1;
@@ -207,21 +217,16 @@ Uses: ${this._num_hotkey_uses}`;
   };
 
   // src/media/cookedFood.ts
-  var CookedFood = class {
+  var CookedFood = class extends InventoryItem {
     _recipeKey;
     _name;
-    _count;
-    _badge_element;
     get recipeKey() {
       return this._recipeKey;
     }
-    get count() {
-      return this._count;
-    }
     constructor(recipeKey, name, imgSrc, count) {
+      super(count);
       this._recipeKey = recipeKey;
       this._name = name;
-      this._count = count;
       const container = document.getElementById("food-row");
       const element = document.createElement("div");
       element.classList.add("cooked-food");
@@ -231,15 +236,7 @@ Uses: ${this._num_hotkey_uses}`;
       img.src = imgSrc;
       img.classList.add("cooked-food-img");
       element.appendChild(img);
-      const badge = document.createElement("div");
-      badge.classList.add("plant-count-badge");
-      badge.textContent = String(count);
-      element.appendChild(badge);
-      this._badge_element = badge;
-    }
-    incrementCount() {
-      this._count += 1;
-      this._badge_element.textContent = String(this._count);
+      this.createBadge(element);
     }
   };
 
@@ -546,6 +543,10 @@ Uses: ${this._num_hotkey_uses}`;
       if (cookBtn) {
         cookBtn.hidden = potContents.length < game.greenhouse.NUM_ITEMS_PER_RECIPE;
       }
+    }, syncPotUI = function() {
+      updateOverlay();
+      updateCookButton();
+      refreshHighlights();
     }, refreshHighlights = function() {
       document.querySelectorAll("#keycrop .harvested-plant").forEach((p) => {
         const canAdd = !p.classList.contains("in-pot") && potContents.length < game.greenhouse.NUM_ITEMS_PER_RECIPE;
@@ -566,9 +567,7 @@ Uses: ${this._num_hotkey_uses}`;
       });
       tray.appendChild(slot);
       potContents.push({ plant, slot });
-      updateOverlay();
-      updateCookButton();
-      refreshHighlights();
+      syncPotUI();
     }, removeFromPot = function(plant, slot) {
       const idx = potContents.findIndex((entry) => entry.plant === plant);
       if (idx !== -1) {
@@ -576,11 +575,9 @@ Uses: ${this._num_hotkey_uses}`;
       }
       slot.remove();
       plant.classList.remove("in-pot");
-      updateOverlay();
-      updateCookButton();
-      refreshHighlights();
+      syncPotUI();
     };
-    updateOverlay2 = updateOverlay, updateCookButton2 = updateCookButton, refreshHighlights2 = refreshHighlights, addToPot2 = addToPot, removeFromPot2 = removeFromPot;
+    updateOverlay2 = updateOverlay, updateCookButton2 = updateCookButton, syncPotUI2 = syncPotUI, refreshHighlights2 = refreshHighlights, addToPot2 = addToPot, removeFromPot2 = removeFromPot;
     const overlay = potWrapper.querySelector(".inventory-pot-overlay");
     const cookBtn = document.getElementById("cook-btn");
     let potActive = false;
@@ -636,9 +633,7 @@ Uses: ${this._num_hotkey_uses}`;
             potImg.src = potImg.dataset.closedSrc;
             potActive = false;
             overlay.hidden = true;
-            updateOverlay();
-            updateCookButton();
-            refreshHighlights();
+            syncPotUI();
             potWrapper.style.pointerEvents = "";
             if (cookBtn) {
               cookBtn.hidden = true;
@@ -678,6 +673,7 @@ Uses: ${this._num_hotkey_uses}`;
   }
   var updateOverlay2;
   var updateCookButton2;
+  var syncPotUI2;
   var refreshHighlights2;
   var addToPot2;
   var removeFromPot2;
