@@ -176,6 +176,7 @@ function readPlantsFromDisk() {
       harvestedCounts = new Map(Object.entries(savedHarvested));
       const savedCooked = saved.cookedFoodCounts ?? {};
       cookedFoodCounts = new Map(Object.entries(savedCooked));
+      playerMoney = saved.playerMoney ?? 0;
       const seen = /* @__PURE__ */ new Map();
       for (const p of savedPlants) {
         const existing = seen.get(p.key);
@@ -200,7 +201,8 @@ function writePlantsToDisk() {
   fs.writeFileSync(plantsPath, JSON.stringify({
     plants,
     harvestedCounts: Object.fromEntries(harvestedCounts),
-    cookedFoodCounts: Object.fromEntries(cookedFoodCounts)
+    cookedFoodCounts: Object.fromEntries(cookedFoodCounts),
+    playerMoney
   }));
 }
 function sendPlantsToWebview() {
@@ -241,6 +243,7 @@ function requestWebviewSave() {
 var plants = new Array();
 var harvestedCounts = /* @__PURE__ */ new Map();
 var cookedFoodCounts = /* @__PURE__ */ new Map();
+var playerMoney = 0;
 var SPECIES_DESCRIPTIONS = {
   "bean": "A humble unassuming legume.",
   "tomato": "This crop has a wide variety of culinary uses.",
@@ -541,7 +544,8 @@ var GreenhouseWebViewProvider = class {
           fs.writeFileSync(plantsPath, JSON.stringify({
             plants: message.content,
             harvestedCounts: Object.fromEntries(harvestedCounts),
-            cookedFoodCounts: Object.fromEntries(cookedFoodCounts)
+            cookedFoodCounts: Object.fromEntries(cookedFoodCounts),
+            playerMoney
           }));
           break;
         }
@@ -620,12 +624,33 @@ var InventoryWebViewProvider = class {
             });
             loadPlantsToInventory();
             loadCookedFoodsToInventory();
+            webview.postMessage({ action: "load_money", amount: playerMoney });
           } else {
             webview.postMessage({
               action: "key-tracking-mode"
             });
           }
           break;
+        case "sell": {
+          playerMoney += message.amount ?? 0;
+          if (message.species) {
+            const count = harvestedCounts.get(message.species) ?? 0;
+            if (count <= 1) {
+              harvestedCounts.delete(message.species);
+            } else {
+              harvestedCounts.set(message.species, count - 1);
+            }
+          } else if (message.recipeKey) {
+            const count = cookedFoodCounts.get(message.recipeKey) ?? 0;
+            if (count <= 1) {
+              cookedFoodCounts.delete(message.recipeKey);
+            } else {
+              cookedFoodCounts.set(message.recipeKey, count - 1);
+            }
+          }
+          writePlantsToDisk();
+          break;
+        }
         case "cooked": {
           const current = cookedFoodCounts.get(message.recipeKey) ?? 0;
           cookedFoodCounts.set(message.recipeKey, current + 1);
@@ -661,6 +686,7 @@ var InventoryWebViewProvider = class {
         <body>
           <div id="keycrop">
           </div>
+          <div id="money-display">$0</div>
           <div id="empty-inventory-message" class="instructions">You currently don't have anything in your inventory.</div>
           <div id="food-row" hidden></div>
           <div id="inventory-bottom-right" data-food-base="${foodBase}">

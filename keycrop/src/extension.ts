@@ -38,6 +38,7 @@ function readPlantsFromDisk() {
       harvestedCounts = new Map(Object.entries(savedHarvested));
       const savedCooked: Record<string, number> = saved.cookedFoodCounts ?? {};
       cookedFoodCounts = new Map(Object.entries(savedCooked));
+      playerMoney = saved.playerMoney ?? 0;
       // Deduplicate by key — prefer non-harvested if there are conflicting entries
       const seen = new Map<string, Plant>();
       for (const p of savedPlants) {
@@ -64,7 +65,8 @@ function writePlantsToDisk() {
   fs.writeFileSync(plantsPath, JSON.stringify({
     plants: plants,
     harvestedCounts: Object.fromEntries(harvestedCounts),
-    cookedFoodCounts: Object.fromEntries(cookedFoodCounts)
+    cookedFoodCounts: Object.fromEntries(cookedFoodCounts),
+    playerMoney
   }));
 }
 
@@ -110,6 +112,7 @@ function requestWebviewSave() {
 let plants = new Array<Plant>();
 let harvestedCounts = new Map<string, number>();
 let cookedFoodCounts = new Map<string, number>();
+let playerMoney = 0;
 
 const SPECIES_DESCRIPTIONS: Record<string, string> = {
   'bean': "A humble unassuming legume.",
@@ -448,7 +451,8 @@ export class GreenhouseWebViewProvider implements vscode.WebviewViewProvider {
             fs.writeFileSync(plantsPath, JSON.stringify({
               plants: message.content,
               harvestedCounts: Object.fromEntries(harvestedCounts),
-              cookedFoodCounts: Object.fromEntries(cookedFoodCounts)
+              cookedFoodCounts: Object.fromEntries(cookedFoodCounts),
+              playerMoney
             }));
             break;
           }
@@ -541,12 +545,27 @@ export class InventoryWebViewProvider implements vscode.WebviewViewProvider {
               //Load harvested plants into inventory
               loadPlantsToInventory();
               loadCookedFoodsToInventory();
+              webview.postMessage({ action: 'load_money', amount: playerMoney });
             }else{
               webview.postMessage({
                 action: 'key-tracking-mode'
               });
             }
             break;
+          case 'sell': {
+            playerMoney += message.amount ?? 0;
+            if (message.species) {
+              const count = harvestedCounts.get(message.species) ?? 0;
+              if (count <= 1) { harvestedCounts.delete(message.species); }
+              else { harvestedCounts.set(message.species, count - 1); }
+            } else if (message.recipeKey) {
+              const count = cookedFoodCounts.get(message.recipeKey) ?? 0;
+              if (count <= 1) { cookedFoodCounts.delete(message.recipeKey); }
+              else { cookedFoodCounts.set(message.recipeKey, count - 1); }
+            }
+            writePlantsToDisk();
+            break;
+          }
           case 'cooked': {
             const current = cookedFoodCounts.get(message.recipeKey) ?? 0;
             cookedFoodCounts.set(message.recipeKey, current + 1);
@@ -585,6 +604,7 @@ export class InventoryWebViewProvider implements vscode.WebviewViewProvider {
         <body>
           <div id="keycrop">
           </div>
+          <div id="money-display">$0</div>
           <div id="empty-inventory-message" class="instructions">You currently don't have anything in your inventory.</div>
           <div id="food-row" hidden></div>
           <div id="inventory-bottom-right" data-food-base="${foodBase}">

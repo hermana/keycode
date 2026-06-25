@@ -1,13 +1,15 @@
 import { InventoryItem } from './inventoryItem';
+import { RECIPES } from './recipes';
 
 export class CookedFood extends InventoryItem {
   _recipeKey: string;
   _name: string;
+  _html_element: HTMLElement;
 
   get recipeKey(): string { return this._recipeKey; }
 
   constructor(recipeKey: string, name: string, imgSrc: string, count: number) {
-    super(count);
+    super(count, RECIPES[recipeKey]?.price ?? 0);
     this._recipeKey = recipeKey;
     this._name = name;
 
@@ -15,8 +17,10 @@ export class CookedFood extends InventoryItem {
 
     const element = document.createElement('div');
     element.classList.add('cooked-food');
+    element.dataset.recipeKey = recipeKey;
     element.title = name;
     container.appendChild(element);
+    this._html_element = element;
 
     const img = document.createElement('img');
     img.src = imgSrc;
@@ -24,5 +28,15 @@ export class CookedFood extends InventoryItem {
     element.appendChild(img);
 
     this.createBadge(element);
+  }
+
+  useOne(): boolean {
+    this._count -= 1;
+    if (this._count <= 0) {
+      this._html_element.remove();
+      return true;
+    }
+    this._badge_element.textContent = String(this._count);
+    return false;
   }
 }

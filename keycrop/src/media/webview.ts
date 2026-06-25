@@ -29,6 +29,20 @@ const game: GameState = {
   greenhouse: new Greenhouse(),
 };
 
+let playerMoney = 0;
+
+function updateMoneyDisplay(): void {
+  const el = document.getElementById('money-display');
+  if (el) { el.textContent = `$${playerMoney}`; }
+}
+
+function sellItem(element: HTMLElement, species?: string, recipeKey?: string): void {
+  const price = parseInt(element.dataset.price ?? '0', 10);
+  playerMoney += price;
+  updateMoneyDisplay();
+  vscode.postMessage({ type: 'sell', amount: price, species, recipeKey });
+}
+
 
 //Messages from VSCode
 window.addEventListener('message', (event: MessageEvent) => {
@@ -75,6 +89,10 @@ window.addEventListener('message', (event: MessageEvent) => {
       }
       break;
     }
+    case 'load_money':
+      playerMoney = message.amount ?? 0;
+      updateMoneyDisplay();
+      break;
     case 'scale':
       switch (message.value.toLowerCase()) {
         case 'small':
@@ -220,6 +238,60 @@ if (potWrapper) {
     const plant = (e.target as HTMLElement).closest('.harvested-plant') as HTMLElement | null;
     if (!plant || plant.classList.contains('in-pot')) { return; }
     addToPot(plant);
+  });
+
+  // Right-click context menu for selling
+  let contextMenuTarget: HTMLElement | null = null;
+
+  const contextMenu = document.createElement('div');
+  contextMenu.id = 'item-context-menu';
+  contextMenu.hidden = true;
+  const sellOption = document.createElement('div');
+  sellOption.className = 'context-menu-option';
+  sellOption.textContent = 'Sell';
+  contextMenu.appendChild(sellOption);
+  document.body.appendChild(contextMenu);
+
+  function showContextMenu(x: number, y: number, target: HTMLElement): void {
+    contextMenuTarget = target;
+    const price = parseInt(target.dataset.price ?? '0', 10);
+    sellOption.textContent = `Sell ($${price})`;
+    contextMenu.style.left = `${x}px`;
+    contextMenu.style.top = `${y}px`;
+    contextMenu.hidden = false;
+  }
+
+  function hideContextMenu(): void {
+    contextMenu.hidden = true;
+    contextMenuTarget = null;
+  }
+
+  document.addEventListener('contextmenu', (e) => {
+    const plant = (e.target as HTMLElement).closest('.harvested-plant') as HTMLElement | null;
+    const food = (e.target as HTMLElement).closest('.cooked-food') as HTMLElement | null;
+    const item = plant ?? food;
+    if (!item) { return; }
+    e.preventDefault();
+    showContextMenu(e.clientX, e.clientY, item);
+  });
+
+  sellOption.addEventListener('click', () => {
+    if (!contextMenuTarget) { return; }
+    const target = contextMenuTarget;
+    hideContextMenu();
+    if (target.classList.contains('harvested-plant')) {
+      sellItem(target, target.dataset.species, undefined);
+      game.greenhouse.consumeHarvestedPlant(target);
+    } else if (target.classList.contains('cooked-food')) {
+      sellItem(target, undefined, target.dataset.recipeKey);
+      game.greenhouse.consumeCookedFood(target);
+    }
+  });
+
+  document.addEventListener('click', () => hideContextMenu());
+  document.addEventListener('contextmenu', (e) => {
+    const item = (e.target as HTMLElement).closest('.harvested-plant, .cooked-food');
+    if (!item) { hideContextMenu(); }
   });
 
   potWrapper.addEventListener('click', () => {

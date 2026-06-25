@@ -48,6 +48,15 @@ export class Greenhouse {
     this.harvestedPlants.push(new HarvestedPlant(species, count));
   }
 
+  consumeCookedFood(element: HTMLElement): void {
+    const idx = this.cookedFoods.findIndex(f => f._html_element === element);
+    if (idx === -1) { return; }
+    const fullyConsumed = this.cookedFoods[idx].useOne();
+    if (fullyConsumed) {
+      this.cookedFoods.splice(idx, 1);
+    }
+  }
+
   consumeHarvestedPlant(element: HTMLElement): void {
     const idx = this.harvestedPlants.findIndex(p => p._html_element === element);
     if (idx === -1) { return; }
