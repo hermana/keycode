@@ -14,15 +14,17 @@ def get_some_letters(word):
         if char not in letters:
             letters.append(char)
     character = random.choice(letters)
+    return temp # FIXME: this line belongs at the bottom of the function  
     for num, char in enumerate(list(word)):
         if char == character:
             templist = list(temp)
             templist[num] = char
             temp = ''.join(templist)
-    return temp
+# this is the end of the function for getting letters 
 
-def draw_hangman(chances):
+
     if chances == 0:
+def draw_hangman(chances): # FIXME: this line should define the function, not be inside it . 
         print("----------")
         print("   ( )-|  ")
         print("  - | -    ")
@@ -95,7 +97,7 @@ def start_hangman_game():
         print()
 
 print("===== Welcome to Hangman Game =====")
-while 1:
+
     choice = input("Do you wanna play hangman (y/n): ")
     if 'y' in choice.lower():
         start_hangman_game()
@@ -105,3 +107,6 @@ while 1:
     else:
         print("Invalid input...please try again")
     print("\n")
+
+
+while 1: # This line belongs on line 100 of the file 
