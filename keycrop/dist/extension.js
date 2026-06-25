@@ -174,6 +174,8 @@ function readPlantsFromDisk() {
       const savedPlants = saved.plants ?? saved;
       const savedHarvested = saved.harvestedCounts ?? {};
       harvestedCounts = new Map(Object.entries(savedHarvested));
+      const savedCooked = saved.cookedFoodCounts ?? {};
+      cookedFoodCounts = new Map(Object.entries(savedCooked));
       const seen = /* @__PURE__ */ new Map();
       for (const p of savedPlants) {
         const existing = seen.get(p.key);
@@ -197,7 +199,8 @@ function writePlantsToDisk() {
   }
   fs.writeFileSync(plantsPath, JSON.stringify({
     plants,
-    harvestedCounts: Object.fromEntries(harvestedCounts)
+    harvestedCounts: Object.fromEntries(harvestedCounts),
+    cookedFoodCounts: Object.fromEntries(cookedFoodCounts)
   }));
 }
 function sendPlantsToWebview() {
@@ -221,6 +224,15 @@ function loadPlantsToInventory() {
     });
   });
 }
+function loadCookedFoodsToInventory() {
+  cookedFoodCounts.forEach((count, recipeKey) => {
+    inventory.postMessage({
+      action: "load_cooked",
+      recipeKey,
+      count
+    });
+  });
+}
 function requestWebviewSave() {
   greenhouse.postMessage({
     action: "save_plants"
@@ -228,6 +240,7 @@ function requestWebviewSave() {
 }
 var plants = new Array();
 var harvestedCounts = /* @__PURE__ */ new Map();
+var cookedFoodCounts = /* @__PURE__ */ new Map();
 var SPECIES_DESCRIPTIONS = {
   "bean": "A humble unassuming legume.",
   "tomato": "This crop has a wide variety of culinary uses.",
@@ -527,7 +540,8 @@ var GreenhouseWebViewProvider = class {
           }));
           fs.writeFileSync(plantsPath, JSON.stringify({
             plants: message.content,
-            harvestedCounts: Object.fromEntries(harvestedCounts)
+            harvestedCounts: Object.fromEntries(harvestedCounts),
+            cookedFoodCounts: Object.fromEntries(cookedFoodCounts)
           }));
           break;
         }
@@ -605,12 +619,19 @@ var InventoryWebViewProvider = class {
               value: "inventory"
             });
             loadPlantsToInventory();
+            loadCookedFoodsToInventory();
           } else {
             webview.postMessage({
               action: "key-tracking-mode"
             });
           }
           break;
+        case "cooked": {
+          const current = cookedFoodCounts.get(message.recipeKey) ?? 0;
+          cookedFoodCounts.set(message.recipeKey, current + 1);
+          writePlantsToDisk();
+          break;
+        }
       }
     });
   }

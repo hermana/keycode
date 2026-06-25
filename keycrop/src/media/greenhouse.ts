@@ -48,6 +48,15 @@ export class Greenhouse {
     this.harvestedPlants.push(new HarvestedPlant(species, count));
   }
 
+  consumeHarvestedPlant(element: HTMLElement): void {
+    const idx = this.harvestedPlants.findIndex(p => p._html_element === element);
+    if (idx === -1) { return; }
+    const fullyConsumed = this.harvestedPlants[idx].useOne();
+    if (fullyConsumed) {
+      this.harvestedPlants.splice(idx, 1);
+    }
+  }
+
   addCookedFood(recipeKey: string, name: string, imgSrc: string): void {
     const existing = this.cookedFoods.find(f => f.recipeKey === recipeKey);
     if (existing) {
@@ -55,5 +64,9 @@ export class Greenhouse {
       return;
     }
     this.cookedFoods.push(new CookedFood(recipeKey, name, imgSrc, 1));
+  }
+
+  loadCookedFood(recipeKey: string, name: string, imgSrc: string, count: number): void {
+    this.cookedFoods.push(new CookedFood(recipeKey, name, imgSrc, count));
   }
 }

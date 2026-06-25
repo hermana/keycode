@@ -36,6 +36,8 @@ function readPlantsFromDisk() {
       const savedPlants: any[] = saved.plants ?? saved;
       const savedHarvested: Record<string, number> = saved.harvestedCounts ?? {};
       harvestedCounts = new Map(Object.entries(savedHarvested));
+      const savedCooked: Record<string, number> = saved.cookedFoodCounts ?? {};
+      cookedFoodCounts = new Map(Object.entries(savedCooked));
       // Deduplicate by key — prefer non-harvested if there are conflicting entries
       const seen = new Map<string, Plant>();
       for (const p of savedPlants) {
@@ -61,7 +63,8 @@ function writePlantsToDisk() {
   }
   fs.writeFileSync(plantsPath, JSON.stringify({
     plants: plants,
-    harvestedCounts: Object.fromEntries(harvestedCounts)
+    harvestedCounts: Object.fromEntries(harvestedCounts),
+    cookedFoodCounts: Object.fromEntries(cookedFoodCounts)
   }));
 }
 
@@ -88,6 +91,16 @@ function loadPlantsToInventory() {
   });
 }
 
+function loadCookedFoodsToInventory() {
+  cookedFoodCounts.forEach((count, recipeKey) => {
+    inventory.postMessage({
+      action: 'load_cooked',
+      recipeKey,
+      count
+    });
+  });
+}
+
 function requestWebviewSave() {
   greenhouse.postMessage({
     action: 'save_plants'
@@ -96,6 +109,7 @@ function requestWebviewSave() {
 
 let plants = new Array<Plant>();
 let harvestedCounts = new Map<string, number>();
+let cookedFoodCounts = new Map<string, number>();
 
 const SPECIES_DESCRIPTIONS: Record<string, string> = {
   'bean': "A humble unassuming legume.",
@@ -433,7 +447,8 @@ export class GreenhouseWebViewProvider implements vscode.WebviewViewProvider {
             }));
             fs.writeFileSync(plantsPath, JSON.stringify({
               plants: message.content,
-              harvestedCounts: Object.fromEntries(harvestedCounts)
+              harvestedCounts: Object.fromEntries(harvestedCounts),
+              cookedFoodCounts: Object.fromEntries(cookedFoodCounts)
             }));
             break;
           }
@@ -525,12 +540,19 @@ export class InventoryWebViewProvider implements vscode.WebviewViewProvider {
               });
               //Load harvested plants into inventory
               loadPlantsToInventory();
+              loadCookedFoodsToInventory();
             }else{
               webview.postMessage({
                 action: 'key-tracking-mode'
               });
             }
             break;
+          case 'cooked': {
+            const current = cookedFoodCounts.get(message.recipeKey) ?? 0;
+            cookedFoodCounts.set(message.recipeKey, current + 1);
+            writePlantsToDisk();
+            break;
+          }
         }
       });
   }

@@ -194,6 +194,16 @@ Uses: ${this._num_hotkey_uses}`;
       this._count += 1;
       this._badge_element.textContent = String(this._count);
     }
+    useOne() {
+      this._count -= 1;
+      if (this._count <= 0) {
+        this._html_element.remove();
+        return true;
+      }
+      this._badge_element.textContent = String(this._count);
+      this._html_element.classList.remove("in-pot");
+      return false;
+    }
   };
 
   // src/media/cookedFood.ts
@@ -272,6 +282,16 @@ Uses: ${this._num_hotkey_uses}`;
       }
       this.harvestedPlants.push(new HarvestedPlant(species, count));
     }
+    consumeHarvestedPlant(element) {
+      const idx = this.harvestedPlants.findIndex((p) => p._html_element === element);
+      if (idx === -1) {
+        return;
+      }
+      const fullyConsumed = this.harvestedPlants[idx].useOne();
+      if (fullyConsumed) {
+        this.harvestedPlants.splice(idx, 1);
+      }
+    }
     addCookedFood(recipeKey, name, imgSrc) {
       const existing = this.cookedFoods.find((f) => f.recipeKey === recipeKey);
       if (existing) {
@@ -279,6 +299,9 @@ Uses: ${this._num_hotkey_uses}`;
         return;
       }
       this.cookedFoods.push(new CookedFood(recipeKey, name, imgSrc, 1));
+    }
+    loadCookedFood(recipeKey, name, imgSrc, count) {
+      this.cookedFoods.push(new CookedFood(recipeKey, name, imgSrc, count));
     }
   };
 
@@ -433,6 +456,19 @@ Uses: ${this._num_hotkey_uses}`;
       case "load_harvested":
         game.greenhouse.loadHarvestedPlant(message.species, message.count);
         document.getElementById("empty-inventory-message")?.remove();
+        break;
+      case "load_cooked": {
+        const recipe = RECIPES[message.recipeKey];
+        if (recipe) {
+          const foodBase = document.getElementById("inventory-bottom-right")?.dataset.foodBase ?? "";
+          const foodRow = document.getElementById("food-row");
+          if (foodRow) {
+            foodRow.hidden = false;
+          }
+          game.greenhouse.loadCookedFood(message.recipeKey, recipe.name, `${foodBase}/${recipe.filename}`, message.count);
+        }
+        break;
+      }
       case "scale":
         switch (message.value.toLowerCase()) {
           case "small":
@@ -594,7 +630,7 @@ Uses: ${this._num_hotkey_uses}`;
             const recipeKey = [species1, species2].sort().join("+");
             entries.forEach(({ plant: p, slot: s }) => {
               s.remove();
-              p.classList.remove("in-pot");
+              game.greenhouse.consumeHarvestedPlant(p);
             });
             potContents.length = 0;
             potImg.src = potImg.dataset.closedSrc;
@@ -631,6 +667,7 @@ Uses: ${this._num_hotkey_uses}`;
                     foodRow.hidden = false;
                   }
                   game.greenhouse.addCookedFood(recipeKey, recipe.name, `${foodBase}/${recipe.filename}`);
+                  vscode.postMessage({ type: "cooked", recipeKey });
                 }
               }, { once: true });
             }

@@ -33,4 +33,15 @@ export class HarvestedPlant {
     this._count += 1;
     this._badge_element.textContent = String(this._count);
   }
+
+  useOne(): boolean {
+    this._count -= 1;
+    if (this._count <= 0) {
+      this._html_element.remove();
+      return true;
+    }
+    this._badge_element.textContent = String(this._count);
+    this._html_element.classList.remove('in-pot');
+    return false;
+  }
 }

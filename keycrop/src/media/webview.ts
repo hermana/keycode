@@ -64,6 +64,17 @@ window.addEventListener('message', (event: MessageEvent) => {
     case 'load_harvested':
       game.greenhouse.loadHarvestedPlant(message.species, message.count);
       (document.getElementById('empty-inventory-message') as HTMLElement | null)?.remove();
+      break;
+    case 'load_cooked': {
+      const recipe = RECIPES[message.recipeKey];
+      if (recipe) {
+        const foodBase = document.getElementById('inventory-bottom-right')?.dataset.foodBase ?? '';
+        const foodRow = document.getElementById('food-row');
+        if (foodRow) { foodRow.hidden = false; }
+        game.greenhouse.loadCookedFood(message.recipeKey, recipe.name, `${foodBase}/${recipe.filename}`, message.count);
+      }
+      break;
+    }
     case 'scale':
       switch (message.value.toLowerCase()) {
         case 'small':
@@ -241,7 +252,7 @@ if (potWrapper) {
 
           entries.forEach(({ plant: p, slot: s }) => {
             s.remove();
-            p.classList.remove('in-pot');
+            game.greenhouse.consumeHarvestedPlant(p);
           });
           potContents.length = 0;
 
@@ -274,6 +285,7 @@ if (potWrapper) {
                 const foodRow = document.getElementById('food-row');
                 if (foodRow) { foodRow.hidden = false; }
                 game.greenhouse.addCookedFood(recipeKey, recipe.name, `${foodBase}/${recipe.filename}`);
+                vscode.postMessage({ type: 'cooked', recipeKey });
               }
             }, { once: true });
           }
