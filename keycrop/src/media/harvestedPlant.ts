@@ -31,7 +31,7 @@ export class HarvestedPlant extends InventoryItem {
       this._html_element.remove();
       return true;
     }
-    this._badge_element.textContent = String(this._count);
+    this.updateBadgeDisplay();
     this._html_element.classList.remove('in-pot');
     return false;
   }

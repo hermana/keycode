@@ -211,6 +211,13 @@ if (potWrapper) {
     return game.greenhouse.harvestedPlants.find(p => p._html_element === plant)?.count ?? 1;
   }
 
+  function updatePlantDisplay(plant: HTMLElement): void {
+    const unitPrice = parseInt(plant.dataset.price ?? '0', 10);
+    const displayCount = plantInventoryCount(plant) - plantPotCount(plant);
+    (plant.querySelector('.plant-count-badge') as HTMLElement).textContent = String(displayCount);
+    (plant.querySelector('.price-badge') as HTMLElement).textContent = `$${unitPrice * displayCount}`;
+  }
+
   function refreshHighlights(): void {
     document.querySelectorAll<HTMLElement>('#keycrop .harvested-plant').forEach(p => {
       const canAdd = plantPotCount(p) < plantInventoryCount(p) && potContents.length < game.greenhouse.NUM_ITEMS_PER_RECIPE;
@@ -229,6 +236,7 @@ if (potWrapper) {
     });
     tray.appendChild(slot);
     potContents.push({ plant, slot });
+    updatePlantDisplay(plant);
     if (plantPotCount(plant) >= plantInventoryCount(plant)) {
       plant.classList.add('in-pot');
     }
@@ -240,6 +248,7 @@ if (potWrapper) {
     if (idx !== -1) { potContents.splice(idx, 1); }
     slot.remove();
     plant.classList.remove('in-pot');
+    updatePlantDisplay(plant);
     syncPotUI();
   }
 

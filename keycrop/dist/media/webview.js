@@ -187,10 +187,13 @@ Uses: ${this._num_hotkey_uses}`;
       parent.appendChild(priceBadge);
       this._price_badge_element = priceBadge;
     }
-    incrementCount() {
-      this._count += 1;
+    updateBadgeDisplay() {
       this._badge_element.textContent = String(this._count);
       this._price_badge_element.textContent = `$${this._price * this._count}`;
+    }
+    incrementCount() {
+      this._count += 1;
+      this.updateBadgeDisplay();
     }
   };
 
@@ -239,7 +242,7 @@ Uses: ${this._num_hotkey_uses}`;
         this._html_element.remove();
         return true;
       }
-      this._badge_element.textContent = String(this._count);
+      this.updateBadgeDisplay();
       this._html_element.classList.remove("in-pot");
       return false;
     }
@@ -383,7 +386,7 @@ Uses: ${this._num_hotkey_uses}`;
         this._html_element.remove();
         return true;
       }
-      this._badge_element.textContent = String(this._count);
+      this.updateBadgeDisplay();
       return false;
     }
   };
@@ -619,6 +622,11 @@ Uses: ${this._num_hotkey_uses}`;
       return potContents.filter((entry) => entry.plant === plant).length;
     }, plantInventoryCount = function(plant) {
       return game.greenhouse.harvestedPlants.find((p) => p._html_element === plant)?.count ?? 1;
+    }, updatePlantDisplay = function(plant) {
+      const unitPrice = parseInt(plant.dataset.price ?? "0", 10);
+      const displayCount = plantInventoryCount(plant) - plantPotCount(plant);
+      plant.querySelector(".plant-count-badge").textContent = String(displayCount);
+      plant.querySelector(".price-badge").textContent = `$${unitPrice * displayCount}`;
     }, refreshHighlights = function() {
       document.querySelectorAll("#keycrop .harvested-plant").forEach((p) => {
         const canAdd = plantPotCount(p) < plantInventoryCount(p) && potContents.length < game.greenhouse.NUM_ITEMS_PER_RECIPE;
@@ -637,6 +645,7 @@ Uses: ${this._num_hotkey_uses}`;
       });
       tray.appendChild(slot);
       potContents.push({ plant, slot });
+      updatePlantDisplay(plant);
       if (plantPotCount(plant) >= plantInventoryCount(plant)) {
         plant.classList.add("in-pot");
       }
@@ -648,6 +657,7 @@ Uses: ${this._num_hotkey_uses}`;
       }
       slot.remove();
       plant.classList.remove("in-pot");
+      updatePlantDisplay(plant);
       syncPotUI();
     }, showContextMenu = function(x, y, target) {
       contextMenuTarget = target;
@@ -660,7 +670,7 @@ Uses: ${this._num_hotkey_uses}`;
       contextMenu.hidden = true;
       contextMenuTarget = null;
     };
-    updateOverlay2 = updateOverlay, updateCookButton2 = updateCookButton, syncPotUI2 = syncPotUI, plantPotCount2 = plantPotCount, plantInventoryCount2 = plantInventoryCount, refreshHighlights2 = refreshHighlights, addToPot2 = addToPot, removeFromPot2 = removeFromPot, showContextMenu2 = showContextMenu, hideContextMenu2 = hideContextMenu;
+    updateOverlay2 = updateOverlay, updateCookButton2 = updateCookButton, syncPotUI2 = syncPotUI, plantPotCount2 = plantPotCount, plantInventoryCount2 = plantInventoryCount, updatePlantDisplay2 = updatePlantDisplay, refreshHighlights2 = refreshHighlights, addToPot2 = addToPot, removeFromPot2 = removeFromPot, showContextMenu2 = showContextMenu, hideContextMenu2 = hideContextMenu;
     const overlay = potWrapper.querySelector(".inventory-pot-overlay");
     const cookBtn = document.getElementById("cook-btn");
     let potActive = false;
@@ -800,6 +810,7 @@ Uses: ${this._num_hotkey_uses}`;
   var syncPotUI2;
   var plantPotCount2;
   var plantInventoryCount2;
+  var updatePlantDisplay2;
   var refreshHighlights2;
   var addToPot2;
   var removeFromPot2;
