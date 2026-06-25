@@ -1,5 +1,6 @@
 {
   "name": "keycrop",
+  "publisher": "hermana",
   "displayName": "keycrop",
   "description": "A virtual greenhouse game for learning VSCode hotkeys",
   "version": "0.0.1",

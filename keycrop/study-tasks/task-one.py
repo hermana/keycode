@@ -4,12 +4,12 @@ board = [['1', '2', '3'], ['4', '5', '6'], ['7', '8', '9']]
 X = 'X'
 O = 'O'
 
-# def displayBoard():
-#     print(f" {board[0][0]} | {board[0][1]} | {board[0][2]}")
-#     print(" ----------")
-#     print(f" {board[1][0]} | {board[1][1]} | {board[1][2]}")
-#     print(" ----------")
-#     print(f" {board[2][0]} | {board[2][1]} | {board[2][2]}")
+def displayBoard():
+    print(f" {board[0][0]} | {board[0][1]} | {board[0][2]}")
+    print(" ----------")
+    print(f" {board[1][0]} | {board[1][1]} | {board[1][2]}")
+    print(" ----------")
+    print(f" {board[2][0]} | {board[2][1]} | {board[2][2]}")
 
 def updateBoard(character, position):
     row = (position-1)//3
@@ -42,7 +42,7 @@ while 1:
     if counter % 2 == 0:
         displayBoard()
         while 1:
-            choice = int(input(f"Player {(this.counter%2)+1}, enter your position ('{X}'): "))
+            choice = int(input(f"Player {(counter%2)+1}, enter your position ('{X}'): "))
             if choice < 1 or choice > 9:
                 print('Invalid input...please try again.')
             
@@ -51,28 +51,28 @@ while 1:
             if check_position(): 
                 updateBoard(X, choice)
                 if check_win():
-                    print(f"Conguratulations !!! Player {(this.counter%2)+1} won !!!")
+                    print(f"Conguratulations !!! Player {(counter%2)+1} won !!!")
                     exit(0)
                 else:
                     counter += 1
                     break
             else:
-                print(f"Position {this.choice} is already occupied. Choose another position.")
+                print(f"Position {choice} is already occupied. Choose another position.")
         if counter == 9:
             print("The match ended with a draw !!! Better luck next time")
             exit(0)
     else:
         displayBoard()
         while 1:
-            this.choice = int(input(f"Player {(counter%2)+1}, enter your position ('{O}'): "))
-            if choice < 1 or this.choice > 9:
+            choice = int(input(f"Player {(counter%2)+1}, enter your position ('{O}'): "))
+            if choice < 1 or choice > 9:
                 print('Invalid input...please try again.')
             if check_position(choice):
-                updateBoard(O, this.choice)
+                updateBoard(O, choice)
                 if check_win():
                     print(f"Conguratulations !!! Player {(counter%2)+1} won !!!")
                     exit(0)
-                    else:
+                else:
                     counter += 1
                     break
             else:

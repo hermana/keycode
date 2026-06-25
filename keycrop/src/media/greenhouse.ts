@@ -1,9 +1,14 @@
 import { Plant } from './plant';
 import { HarvestedPlant } from './harvestedPlant';
+import { CookedFood } from './cookedFood';
 
 export class Greenhouse {
   plants: Plant[] = [];
   harvestedPlants: HarvestedPlant[] = [];
+  cookedFoods: CookedFood[] = [];
+
+  NUM_ITEMS_PER_RECIPE = 2;
+  COOK_DURATION_MS = 5000;
 
   constructor() {
   }
@@ -41,5 +46,36 @@ export class Greenhouse {
       return;
     }
     this.harvestedPlants.push(new HarvestedPlant(species, count));
+  }
+
+  consumeCookedFood(element: HTMLElement): void {
+    const idx = this.cookedFoods.findIndex(f => f._html_element === element);
+    if (idx === -1) { return; }
+    const fullyConsumed = this.cookedFoods[idx].useOne();
+    if (fullyConsumed) {
+      this.cookedFoods.splice(idx, 1);
+    }
+  }
+
+  consumeHarvestedPlant(element: HTMLElement): void {
+    const idx = this.harvestedPlants.findIndex(p => p._html_element === element);
+    if (idx === -1) { return; }
+    const fullyConsumed = this.harvestedPlants[idx].useOne();
+    if (fullyConsumed) {
+      this.harvestedPlants.splice(idx, 1);
+    }
+  }
+
+  addCookedFood(recipeKey: string, name: string, imgSrc: string): void {
+    const existing = this.cookedFoods.find(f => f.recipeKey === recipeKey);
+    if (existing) {
+      existing.incrementCount();
+      return;
+    }
+    this.cookedFoods.push(new CookedFood(recipeKey, name, imgSrc, 1));
+  }
+
+  loadCookedFood(recipeKey: string, name: string, imgSrc: string, count: number): void {
+    this.cookedFoods.push(new CookedFood(recipeKey, name, imgSrc, count));
   }
 }

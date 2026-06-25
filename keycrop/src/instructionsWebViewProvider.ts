@@ -6,7 +6,14 @@ export class InstructionsWebViewProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = 'instructions';
   private _view?: vscode.WebviewView;
 
-  constructor(private readonly context: vscode.ExtensionContext) {}
+  constructor(
+    private readonly context: vscode.ExtensionContext,
+    private readonly getHotkeyCounts: () => Record<string, number>
+  ) {}
+
+  public postMessage(message: any): void {
+    this._view?.webview.postMessage(message);
+  }
 
   public resolveWebviewView(webviewView: vscode.WebviewView, _context: vscode.WebviewViewResolveContext, _token: vscode.CancellationToken): Thenable<void> | void {
     this._view = webviewView;
@@ -18,12 +25,17 @@ export class InstructionsWebViewProvider implements vscode.WebviewViewProvider {
     };
 
     webview.html = this.getHtmlContent(webview);
+
+    webview.onDidReceiveMessage((message) => {
+      if (message.type === 'init') {
+        webview.postMessage({ action: 'update_counts', counts: this.getHotkeyCounts() });
+      }
+    });
   }
 
   private getHtmlContent(webview: vscode.Webview): string {
 
     const style = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'src/media', 'style.css'));
-    const webviewJS = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'dist/media', 'webview.js'));
 
     const categories = [...new Set(KEY_MAP.map(k => k.category))];
 
@@ -32,7 +44,7 @@ export class InstructionsWebViewProvider implements vscode.WebviewViewProvider {
     ).join('\n        ');
 
     const tableRows = KEY_MAP.map(k =>
-      `<tr data-category="${k.category}"><td>${k.capital_key}</td><td>${k.description}</td></tr>`
+      `<tr data-category="${k.category}" data-command="${k.command}"><td>${k.capital_key}</td><td>${k.description}</td><td class="use-count">0</td></tr>`
     ).join('\n                ');
 
     return `
@@ -52,6 +64,7 @@ export class InstructionsWebViewProvider implements vscode.WebviewViewProvider {
                 <tr>
                   <th>Hotkey</th>
                   <th>Description</th>
+                  <th>Uses</th>
                 </tr>
               </thead>
               <tbody>
@@ -64,6 +77,19 @@ export class InstructionsWebViewProvider implements vscode.WebviewViewProvider {
           </div>
         </div>
         <script>
+          const vscode = acquireVsCodeApi();
+          vscode.postMessage({ type: 'init' });
+
+          window.addEventListener('message', (event) => {
+            const message = event.data;
+            if (message.action === 'update_counts') {
+              Object.entries(message.counts).forEach(([cmd, count]) => {
+                const row = document.querySelector('tr[data-command="' + cmd + '"]');
+                if (row) { row.querySelector('.use-count').textContent = String(count); }
+              });
+            }
+          });
+
           const buttons = document.querySelectorAll('.category-btn');
           const rows = document.querySelectorAll('tbody tr');
 
@@ -86,7 +112,6 @@ export class InstructionsWebViewProvider implements vscode.WebviewViewProvider {
             });
           });
         </script>
-        <script src="${webviewJS}"></script>
       </body>
       </html>
     `;

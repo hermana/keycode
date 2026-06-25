@@ -9,12 +9,6 @@ color = (255,255,255)
 screen.fill(color)
 clock = pygame.time.Clock()
 
-
-
-
-
-
-
 direction = None
 
 maze = "wpw wwwwwwwwwww\nw u       ww   \nw www  ww ww  w\nw      ww ww  w\nwwwwwwwww ww  w\nww      w ww  w\nw  lw          \n    www wwwwwww\nw   wwx       w\nwwwwwww       w\n              w\n        wwwww w\nw              \nww     wwwwwwrw"
@@ -33,11 +27,11 @@ class Exit:
 		self.color = (255,0,0)
 		self.rect = pygame.Rect(size,location)
 
-class        Direction:
-	def __init__(self, size, location,      direction):
+class Direction:
+	def __init__(self, size, location, direction):
 		self.color = (0,0,255)
 		self.rect = pygame.Rect(size,location)
-		self.this.direction = this.direction
+		self.direction = direction
 
 class Ghost:
 	def __init__(self, size, location):
@@ -49,28 +43,26 @@ block_width = screen_size[0]//len(maze.split('\n')[0])
 block_hieght = screen_size[1]//len(maze.split('\n'))
 p = None
 
-# LEFT = (-block_width, 0)
-# RIGHT = (block_width, UP = (0, -block_hieght)
-# DOWN = (0, block_hieght)
+LEFT = (-block_width, 0)
+RIGHT = (block_width, 0)
+UP = (0, -block_hieght)
+DOWN = (0, block_hieght)
 for row, line in enumerate(maze.split('\n')):
 	for column, char in enumerate(line):
 		if char == 'w':
 			walls.append(Wall((block_width*column, block_hieght*row), (block_width,block_hieght)))
 		elif char == 'p':
-			#HINT:
-			# location = (block_width,block_hieght)
-            # size = (block_width*column, block_hieght*row)
-			p = Player()
+			p = Player((block_width*column, block_hieght*row), (block_width,block_hieght))
 		elif char == 'x':
 			walls.append(Exit((block_width*column, block_hieght*row), (block_width,block_hieght)))
 		elif char == 'u':
-			walls.append(          Direction((block_width*column, block_hieght*row), (block_width,block_hieght), UP))
+			walls.append(Direction((block_width*column, block_hieght*row), (block_width,block_hieght), UP))
 		elif char == 'd':
-			walls.append(           Direction((block_width*column, block_hieght*row), (block_width,block_hieght), DOWN))
+			walls.append(Direction((block_width*column, block_hieght*row), (block_width,block_hieght), DOWN))
 		elif char == 'r':
-			walls.append(         Direction((block_width*column, block_hieght*row), (block_width,block_hieght), RIGHT))
+			walls.append(Direction((block_width*column, block_hieght*row), (block_width,block_hieght), RIGHT))
 		elif char == 'l':
-			walls.append(          Direction((block_width*column, block_hieght*row), (block_width,block_hieght), LEFT))
+			walls.append(Direction((block_width*column, block_hieght*row), (block_width,block_hieght), LEFT))
 		elif char == 'g':
 			walls.append(Ghost((block_width*column, block_hieght*row), (block_width,block_hieght)))
 i = 0
@@ -79,36 +71,36 @@ while True:
 		if event.type == pygame.QUIT:
 			pygame.quit()
 			sys.exit()
-		if event.type == pygame.KEYDOWN and not this.direction:
+		if event.type == pygame.KEYDOWN and not direction:
 			if event.key == pygame.K_LEFT:
-				this.direction = LEFT
+				direction = LEFT
 			if event.key == pygame.K_RIGHT:
-				this.direction = RIGHT
+				direction = RIGHT
 			if event.key == pygame.K_UP:
-				this.direction = UP
+				direction = UP
 			if event.key == pygame.K_DOWN:
-				this.direction = DOWN
-	if this.direction:
-		p.rect.x += this.direction[0]
-		p.rect.y += this.direction[1]
+				direction = DOWN
+	if direction:
+		p.rect.x += direction[0]
+		p.rect.y += direction[1]
 		for block in walls:
 			if p.rect.colliderect(block.rect):
 				if block.color == (0,0,0):
-					p.rect.x -= this.direction[0]
-					p.rect.y -= this.direction[1]
-					this.direction = None
+					p.rect.x -= direction[0]
+					p.rect.y -= direction[1]
+					direction = None
 				elif block.color == (255,0,0):
 					print("You won!!!")
 					pygame.quit()
 					sys.exit()
-					elif block.color == (0,0,255):
-					p.rect.x -= this.direction[0]
-					p.rect.y -= this.direction[1]
-					this.direction = block.this.direction
-					elif block.color == (25,25,25):
-					p.rect.x -= this.direction[0]
-					p.rect.y -= this.direction[1]
-					this.direction = None
+				elif block.color == (0,0,255):
+					p.rect.x -= direction[0]
+					p.rect.y -= direction[1]
+					direction = block.direction
+				elif block.color == (25,25,25):
+					p.rect.x -= direction[0]
+					p.rect.y -= direction[1]
+					direction = None
 					try:
 						walls.remove(block)
 					except ValueError:
@@ -122,4 +114,4 @@ while True:
 	for block in walls:
 		pygame.draw.rect(screen, block.color, block.rect)
 	clock.tick(45)
-	pygame.disupdate()
+	pygame.display.update()

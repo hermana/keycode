@@ -3,6 +3,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { MODE } from './mode';
 import { InstructionsWebViewProvider } from './instructionsWebViewProvider';
+import { PLANTS } from './media/plants';
 
 const CURRENT_MODE: MODE = MODE.GAME;
 
@@ -36,6 +37,9 @@ function readPlantsFromDisk() {
       const savedPlants: any[] = saved.plants ?? saved;
       const savedHarvested: Record<string, number> = saved.harvestedCounts ?? {};
       harvestedCounts = new Map(Object.entries(savedHarvested));
+      const savedCooked: Record<string, number> = saved.cookedFoodCounts ?? {};
+      cookedFoodCounts = new Map(Object.entries(savedCooked));
+      playerMoney = saved.playerMoney ?? 0;
       // Deduplicate by key — prefer non-harvested if there are conflicting entries
       const seen = new Map<string, Plant>();
       for (const p of savedPlants) {
@@ -61,7 +65,9 @@ function writePlantsToDisk() {
   }
   fs.writeFileSync(plantsPath, JSON.stringify({
     plants: plants,
-    harvestedCounts: Object.fromEntries(harvestedCounts)
+    harvestedCounts: Object.fromEntries(harvestedCounts),
+    cookedFoodCounts: Object.fromEntries(cookedFoodCounts),
+    playerMoney
   }));
 }
 
@@ -88,6 +94,16 @@ function loadPlantsToInventory() {
   });
 }
 
+function loadCookedFoodsToInventory() {
+  cookedFoodCounts.forEach((count, recipeKey) => {
+    inventory.postMessage({
+      action: 'load_cooked',
+      recipeKey,
+      count
+    });
+  });
+}
+
 function requestWebviewSave() {
   greenhouse.postMessage({
     action: 'save_plants'
@@ -96,6 +112,18 @@ function requestWebviewSave() {
 
 let plants = new Array<Plant>();
 let harvestedCounts = new Map<string, number>();
+let cookedFoodCounts = new Map<string, number>();
+let playerMoney = 0;
+
+function getHotkeyCounts(): Record<string, number> {
+  const counts: Record<string, number> = {};
+  for (const plant of plants) {
+    if (plant.key) {
+      counts[plant.key] = (counts[plant.key] ?? 0) + plant.hotkey_uses;
+    }
+  }
+  return counts;
+}
 
 const SPECIES_DESCRIPTIONS: Record<string, string> = {
   'bean': "A humble unassuming legume.",
@@ -137,19 +165,51 @@ function growPlant(key: string) {
     plants = plants.filter(p => p.key !== key);
     const usedSpecies = new Set(plants.filter(p => !p.harvested).map(p => p.species));
     const availableSpecies = ALL_SPECIES.filter(s => !usedSpecies.has(s));
-    const speciesItems = availableSpecies.map(s => ({ label: s.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()), description: SPECIES_DESCRIPTIONS[s] }));
+
+    type PlantPickItem = vscode.QuickPickItem & { species: string; locked: boolean };
+    const toLabel = (s: string) => s.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+
+    const unlocked = availableSpecies.filter(s => {
+      const data = PLANTS[s];
+      return !data || data.category === 'vegetable' || playerMoney >= data.price;
+    });
+    const locked = availableSpecies.filter(s => {
+      const data = PLANTS[s];
+      return data && data.category !== 'vegetable' && playerMoney < data.price;
+    });
+
+    const speciesItems: PlantPickItem[] = [
+      ...unlocked.map(s => ({
+        label: toLabel(s),
+        description: SPECIES_DESCRIPTIONS[s],
+        species: s,
+        locked: false
+      })),
+      ...(locked.length > 0 ? [
+        { label: 'Locked', kind: vscode.QuickPickItemKind.Separator, species: '', locked: false },
+        ...locked.map(s => ({
+          label: `$(lock) ${toLabel(s)}`,
+          description: `$${PLANTS[s].price} required · ${SPECIES_DESCRIPTIONS[s]}`,
+          species: s,
+          locked: true
+        }))
+      ] : [])
+    ];
+
     vscode.window.showQuickPick(speciesItems, {
       placeHolder: 'Choose a species for your new plant'
     }).then(item => {
-      const species = item?.label.toLowerCase().replace(/ /g, '_');
-      if (species) {
-        const displayName = species.replace(/_/g, ' ');
-        vscode.window.showInformationMessage("A new " + displayName + " plant has sprouted in the greenhouse!");
-        plants.push({ key: key, species: species, size: 'start', harvested: false, hotkey_uses: 1 });
-        addPlant({ key: key, species: species, size: 'start', harvested: false, hotkey_uses: 1 });
-        writePlantsToDisk();
-        requestWebviewSave();
+      if (!item) { return; }
+      if (item.locked) {
+        vscode.window.showInformationMessage(`You need $${PLANTS[item.species].price} to unlock ${toLabel(item.species)}.`);
+        return;
       }
+      const { species } = item;
+      vscode.window.showInformationMessage(`A new ${species.replace(/_/g, ' ')} plant has sprouted in the greenhouse!`);
+      plants.push({ key: key, species: species, size: 'start', harvested: false, hotkey_uses: 1 });
+      addPlant({ key: key, species: species, size: 'start', harvested: false, hotkey_uses: 1 });
+      writePlantsToDisk();
+      requestWebviewSave();
     });
   }
 }
@@ -177,15 +237,15 @@ export function activate(context: vscode.ExtensionContext) {
 
   readPlantsFromDisk();
 
-  instructions = new InstructionsWebViewProvider(context);
+  instructions = new InstructionsWebViewProvider(context, getHotkeyCounts);
 	context.subscriptions.push(vscode.window.registerWebviewViewProvider(InstructionsWebViewProvider.viewType, instructions));
 
 	if (CURRENT_MODE === MODE.GAME) {
 		greenhouse = new GreenhouseWebViewProvider(context);
-		context.subscriptions.push(vscode.window.registerWebviewViewProvider(GreenhouseWebViewProvider.viewType, greenhouse));
+		context.subscriptions.push(vscode.window.registerWebviewViewProvider(GreenhouseWebViewProvider.viewType, greenhouse, { webviewOptions: { retainContextWhenHidden: true } }));
 
 		inventory = new InventoryWebViewProvider(context);
-		context.subscriptions.push(vscode.window.registerWebviewViewProvider(InventoryWebViewProvider.viewType, inventory));
+		context.subscriptions.push(vscode.window.registerWebviewViewProvider(InventoryWebViewProvider.viewType, inventory, { webviewOptions: { retainContextWhenHidden: true } }));
 	}
 
 	vscode.workspace.onDidChangeConfiguration(event => {
@@ -433,8 +493,11 @@ export class GreenhouseWebViewProvider implements vscode.WebviewViewProvider {
             }));
             fs.writeFileSync(plantsPath, JSON.stringify({
               plants: message.content,
-              harvestedCounts: Object.fromEntries(harvestedCounts)
+              harvestedCounts: Object.fromEntries(harvestedCounts),
+              cookedFoodCounts: Object.fromEntries(cookedFoodCounts),
+              playerMoney
             }));
+            instructions.postMessage({ action: 'update_counts', counts: getHotkeyCounts() });
             break;
           }
           case 'harvested': {
@@ -525,12 +588,42 @@ export class InventoryWebViewProvider implements vscode.WebviewViewProvider {
               });
               //Load harvested plants into inventory
               loadPlantsToInventory();
+              loadCookedFoodsToInventory();
+              webview.postMessage({ action: 'load_money', amount: playerMoney });
             }else{
               webview.postMessage({
                 action: 'key-tracking-mode'
               });
             }
             break;
+          case 'sell': {
+            playerMoney += message.amount ?? 0;
+            if (message.species) {
+              const count = harvestedCounts.get(message.species) ?? 0;
+              if (count <= 1) { harvestedCounts.delete(message.species); }
+              else { harvestedCounts.set(message.species, count - 1); }
+            } else if (message.recipeKey) {
+              const count = cookedFoodCounts.get(message.recipeKey) ?? 0;
+              if (count <= 1) { cookedFoodCounts.delete(message.recipeKey); }
+              else { cookedFoodCounts.set(message.recipeKey, count - 1); }
+            }
+            writePlantsToDisk();
+            break;
+          }
+          case 'cooked': {
+            const current = cookedFoodCounts.get(message.recipeKey) ?? 0;
+            cookedFoodCounts.set(message.recipeKey, current + 1);
+            for (const species of (message.species as string[])) {
+              const count = harvestedCounts.get(species) ?? 0;
+              if (count <= 1) {
+                harvestedCounts.delete(species);
+              } else {
+                harvestedCounts.set(species, count - 1);
+              }
+            }
+            writePlantsToDisk();
+            break;
+          }
         }
       });
   }
@@ -539,6 +632,9 @@ export class InventoryWebViewProvider implements vscode.WebviewViewProvider {
 
       const style = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'src/media', 'style.css'));
       const webviewJS = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'dist/media', 'webview.js'));
+      const openPot = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'src/media/recipes', 'open_pot.png'));
+      const closedPot = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'src/media/recipes', 'closed_pot.png'));
+      const foodBase = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'src/media/recipes/food'));
 
       return `
         <!DOCTYPE html>
@@ -552,7 +648,19 @@ export class InventoryWebViewProvider implements vscode.WebviewViewProvider {
         <body>
           <div id="keycrop">
           </div>
+          <div id="money-display">$0</div>
           <div id="empty-inventory-message" class="instructions">You currently don't have anything in your inventory.</div>
+          <div id="food-row" hidden></div>
+          <div id="inventory-bottom-right" data-food-base="${foodBase}">
+            <div id="inventory-pot-wrapper" class="inventory-pot-wrapper">
+              <img src="${openPot}" data-open-src="${openPot}" data-closed-src="${closedPot}" class="inventory-pot" />
+              <span class="inventory-pot-overlay" hidden></span>
+            </div>
+            <button id="cook-btn" hidden>Cook</button>
+            <div id="cook-progress-wrapper" hidden>
+              <div id="cook-progress-bar"></div>
+            </div>
+          </div>
           <script src="${webviewJS}"></script>
         </body>
         </html>

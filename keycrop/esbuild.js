@@ -1,4 +1,19 @@
 const esbuild = require("esbuild");
+const fs = require("fs");
+const path = require("path");
+
+function copyDir(src, dest) {
+	fs.mkdirSync(dest, { recursive: true });
+	for (const entry of fs.readdirSync(src, { withFileTypes: true })) {
+		const srcPath = path.join(src, entry.name);
+		const destPath = path.join(dest, entry.name);
+		if (entry.isDirectory()) {
+			copyDir(srcPath, destPath);
+		} else if (/\.(png|jpg|jpeg|gif|svg|webp)$/i.test(entry.name)) {
+			fs.copyFileSync(srcPath, destPath);
+		}
+	}
+}
 
 const production = process.argv.includes('--production');
 const watch = process.argv.includes('--watch');
@@ -59,6 +74,8 @@ async function main() {
 			esbuildProblemMatcherPlugin,
 		],
 	});
+
+	copyDir("src/media", "dist/media");
 
 	if (watch) {
 		await extensionCtx.watch();

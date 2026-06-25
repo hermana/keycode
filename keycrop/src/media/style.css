@@ -147,9 +147,35 @@
 .harvested-plant {
   float: left;
   margin-top:8px;
-  width:50px;
-  height:50px;
+  margin-bottom:14px;
+  width:64px;
+  height:64px;
   position: relative;
+}
+
+#food-row {
+  clear: both;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 8px 0 4px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin-top: 8px;
+}
+
+.cooked-food {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  margin-bottom: 14px;
+}
+
+.cooked-food-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  image-rendering: pixelated;
+  display: block;
 }
 
 .plant-count-badge {
@@ -158,6 +184,25 @@
   right: -8px;
   background: #555;
   color: #fff;
+  font-size: 10px;
+  font-weight: bold;
+  min-width: 16px;
+  height: 16px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  box-sizing: border-box;
+  pointer-events: none;
+}
+
+.price-badge {
+  position: absolute;
+  bottom: -8px;
+  right: -8px;
+  background: #7a6200;
+  color: #ffd700;
   font-size: 10px;
   font-weight: bold;
   min-width: 16px;
@@ -719,6 +764,152 @@ background: url(./vegetables/watermelon_large.png);
 .watermelon.stage-13 { background: url(./midjourney-interpolated-vegetables/watermelon_13.png); background-size: contain; background-repeat: no-repeat; }
 .watermelon.stage-14 { background: url(./midjourney-interpolated-vegetables/watermelon_14.png); background-size: contain; background-repeat: no-repeat; }
 .watermelon.harvested-plant { background: url(./midjourney-interpolated-vegetables/watermelon_harvested.png); background-size: contain; background-repeat: no-repeat; }
+
+#item-context-menu {
+  position: fixed;
+  background: var(--vscode-menu-background, #2d2d2d);
+  border: 1px solid var(--vscode-menu-border, rgba(255,255,255,0.2));
+  border-radius: 4px;
+  padding: 4px 0;
+  z-index: 10000;
+  min-width: 120px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+
+.context-menu-option {
+  padding: 6px 14px;
+  font-family: monospace;
+  font-size: 0.85rem;
+  cursor: pointer;
+  color: var(--vscode-menu-foreground, #ccc);
+}
+
+.context-menu-option:hover {
+  background: var(--vscode-menu-selectionBackground, rgba(255,255,255,0.1));
+  color: var(--vscode-menu-selectionForeground, #fff);
+}
+
+#money-display {
+  position: fixed;
+  bottom: 8px;
+  left: 8px;
+  font-family: monospace;
+  font-size: 1rem;
+  font-weight: bold;
+  color: #ffd700;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 4px 8px;
+  border-radius: 4px;
+  pointer-events: none;
+}
+
+#inventory-bottom-right {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.inventory-pot-wrapper {
+  position: relative;
+  cursor: pointer;
+  display: inline-block;
+}
+
+#cook-btn {
+  width: 100%;
+  padding: 6px 12px;
+  background: #4a7c59;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-family: monospace;
+  font-size: 0.85rem;
+}
+
+#cook-btn:hover {
+  background: #3a6145;
+}
+
+#cook-progress-wrapper {
+  width: 64px;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+#cook-progress-bar {
+  height: 100%;
+  width: 100%;
+  background: #4a7c59;
+}
+
+.inventory-pot {
+  width: 64px;
+  height: 64px;
+  image-rendering: pixelated;
+  display: block;
+  pointer-events: none;
+}
+
+.inventory-pot-overlay {
+  position: absolute;
+  bottom: 6px;
+  right: 6px;
+  font-size: 10px;
+  font-family: monospace;
+  font-weight: bold;
+  color: #fff;
+  text-shadow: 1px 1px 2px #000;
+  pointer-events: none;
+}
+
+.harvested-plant.highlighted .plant-count-badge {
+  background: #f5c400;
+  color: #000;
+}
+
+.harvested-plant.in-pot {
+  display: none;
+}
+
+.pot-tray {
+  position: absolute;
+  bottom: 64px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding-bottom: 4px;
+}
+
+.pot-tray-slot {
+  width: 36px;
+  height: 36px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  image-rendering: pixelated;
+  cursor: pointer;
+  opacity: 0.95;
+}
+
+.pot-tray-slot:hover {
+  opacity: 0.5;
+}
+
+@keyframes fall-into-pot {
+  0%   { transform: translateY(0) scale(1); opacity: 1; }
+  100% { transform: translateY(72px) scale(0.1); opacity: 0; }
+}
+
+.pot-tray-slot.falling {
+  animation: fall-into-pot 0.35s ease-in forwards;
+  pointer-events: none;
+}
 
 .chili-icon{
   max-width: 100%;
