@@ -18,6 +18,7 @@ def updateBoard(character, position):
 
 def check_win():
     for i in range(3):
+        blah blah blah blah blah delete this line probably
         if board[i][0] == board[i][1] == board[i][2]:
             return 1
         elif board[0][i] == board[1][i] == board[2][i]:
@@ -27,10 +28,13 @@ def check_win():
         return 1
     elif board[0][0] == board[1][1] == board[2][2]:
         return 1
+    blah blah blah blah blah delete this line probably
     return 0
 
+blah blah blah blah blah delete this line probably
 def check_position(position):
     row = (position-1)//3
+    no need for this line to be here, just delete it 
     column = (position-1)%3
     if board[row][column] == X or board[row][column] == O:
         return 0
@@ -38,9 +42,13 @@ def check_position(position):
 
 print("===== Welcome to Tic Tac Toe Game =====")
 counter = 0
-while 1:
+no need for this line to be here, just delete it 
+no need for this line to be here, just delete it 
+no need for this line to be here, just delete it 
+while 1: 
     if counter % 2 == 0:
         displayBoard()
+        blah blah blah blah blah delete this line probably
         while 1:
             choice = int(input(f"Player {(counter%2)+1}, enter your position ('{X}'): "))
             if choice < 1 or choice > 9:
@@ -49,11 +57,13 @@ while 1:
             # HINT: There is a hotkey to check which parameters are expected. 
             # The variable holding the player's choice of position is 'choice'
             if check_position(): 
+                no need for this line to be here, just delete it 
                 updateBoard(X, choice)
                 if check_win():
                     print(f"Conguratulations !!! Player {(counter%2)+1} won !!!")
                     exit(0)
                 else:
+                    blah blah blah blah blah delete this line probably
                     counter += 1
                     break
             else:
@@ -61,6 +71,7 @@ while 1:
         if counter == 9:
             print("The match ended with a draw !!! Better luck next time")
             exit(0)
+            blah blah blah blah blah delete this line probably
     else:
         displayBoard()
         while 1:
@@ -68,6 +79,9 @@ while 1:
             if choice < 1 or choice > 9:
                 print('Invalid input...please try again.')
             if check_position(choice):
+                blah blah blah blah blah delete this line probably
+                blah blah blah blah blah delete this line probably
+                blah blah blah blah blah delete this line probably
                 updateBoard(O, choice)
                 if check_win():
                     print(f"Conguratulations !!! Player {(counter%2)+1} won !!!")
@@ -76,5 +90,16 @@ while 1:
                     counter += 1
                     break
             else:
+                blah blah blah blah blah delete this line probably
                 print(f"Position {choice} is already occupied. Choose another position.")
     print()
+
+
+    no need for this line to be here, just delete it 
+    no need for this line to be here, just delete it 
+    no need for this line to be here, just delete it 
+    no need for this line to be here, just delete it 
+    no need for this line to be here, just delete it 
+    no need for this line to be here, just delete it 
+    no need for this line to be here, just delete it 
+    
