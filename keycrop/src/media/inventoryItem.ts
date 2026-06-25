@@ -2,6 +2,7 @@ export abstract class InventoryItem {
   protected _count: number;
   protected _price: number;
   protected _badge_element!: HTMLElement;
+  protected _price_badge_element!: HTMLElement;
 
   get count(): number { return this._count; }
 
@@ -21,12 +22,14 @@ export abstract class InventoryItem {
 
     const priceBadge = document.createElement('div');
     priceBadge.classList.add('price-badge');
-    priceBadge.textContent = `$${this._price}`;
+    priceBadge.textContent = `$${this._price * this._count}`;
     parent.appendChild(priceBadge);
+    this._price_badge_element = priceBadge;
   }
 
   incrementCount(): void {
     this._count += 1;
     this._badge_element.textContent = String(this._count);
+    this._price_badge_element.textContent = `$${this._price * this._count}`;
   }
 }

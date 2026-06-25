@@ -203,16 +203,23 @@ if (potWrapper) {
     refreshHighlights();
   }
 
+  function plantPotCount(plant: HTMLElement): number {
+    return potContents.filter(entry => entry.plant === plant).length;
+  }
+
+  function plantInventoryCount(plant: HTMLElement): number {
+    return game.greenhouse.harvestedPlants.find(p => p._html_element === plant)?.count ?? 1;
+  }
+
   function refreshHighlights(): void {
     document.querySelectorAll<HTMLElement>('#keycrop .harvested-plant').forEach(p => {
-      const canAdd = !p.classList.contains('in-pot') && potContents.length < game.greenhouse.NUM_ITEMS_PER_RECIPE;;
+      const canAdd = plantPotCount(p) < plantInventoryCount(p) && potContents.length < game.greenhouse.NUM_ITEMS_PER_RECIPE;
       p.classList.toggle('highlighted', potActive && canAdd);
     });
   }
 
   function addToPot(plant: HTMLElement): void {
     if (potContents.length >= game.greenhouse.NUM_ITEMS_PER_RECIPE) { return; }
-    plant.classList.add('in-pot');
     const slot = document.createElement('div');
     slot.className = 'pot-tray-slot';
     slot.style.backgroundImage = window.getComputedStyle(plant).backgroundImage;
@@ -222,6 +229,9 @@ if (potWrapper) {
     });
     tray.appendChild(slot);
     potContents.push({ plant, slot });
+    if (plantPotCount(plant) >= plantInventoryCount(plant)) {
+      plant.classList.add('in-pot');
+    }
     syncPotUI();
   }
 
@@ -236,7 +246,7 @@ if (potWrapper) {
   game.div.addEventListener('click', (e) => {
     if (!potActive) { return; }
     const plant = (e.target as HTMLElement).closest('.harvested-plant') as HTMLElement | null;
-    if (!plant || plant.classList.contains('in-pot')) { return; }
+    if (!plant || plantPotCount(plant) >= plantInventoryCount(plant)) { return; }
     addToPot(plant);
   });
 
@@ -326,6 +336,7 @@ if (potWrapper) {
 
           entries.forEach(({ plant: p, slot: s }) => {
             s.remove();
+            p.classList.remove('in-pot');
             game.greenhouse.consumeHarvestedPlant(p);
           });
           potContents.length = 0;
@@ -368,7 +379,7 @@ if (potWrapper) {
 }
 
 //Start loop
-const timer = setInterval(update, 1000 / game.fps);
+setInterval(update, 1000 / game.fps);
 
 //Tell vscode game loaded
 //TODO: type or action here?

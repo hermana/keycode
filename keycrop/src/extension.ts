@@ -3,6 +3,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { MODE } from './mode';
 import { InstructionsWebViewProvider } from './instructionsWebViewProvider';
+import { PLANTS } from './media/plants';
 
 const CURRENT_MODE: MODE = MODE.GAME;
 
@@ -154,19 +155,51 @@ function growPlant(key: string) {
     plants = plants.filter(p => p.key !== key);
     const usedSpecies = new Set(plants.filter(p => !p.harvested).map(p => p.species));
     const availableSpecies = ALL_SPECIES.filter(s => !usedSpecies.has(s));
-    const speciesItems = availableSpecies.map(s => ({ label: s.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()), description: SPECIES_DESCRIPTIONS[s] }));
+
+    type PlantPickItem = vscode.QuickPickItem & { species: string; locked: boolean };
+    const toLabel = (s: string) => s.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+
+    const unlocked = availableSpecies.filter(s => {
+      const data = PLANTS[s];
+      return !data || data.category === 'vegetable' || playerMoney >= data.price;
+    });
+    const locked = availableSpecies.filter(s => {
+      const data = PLANTS[s];
+      return data && data.category !== 'vegetable' && playerMoney < data.price;
+    });
+
+    const speciesItems: PlantPickItem[] = [
+      ...unlocked.map(s => ({
+        label: toLabel(s),
+        description: SPECIES_DESCRIPTIONS[s],
+        species: s,
+        locked: false
+      })),
+      ...(locked.length > 0 ? [
+        { label: 'Locked', kind: vscode.QuickPickItemKind.Separator, species: '', locked: false },
+        ...locked.map(s => ({
+          label: `$(lock) ${toLabel(s)}`,
+          description: `$${PLANTS[s].price} required · ${SPECIES_DESCRIPTIONS[s]}`,
+          species: s,
+          locked: true
+        }))
+      ] : [])
+    ];
+
     vscode.window.showQuickPick(speciesItems, {
       placeHolder: 'Choose a species for your new plant'
     }).then(item => {
-      const species = item?.label.toLowerCase().replace(/ /g, '_');
-      if (species) {
-        const displayName = species.replace(/_/g, ' ');
-        vscode.window.showInformationMessage("A new " + displayName + " plant has sprouted in the greenhouse!");
-        plants.push({ key: key, species: species, size: 'start', harvested: false, hotkey_uses: 1 });
-        addPlant({ key: key, species: species, size: 'start', harvested: false, hotkey_uses: 1 });
-        writePlantsToDisk();
-        requestWebviewSave();
+      if (!item) { return; }
+      if (item.locked) {
+        vscode.window.showInformationMessage(`You need $${PLANTS[item.species].price} to unlock ${toLabel(item.species)}.`);
+        return;
       }
+      const { species } = item;
+      vscode.window.showInformationMessage(`A new ${species.replace(/_/g, ' ')} plant has sprouted in the greenhouse!`);
+      plants.push({ key: key, species: species, size: 'start', harvested: false, hotkey_uses: 1 });
+      addPlant({ key: key, species: species, size: 'start', harvested: false, hotkey_uses: 1 });
+      writePlantsToDisk();
+      requestWebviewSave();
     });
   }
 }

@@ -154,6 +154,25 @@ var InstructionsWebViewProvider = class {
   }
 };
 
+// src/media/plants.ts
+var PLANTS = {
+  bean: { price: 2, category: "vegetable" },
+  tomato: { price: 2, category: "vegetable" },
+  broccoli: { price: 2, category: "vegetable" },
+  chili: { price: 2, category: "vegetable" },
+  lettuce: { price: 2, category: "vegetable" },
+  rhubarb: { price: 2, category: "vegetable" },
+  ivy: { price: 50, category: "decorative" },
+  jacaranda_tree: { price: 50, category: "decorative" },
+  raspberry: { price: 4, category: "fruit" },
+  strawberry: { price: 4, category: "fruit" },
+  watermelon: { price: 4, category: "fruit" },
+  glowberry: { price: 100, category: "exotic" },
+  bulbino: { price: 100, category: "exotic" },
+  poison_cabbage: { price: 100, category: "exotic" },
+  neon_mould: { price: 100, category: "exotic" }
+};
+
 // src/extension.ts
 var CURRENT_MODE = 0 /* GAME */;
 var greenhouse;
@@ -281,19 +300,48 @@ function growPlant(key) {
     plants = plants.filter((p) => p.key !== key);
     const usedSpecies = new Set(plants.filter((p) => !p.harvested).map((p) => p.species));
     const availableSpecies = ALL_SPECIES.filter((s) => !usedSpecies.has(s));
-    const speciesItems = availableSpecies.map((s) => ({ label: s.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()), description: SPECIES_DESCRIPTIONS[s] }));
+    const toLabel = (s) => s.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+    const unlocked = availableSpecies.filter((s) => {
+      const data = PLANTS[s];
+      return !data || data.category === "vegetable" || playerMoney >= data.price;
+    });
+    const locked = availableSpecies.filter((s) => {
+      const data = PLANTS[s];
+      return data && data.category !== "vegetable" && playerMoney < data.price;
+    });
+    const speciesItems = [
+      ...unlocked.map((s) => ({
+        label: toLabel(s),
+        description: SPECIES_DESCRIPTIONS[s],
+        species: s,
+        locked: false
+      })),
+      ...locked.length > 0 ? [
+        { label: "Locked", kind: vscode2.QuickPickItemKind.Separator, species: "", locked: false },
+        ...locked.map((s) => ({
+          label: `$(lock) ${toLabel(s)}`,
+          description: `$${PLANTS[s].price} required \xB7 ${SPECIES_DESCRIPTIONS[s]}`,
+          species: s,
+          locked: true
+        }))
+      ] : []
+    ];
     vscode2.window.showQuickPick(speciesItems, {
       placeHolder: "Choose a species for your new plant"
     }).then((item) => {
-      const species = item?.label.toLowerCase().replace(/ /g, "_");
-      if (species) {
-        const displayName = species.replace(/_/g, " ");
-        vscode2.window.showInformationMessage("A new " + displayName + " plant has sprouted in the greenhouse!");
-        plants.push({ key, species, size: "start", harvested: false, hotkey_uses: 1 });
-        addPlant({ key, species, size: "start", harvested: false, hotkey_uses: 1 });
-        writePlantsToDisk();
-        requestWebviewSave();
+      if (!item) {
+        return;
       }
+      if (item.locked) {
+        vscode2.window.showInformationMessage(`You need $${PLANTS[item.species].price} to unlock ${toLabel(item.species)}.`);
+        return;
+      }
+      const { species } = item;
+      vscode2.window.showInformationMessage(`A new ${species.replace(/_/g, " ")} plant has sprouted in the greenhouse!`);
+      plants.push({ key, species, size: "start", harvested: false, hotkey_uses: 1 });
+      addPlant({ key, species, size: "start", harvested: false, hotkey_uses: 1 });
+      writePlantsToDisk();
+      requestWebviewSave();
     });
   }
 }

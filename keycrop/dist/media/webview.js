@@ -166,6 +166,7 @@ Uses: ${this._num_hotkey_uses}`;
     _count;
     _price;
     _badge_element;
+    _price_badge_element;
     get count() {
       return this._count;
     }
@@ -182,32 +183,34 @@ Uses: ${this._num_hotkey_uses}`;
       this._badge_element = badge;
       const priceBadge = document.createElement("div");
       priceBadge.classList.add("price-badge");
-      priceBadge.textContent = `$${this._price}`;
+      priceBadge.textContent = `$${this._price * this._count}`;
       parent.appendChild(priceBadge);
+      this._price_badge_element = priceBadge;
     }
     incrementCount() {
       this._count += 1;
       this._badge_element.textContent = String(this._count);
+      this._price_badge_element.textContent = `$${this._price * this._count}`;
     }
   };
 
-  // src/media/prices.ts
-  var PLANT_PRICES = {
-    bean: 2,
-    tomato: 2,
-    broccoli: 2,
-    chili: 2,
-    bulbino: 15,
-    glowberry: 20,
-    ivy: 7,
-    jacaranda_tree: 18,
-    lettuce: 4,
-    neon_mould: 25,
-    poison_cabbage: 12,
-    raspberry: 9,
-    rhubarb: 7,
-    strawberry: 11,
-    watermelon: 8
+  // src/media/plants.ts
+  var PLANTS = {
+    bean: { price: 2, category: "vegetable" },
+    tomato: { price: 2, category: "vegetable" },
+    broccoli: { price: 2, category: "vegetable" },
+    chili: { price: 2, category: "vegetable" },
+    lettuce: { price: 2, category: "vegetable" },
+    rhubarb: { price: 2, category: "vegetable" },
+    ivy: { price: 50, category: "decorative" },
+    jacaranda_tree: { price: 50, category: "decorative" },
+    raspberry: { price: 4, category: "fruit" },
+    strawberry: { price: 4, category: "fruit" },
+    watermelon: { price: 4, category: "fruit" },
+    glowberry: { price: 100, category: "exotic" },
+    bulbino: { price: 100, category: "exotic" },
+    poison_cabbage: { price: 100, category: "exotic" },
+    neon_mould: { price: 100, category: "exotic" }
   };
 
   // src/media/harvestedPlant.ts
@@ -218,7 +221,7 @@ Uses: ${this._num_hotkey_uses}`;
       return this._species;
     }
     constructor(species, count) {
-      super(count, PLANT_PRICES[species] ?? 0);
+      super(count, PLANTS[species]?.price ?? 0);
       this._species = species;
       const element = document.createElement("div");
       document.getElementById("keycrop").appendChild(element);
@@ -612,17 +615,19 @@ Uses: ${this._num_hotkey_uses}`;
       updateOverlay();
       updateCookButton();
       refreshHighlights();
+    }, plantPotCount = function(plant) {
+      return potContents.filter((entry) => entry.plant === plant).length;
+    }, plantInventoryCount = function(plant) {
+      return game.greenhouse.harvestedPlants.find((p) => p._html_element === plant)?.count ?? 1;
     }, refreshHighlights = function() {
       document.querySelectorAll("#keycrop .harvested-plant").forEach((p) => {
-        const canAdd = !p.classList.contains("in-pot") && potContents.length < game.greenhouse.NUM_ITEMS_PER_RECIPE;
-        ;
+        const canAdd = plantPotCount(p) < plantInventoryCount(p) && potContents.length < game.greenhouse.NUM_ITEMS_PER_RECIPE;
         p.classList.toggle("highlighted", potActive && canAdd);
       });
     }, addToPot = function(plant) {
       if (potContents.length >= game.greenhouse.NUM_ITEMS_PER_RECIPE) {
         return;
       }
-      plant.classList.add("in-pot");
       const slot = document.createElement("div");
       slot.className = "pot-tray-slot";
       slot.style.backgroundImage = window.getComputedStyle(plant).backgroundImage;
@@ -632,6 +637,9 @@ Uses: ${this._num_hotkey_uses}`;
       });
       tray.appendChild(slot);
       potContents.push({ plant, slot });
+      if (plantPotCount(plant) >= plantInventoryCount(plant)) {
+        plant.classList.add("in-pot");
+      }
       syncPotUI();
     }, removeFromPot = function(plant, slot) {
       const idx = potContents.findIndex((entry) => entry.plant === plant);
@@ -652,7 +660,7 @@ Uses: ${this._num_hotkey_uses}`;
       contextMenu.hidden = true;
       contextMenuTarget = null;
     };
-    updateOverlay2 = updateOverlay, updateCookButton2 = updateCookButton, syncPotUI2 = syncPotUI, refreshHighlights2 = refreshHighlights, addToPot2 = addToPot, removeFromPot2 = removeFromPot, showContextMenu2 = showContextMenu, hideContextMenu2 = hideContextMenu;
+    updateOverlay2 = updateOverlay, updateCookButton2 = updateCookButton, syncPotUI2 = syncPotUI, plantPotCount2 = plantPotCount, plantInventoryCount2 = plantInventoryCount, refreshHighlights2 = refreshHighlights, addToPot2 = addToPot, removeFromPot2 = removeFromPot, showContextMenu2 = showContextMenu, hideContextMenu2 = hideContextMenu;
     const overlay = potWrapper.querySelector(".inventory-pot-overlay");
     const cookBtn = document.getElementById("cook-btn");
     let potActive = false;
@@ -665,7 +673,7 @@ Uses: ${this._num_hotkey_uses}`;
         return;
       }
       const plant = e.target.closest(".harvested-plant");
-      if (!plant || plant.classList.contains("in-pot")) {
+      if (!plant || plantPotCount(plant) >= plantInventoryCount(plant)) {
         return;
       }
       addToPot(plant);
@@ -742,6 +750,7 @@ Uses: ${this._num_hotkey_uses}`;
             const recipeKey = [species1, species2].sort().join("+");
             entries.forEach(({ plant: p, slot: s }) => {
               s.remove();
+              p.classList.remove("in-pot");
               game.greenhouse.consumeHarvestedPlant(p);
             });
             potContents.length = 0;
@@ -789,12 +798,14 @@ Uses: ${this._num_hotkey_uses}`;
   var updateOverlay2;
   var updateCookButton2;
   var syncPotUI2;
+  var plantPotCount2;
+  var plantInventoryCount2;
   var refreshHighlights2;
   var addToPot2;
   var removeFromPot2;
   var showContextMenu2;
   var hideContextMenu2;
-  var timer = setInterval(update, 1e3 / game.fps);
+  setInterval(update, 1e3 / game.fps);
   vscode.postMessage({ type: "init" });
 })();
 //# sourceMappingURL=webview.js.map

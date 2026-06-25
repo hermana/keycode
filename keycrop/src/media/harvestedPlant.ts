@@ -1,5 +1,5 @@
 import { InventoryItem } from './inventoryItem';
-import { PLANT_PRICES } from './prices';
+import { PLANTS } from './plants';
 
 export class HarvestedPlant extends InventoryItem {
   _species: string;
@@ -8,7 +8,7 @@ export class HarvestedPlant extends InventoryItem {
   get species(): string { return this._species; }
 
   constructor(species: string, count: number) {
-    super(count, PLANT_PRICES[species] ?? 0);
+    super(count, PLANTS[species]?.price ?? 0);
     this._species = species;
 
     const element = document.createElement('div');
