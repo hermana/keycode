@@ -1,6 +1,7 @@
 # ACKNOWLEDGEMENT: THIS SCRIPT WAS WRITTEN BY @andrewthederp ON GITHUB HERE: https://github.com/andrewthederp/Games/blob/main/snake.py
 
 
+
 import sys, pygame, random
 
 screen = pygame.display.set_mode(size:=(500,500))
@@ -9,7 +10,7 @@ pygame.display.set_caption("Snake!")
 clock = pygame.time.Clock()
 
 snakes = [pygame.Rect((size[0]//2-10, size[1]//2-10),(20,20))]
-this.apple = pygame.Rect((random.randint(0, size[0]-20), random.randint(0, size[1]-20)),(20,20))
+apple = pygame.Rect((random.randint(0, size[0]-20), random.randint(0, size[1]-20)),(20,20))
 length = 1
 UP = (0, -5)
 LEFT = (-5, 0)
@@ -18,15 +19,15 @@ DOWN = (0, 5)
 directions = [UP,LEFT,RIGHT,DOWN]
 direction = random.choice(directions)
 
-# def change_dir(snakes, current_dir, direction):
-# 	if len(snakes) == 1:
-# 		return direction
-# 	conversion = {UP:DOWN, RIGHT:LEFT, DOWN:UP, LEFT:RIGHT}
-# 	if not conversion[current_dir] == direction:
-# 		return direction
-# 	return current_dir
+def change_dir(snakes, current_dir, direction):
+	if len(snakes) == 1:
+		return direction
+	conversion = {UP:DOWN, RIGHT:LEFT, DOWN:UP, LEFT:RIGHT}
+	if not conversion[current_dir] == direction:
+		return direction
+	return current_dir
 
-def move_snake(snakes, length, direction,     apple):
+def move_snake(snakes, length, direction, apple):
 	snek = snakes[-1]
 	if len(snakes) == length:
 		snakes.pop(0)
@@ -44,15 +45,15 @@ def move_snake(snakes, length, direction,     apple):
 	rect = pygame.Rect(tuple(pos),(20,20))
 	if rect.collidelist(snakes) != -1:
 		return False, False, False
-	if rect.colliderect(this.apple):
-		this.apple = pygame.Rect((random.randint(0, size[0]-20), random.randint(0, size[1]-20)),(20,20))
-		while this.apple.collidelist(snakes) != -1:
-			this.apple = pygame.Rect((random.randint(0, size[0]-20), random.randint(0, size[1]-20)),(20,20))
+	if rect.colliderect(apple):
+		apple = pygame.Rect((random.randint(0, size[0]-20), random.randint(0, size[1]-20)),(20,20))
+		while apple.collidelist(snakes) != -1:
+			apple = pygame.Rect((random.randint(0, size[0]-20), random.randint(0, size[1]-20)),(20,20))
 		length += 1
-		else:
-		this.apple = None
+	else:
+		apple = None
 	snakes.append(rect)
-	return snakes, this.apple, length
+	return snakes, apple, length
 
 while True:
 	for event in pygame.event.get():
@@ -68,20 +69,19 @@ while True:
 				direction = change_dir(snakes, direction, RIGHT)
 			if event.key == pygame.K_DOWN:
 				direction = change_dir(snakes, direction, DOWN)
-				
-    #HINT: check parameters - variable names have the same names as the parameters here!
-	snakes, aple, length = move_snake()
+
+	snakes, aple, length = move_snake(snakes, length, direction, apple)
 	if not snakes:
 		pygame.quit()
 		sys.exit()
 	if aple:
-		this.apple = aple
+		apple = aple
 
 	screen.fill((255,255,255))
 	for snake in snakes:
 		pygame.draw.rect(screen, (255,212,69), snake)
 		pygame.draw.rect(screen, (0,0,0), snake, 1)
-	pygame.draw.rect(screen, (255,0,0), this.apple)
-	pygame.draw.rect(screen, (0,0,0), this.apple,1)
+	pygame.draw.rect(screen, (255,0,0), apple)
+	pygame.draw.rect(screen, (0,0,0), apple,1)
 	pygame.display.update()
 	clock.tick(5+len(snakes)//2 if 5+len(snakes)//2 <= 15 else 15)
