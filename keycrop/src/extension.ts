@@ -242,10 +242,10 @@ export function activate(context: vscode.ExtensionContext) {
 
 	if (CURRENT_MODE === MODE.GAME) {
 		greenhouse = new GreenhouseWebViewProvider(context);
-		context.subscriptions.push(vscode.window.registerWebviewViewProvider(GreenhouseWebViewProvider.viewType, greenhouse));
+		context.subscriptions.push(vscode.window.registerWebviewViewProvider(GreenhouseWebViewProvider.viewType, greenhouse, { webviewOptions: { retainContextWhenHidden: true } }));
 
 		inventory = new InventoryWebViewProvider(context);
-		context.subscriptions.push(vscode.window.registerWebviewViewProvider(InventoryWebViewProvider.viewType, inventory));
+		context.subscriptions.push(vscode.window.registerWebviewViewProvider(InventoryWebViewProvider.viewType, inventory, { webviewOptions: { retainContextWhenHidden: true } }));
 	}
 
 	vscode.workspace.onDidChangeConfiguration(event => {

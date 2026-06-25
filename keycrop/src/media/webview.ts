@@ -314,6 +314,8 @@ if (potWrapper) {
   });
 
   potWrapper.addEventListener('click', () => {
+    const isCooking = progressWrapper && !progressWrapper.hidden;
+    if (isCooking || potContents.length > 0) { return; }
     potActive = !potActive;
     overlay.hidden = !potActive;
     if (potActive) { updateOverlay(); }
