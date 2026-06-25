@@ -285,7 +285,7 @@ if (potWrapper) {
                 const foodRow = document.getElementById('food-row');
                 if (foodRow) { foodRow.hidden = false; }
                 game.greenhouse.addCookedFood(recipeKey, recipe.name, `${foodBase}/${recipe.filename}`);
-                vscode.postMessage({ type: 'cooked', recipeKey });
+                vscode.postMessage({ type: 'cooked', recipeKey, species: [species1, species2] });
               }
             }, { once: true });
           }

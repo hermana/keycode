@@ -629,6 +629,14 @@ var InventoryWebViewProvider = class {
         case "cooked": {
           const current = cookedFoodCounts.get(message.recipeKey) ?? 0;
           cookedFoodCounts.set(message.recipeKey, current + 1);
+          for (const species of message.species) {
+            const count = harvestedCounts.get(species) ?? 0;
+            if (count <= 1) {
+              harvestedCounts.delete(species);
+            } else {
+              harvestedCounts.set(species, count - 1);
+            }
+          }
           writePlantsToDisk();
           break;
         }

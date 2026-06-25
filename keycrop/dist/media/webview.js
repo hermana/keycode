@@ -667,7 +667,7 @@ Uses: ${this._num_hotkey_uses}`;
                     foodRow.hidden = false;
                   }
                   game.greenhouse.addCookedFood(recipeKey, recipe.name, `${foodBase}/${recipe.filename}`);
-                  vscode.postMessage({ type: "cooked", recipeKey });
+                  vscode.postMessage({ type: "cooked", recipeKey, species: [species1, species2] });
                 }
               }, { once: true });
             }
