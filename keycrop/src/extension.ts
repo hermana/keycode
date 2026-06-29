@@ -178,12 +178,16 @@ function growPlant(key: string) {
     });
 
     const speciesItems: PlantPickItem[] = [
-      ...unlocked.map(s => ({
-        label: toLabel(s),
-        description: SPECIES_DESCRIPTIONS[s],
-        species: s,
-        locked: false
-      })),
+      ...unlocked.map(s => {
+        const data = PLANTS[s];
+        const isFree = !data || data.category === 'vegetable';
+        return {
+          label: toLabel(s),
+          description: isFree ? SPECIES_DESCRIPTIONS[s] : `$${data.price} · ${SPECIES_DESCRIPTIONS[s]}`,
+          species: s,
+          locked: false
+        };
+      }),
       ...(locked.length > 0 ? [
         { label: 'Locked', kind: vscode.QuickPickItemKind.Separator, species: '', locked: false },
         ...locked.map(s => ({
@@ -204,6 +208,11 @@ function growPlant(key: string) {
         return;
       }
       const { species } = item;
+      const plantData = PLANTS[species];
+      if (plantData && plantData.category !== 'vegetable') {
+        playerMoney -= plantData.price;
+        inventory.postMessage({ action: 'load_money', amount: playerMoney });
+      }
       vscode.window.showInformationMessage(`A new ${species.replace(/_/g, ' ')} plant has sprouted in the greenhouse!`);
       plants.push({ key: key, species: species, size: 'start', harvested: false, hotkey_uses: 1 });
       addPlant({ key: key, species: species, size: 'start', harvested: false, hotkey_uses: 1 });
@@ -500,7 +509,7 @@ export class GreenhouseWebViewProvider implements vscode.WebviewViewProvider {
             break;
           }
           case 'harvested': {
-            const harvestedPlant = plants.find(p => p.species === message.text && !p.harvested);
+            const harvestedPlant = plants.find(p => p.key === message.key && !p.harvested);
             if (harvestedPlant) {
               const alreadyInInventory = harvestedCounts.has(harvestedPlant.species);
               harvestedPlant.harvested = true;

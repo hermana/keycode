@@ -339,12 +339,16 @@ function growPlant(key) {
       return data && data.category !== "vegetable" && playerMoney < data.price;
     });
     const speciesItems = [
-      ...unlocked.map((s) => ({
-        label: toLabel(s),
-        description: SPECIES_DESCRIPTIONS[s],
-        species: s,
-        locked: false
-      })),
+      ...unlocked.map((s) => {
+        const data = PLANTS[s];
+        const isFree = !data || data.category === "vegetable";
+        return {
+          label: toLabel(s),
+          description: isFree ? SPECIES_DESCRIPTIONS[s] : `$${data.price} \xB7 ${SPECIES_DESCRIPTIONS[s]}`,
+          species: s,
+          locked: false
+        };
+      }),
       ...locked.length > 0 ? [
         { label: "Locked", kind: vscode2.QuickPickItemKind.Separator, species: "", locked: false },
         ...locked.map((s) => ({
@@ -366,6 +370,11 @@ function growPlant(key) {
         return;
       }
       const { species } = item;
+      const plantData = PLANTS[species];
+      if (plantData && plantData.category !== "vegetable") {
+        playerMoney -= plantData.price;
+        inventory.postMessage({ action: "load_money", amount: playerMoney });
+      }
       vscode2.window.showInformationMessage(`A new ${species.replace(/_/g, " ")} plant has sprouted in the greenhouse!`);
       plants.push({ key, species, size: "start", harvested: false, hotkey_uses: 1 });
       addPlant({ key, species, size: "start", harvested: false, hotkey_uses: 1 });
@@ -628,7 +637,7 @@ var GreenhouseWebViewProvider = class {
           break;
         }
         case "harvested": {
-          const harvestedPlant = plants.find((p) => p.species === message.text && !p.harvested);
+          const harvestedPlant = plants.find((p) => p.key === message.key && !p.harvested);
           if (harvestedPlant) {
             const alreadyInInventory = harvestedCounts.has(harvestedPlant.species);
             harvestedPlant.harvested = true;

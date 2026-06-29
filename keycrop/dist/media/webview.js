@@ -107,12 +107,12 @@ Uses: ${this._num_hotkey_uses}`;
         this._last_key_use = now;
         this._updateStageClass();
         if (this._num_hotkey_uses > 14 && this._html_element.classList.contains("harvested-plant")) {
-          vscode2.postMessage({ type: "harvested", text: this.species });
+          vscode2.postMessage({ type: "harvested", text: this.species, key: this._key });
         } else if (this._num_hotkey_uses > 14) {
           this._html_element.classList.remove("plant");
           this._html_element.classList.add("harvested-plant");
           this._html_element.hidden = true;
-          vscode2.postMessage({ type: "harvested", text: this.species });
+          vscode2.postMessage({ type: "harvested", text: this.species, key: this._key });
         } else if (this._num_hotkey_uses > 10) {
           this._size = "large";
           this._html_element.classList.remove("medium");
