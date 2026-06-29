@@ -374,7 +374,7 @@
                         "command": "expandLineSelection",
                         "when": "textInputFocus" 
                     },
-                    "keycrop.growSelectCurrentLine"
+                    "keycrop.growSelectLine"
                 ]
             }    
     },

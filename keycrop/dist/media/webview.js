@@ -430,36 +430,295 @@ Uses: ${this._num_hotkey_uses}`;
       }
       this.harvestedPlants.push(new HarvestedPlant(species, count));
     }
-    consumeCookedFood(element) {
-      const idx = this.cookedFoods.findIndex((f) => f._html_element === element);
-      if (idx === -1) {
-        return;
-      }
-      const fullyConsumed = this.cookedFoods[idx].useOne();
-      if (fullyConsumed) {
-        this.cookedFoods.splice(idx, 1);
-      }
-    }
     consumeHarvestedPlant(element) {
-      const idx = this.harvestedPlants.findIndex((p) => p._html_element === element);
+      this.consumeItem(this.harvestedPlants, element);
+    }
+    consumeCookedFood(element) {
+      this.consumeItem(this.cookedFoods, element);
+    }
+    consumeItem(list, element) {
+      const idx = list.findIndex((item) => item._html_element === element);
       if (idx === -1) {
         return;
       }
-      const fullyConsumed = this.harvestedPlants[idx].useOne();
-      if (fullyConsumed) {
-        this.harvestedPlants.splice(idx, 1);
+      if (list[idx].useOne()) {
+        list.splice(idx, 1);
       }
     }
-    addCookedFood(recipeKey, name, imgSrc) {
+    addCookedFood(recipeKey, name, imgSrc, count = 1) {
       const existing = this.cookedFoods.find((f) => f.recipeKey === recipeKey);
       if (existing) {
         existing.incrementCount();
         return;
       }
-      this.cookedFoods.push(new CookedFood(recipeKey, name, imgSrc, 1));
-    }
-    loadCookedFood(recipeKey, name, imgSrc, count) {
       this.cookedFoods.push(new CookedFood(recipeKey, name, imgSrc, count));
+    }
+    serialize() {
+      return [...new Set(this.plants)].map((plant) => ({
+        key: plant.key,
+        species: plant.species,
+        size: plant.size,
+        harvested: plant.html_element.classList.contains("harvested-plant"),
+        hotkey_uses: plant.num_hotkey_uses,
+        num_mashes: plant.num_mashes
+      }));
+    }
+  };
+
+  // src/media/sellMenu.ts
+  var SellMenu = class {
+    constructor(onConfirm) {
+      this.onConfirm = onConfirm;
+      this.menu = document.createElement("div");
+      this.menu.id = "item-context-menu";
+      this.menu.hidden = true;
+      this.sellOption = document.createElement("div");
+      this.sellOption.className = "context-menu-option";
+      this.sellOption.textContent = "Sell";
+      this.menu.appendChild(this.sellOption);
+      document.body.appendChild(this.menu);
+      this.sellOption.addEventListener("click", () => this.onSellClick());
+      document.addEventListener("click", () => this.hide());
+    }
+    menu;
+    sellOption;
+    target = null;
+    show(x, y, target) {
+      this.target = target;
+      const price = parseInt(target.dataset.price ?? "0", 10);
+      this.sellOption.textContent = `Sell ($${price})`;
+      this.menu.style.left = `${x}px`;
+      this.menu.style.top = `${y}px`;
+      this.menu.hidden = false;
+    }
+    hide() {
+      this.menu.hidden = true;
+      this.target = null;
+    }
+    onSellClick() {
+      if (!this.target) {
+        return;
+      }
+      const target = this.target;
+      this.hide();
+      this.onConfirm(target);
+    }
+  };
+
+  // src/media/potController.ts
+  var PotController = class {
+    constructor(potWrapper2, gameDiv, greenhouse, vscode2, onSell) {
+      this.potWrapper = potWrapper2;
+      this.gameDiv = gameDiv;
+      this.greenhouse = greenhouse;
+      this.vscode = vscode2;
+      this.onSell = onSell;
+      this.overlay = potWrapper2.querySelector(".inventory-pot-overlay");
+      this.cookBtn = document.getElementById("cook-btn");
+      this.progressWrapper = document.getElementById("cook-progress-wrapper");
+      this.progressBar = document.getElementById("cook-progress-bar");
+      this.potImg = potWrapper2.querySelector(".inventory-pot");
+      this.tray = document.createElement("div");
+      this.tray.className = "pot-tray";
+      potWrapper2.appendChild(this.tray);
+      this.sellMenu = new SellMenu((target) => {
+        if (target.classList.contains("harvested-plant")) {
+          this.greenhouse.consumeHarvestedPlant(target);
+          this.onSell(target, target.dataset.species, void 0);
+        } else if (target.classList.contains("cooked-food")) {
+          this.greenhouse.consumeCookedFood(target);
+          this.onSell(target, void 0, target.dataset.recipeKey);
+        }
+      });
+      this.setupEventListeners();
+    }
+    overlay;
+    cookBtn;
+    tray;
+    progressWrapper;
+    progressBar;
+    potImg;
+    sellMenu;
+    potActive = false;
+    potContents = [];
+    setupEventListeners() {
+      this.potWrapper.addEventListener("click", () => this.onPotWrapperClick());
+      this.cookBtn?.addEventListener("click", () => this.startCooking());
+      this.gameDiv.addEventListener("click", (e) => this.onGameDivClick(e));
+      document.getElementById("food-row")?.addEventListener("click", (e) => this.onFoodRowClick(e));
+    }
+    // --- Overlay / cook button sync ---
+    updateOverlay() {
+      this.overlay.textContent = `${this.potContents.length}/${this.greenhouse.NUM_ITEMS_PER_RECIPE}`;
+    }
+    updateCookButton() {
+      if (this.cookBtn) {
+        this.cookBtn.hidden = this.potContents.length < this.greenhouse.NUM_ITEMS_PER_RECIPE;
+      }
+    }
+    syncPotUI() {
+      this.updateOverlay();
+      this.updateCookButton();
+      this.refreshHighlights();
+    }
+    // --- Plant display helpers ---
+    plantPotCount(plant) {
+      return this.potContents.filter((e) => e.plant === plant).length;
+    }
+    plantInventoryCount(plant) {
+      return this.greenhouse.harvestedPlants.find((p) => p._html_element === plant)?.count ?? 1;
+    }
+    updatePlantDisplay(plant) {
+      const unitPrice = parseInt(plant.dataset.price ?? "0", 10);
+      const displayCount = this.plantInventoryCount(plant) - this.plantPotCount(plant);
+      plant.querySelector(".plant-count-badge").textContent = String(displayCount);
+      plant.querySelector(".price-badge").textContent = `$${unitPrice * displayCount}`;
+    }
+    refreshHighlights() {
+      document.querySelectorAll("#keycrop .harvested-plant").forEach((p) => {
+        const canAdd = this.plantPotCount(p) < this.plantInventoryCount(p) && this.potContents.length < this.greenhouse.NUM_ITEMS_PER_RECIPE;
+        p.classList.toggle("highlighted", this.potActive && canAdd);
+      });
+    }
+    // --- Tray management ---
+    addToPot(plant) {
+      if (this.potContents.length >= this.greenhouse.NUM_ITEMS_PER_RECIPE) {
+        return;
+      }
+      const slot = document.createElement("div");
+      slot.className = "pot-tray-slot";
+      slot.style.backgroundImage = window.getComputedStyle(plant).backgroundImage;
+      slot.addEventListener("click", (e) => {
+        e.stopPropagation();
+        this.removeFromPot(plant, slot);
+      });
+      this.tray.appendChild(slot);
+      this.potContents.push({ plant, slot });
+      this.updatePlantDisplay(plant);
+      if (this.plantPotCount(plant) >= this.plantInventoryCount(plant)) {
+        plant.classList.add("in-pot");
+      }
+      this.syncPotUI();
+    }
+    removeFromPot(plant, slot) {
+      const idx = this.potContents.findIndex((e) => e.plant === plant);
+      if (idx !== -1) {
+        this.potContents.splice(idx, 1);
+      }
+      slot.remove();
+      plant.classList.remove("in-pot");
+      this.updatePlantDisplay(plant);
+      this.syncPotUI();
+    }
+    // --- Event handlers ---
+    onPotWrapperClick() {
+      const isCooking = this.progressWrapper && !this.progressWrapper.hidden;
+      const hasEnough = this.greenhouse.harvestedPlants.length >= this.greenhouse.NUM_ITEMS_PER_RECIPE;
+      if (isCooking || this.potContents.length > 0 || !hasEnough) {
+        return;
+      }
+      this.potActive = !this.potActive;
+      this.overlay.hidden = !this.potActive;
+      if (this.potActive) {
+        this.updateOverlay();
+      }
+      this.refreshHighlights();
+    }
+    onGameDivClick(e) {
+      const plant = e.target.closest(".harvested-plant");
+      if (!plant) {
+        return;
+      }
+      if (this.potActive && this.plantPotCount(plant) < this.plantInventoryCount(plant)) {
+        this.addToPot(plant);
+      } else if (!this.potActive) {
+        e.stopPropagation();
+        this.sellMenu.show(e.clientX, e.clientY, plant);
+      }
+    }
+    onFoodRowClick(e) {
+      const food = e.target.closest(".cooked-food");
+      if (!food) {
+        return;
+      }
+      e.stopPropagation();
+      this.sellMenu.show(e.clientX, e.clientY, food);
+    }
+    // --- Cooking ---
+    startCooking() {
+      if (this.potContents.length < this.greenhouse.NUM_ITEMS_PER_RECIPE) {
+        return;
+      }
+      if (this.cookBtn) {
+        this.cookBtn.disabled = true;
+      }
+      this.potWrapper.style.pointerEvents = "none";
+      const entries = [...this.potContents];
+      let completed = 0;
+      entries.forEach(({ slot }, i) => {
+        slot.style.animationDelay = `${i * 80}ms`;
+        slot.classList.add("falling");
+        slot.addEventListener("animationend", () => {
+          completed++;
+          if (completed === entries.length) {
+            this.onAllSlotsAnimated(entries);
+          }
+        }, { once: true });
+      });
+    }
+    onAllSlotsAnimated(entries) {
+      const species1 = entries[0].plant.dataset.species ?? "";
+      const species2 = entries[1].plant.dataset.species ?? "";
+      const recipeKey = [species1, species2].sort().join("+");
+      entries.forEach(({ plant: p, slot: s }) => {
+        s.remove();
+        p.classList.remove("in-pot");
+        this.greenhouse.consumeHarvestedPlant(p);
+      });
+      this.potContents.length = 0;
+      this.potImg.src = this.potImg.dataset.closedSrc;
+      this.potActive = false;
+      this.overlay.hidden = true;
+      this.syncPotUI();
+      this.potWrapper.style.pointerEvents = "";
+      if (this.cookBtn) {
+        this.cookBtn.hidden = true;
+      }
+      this.startProgressBar(recipeKey, species1, species2);
+    }
+    startProgressBar(recipeKey, species1, species2) {
+      if (!this.progressWrapper || !this.progressBar) {
+        return;
+      }
+      this.progressWrapper.hidden = false;
+      this.progressBar.style.transition = "none";
+      this.progressBar.style.width = "100%";
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          this.progressBar.style.transition = `width ${this.greenhouse.COOK_DURATION_MS}ms linear`;
+          this.progressBar.style.width = "0%";
+        });
+      });
+      this.progressBar.addEventListener("transitionend", () => {
+        this.onCookComplete(recipeKey, species1, species2);
+      }, { once: true });
+    }
+    onCookComplete(recipeKey, species1, species2) {
+      this.progressWrapper.hidden = true;
+      if (this.cookBtn) {
+        this.cookBtn.disabled = false;
+      }
+      this.potImg.src = this.potImg.dataset.openSrc;
+      const recipe = RECIPES[recipeKey];
+      if (recipe) {
+        const foodBase = document.getElementById("inventory-bottom-right")?.dataset.foodBase ?? "";
+        const foodRow = document.getElementById("food-row");
+        if (foodRow) {
+          foodRow.hidden = false;
+        }
+        this.greenhouse.addCookedFood(recipeKey, recipe.name, `${foodBase}/${recipe.filename}`);
+        this.vscode.postMessage({ type: "cooked", recipeKey, species: [species1, species2] });
+      }
     }
   };
 
@@ -481,11 +740,19 @@ Uses: ${this._num_hotkey_uses}`;
       el.textContent = `$${playerMoney}`;
     }
   }
+  function updateEmptyMessage() {
+    const el = document.getElementById("empty-inventory-message");
+    if (!el) {
+      return;
+    }
+    el.hidden = game.greenhouse.harvestedPlants.length > 0 || game.greenhouse.cookedFoods.length > 0;
+  }
   function sellItem(element, species, recipeKey) {
     const price = parseInt(element.dataset.price ?? "0", 10);
     playerMoney += price;
     updateMoneyDisplay();
     vscode.postMessage({ type: "sell", amount: price, species, recipeKey });
+    updateEmptyMessage();
   }
   window.addEventListener("message", (event) => {
     const message = event.data;
@@ -506,11 +773,9 @@ Uses: ${this._num_hotkey_uses}`;
         game.greenhouse.grow(message.key, vscode);
         checkAcheivements();
         break;
-      case "save_plants": {
-        const plantsString = getPlantsString();
-        vscode.postMessage({ type: "save_plants", content: plantsString });
+      case "save_plants":
+        vscode.postMessage({ type: "save_plants", content: game.greenhouse.serialize() });
         break;
-      }
       case "load":
         game.greenhouse.loadPlant(message, game.div.getAttribute("background"));
         break;
@@ -519,7 +784,7 @@ Uses: ${this._num_hotkey_uses}`;
         break;
       case "load_harvested":
         game.greenhouse.loadHarvestedPlant(message.species, message.count);
-        document.getElementById("empty-inventory-message")?.remove();
+        updateEmptyMessage();
         break;
       case "load_cooked": {
         const recipe = RECIPES[message.recipeKey];
@@ -529,7 +794,8 @@ Uses: ${this._num_hotkey_uses}`;
           if (foodRow) {
             foodRow.hidden = false;
           }
-          game.greenhouse.loadCookedFood(message.recipeKey, recipe.name, `${foodBase}/${recipe.filename}`, message.count);
+          game.greenhouse.addCookedFood(message.recipeKey, recipe.name, `${foodBase}/${recipe.filename}`, message.count);
+          updateEmptyMessage();
         }
         break;
       }
@@ -581,25 +847,6 @@ Uses: ${this._num_hotkey_uses}`;
     game.width = window.innerWidth;
     game.height = window.innerHeight;
   }
-  function getPlantsString() {
-    const plantsString = [];
-    const currentPlants = [...new Set(game.greenhouse.plants)];
-    if (currentPlants.length > 0) {
-      currentPlants.forEach((plant) => {
-        const harvested = plant.html_element.classList.contains("harvested-plant");
-        const plantString = {
-          "key": plant.key,
-          "species": plant.species,
-          "size": plant.size,
-          "harvested": harvested,
-          "hotkey_uses": plant.num_hotkey_uses,
-          "num_mashes": plant.num_mashes
-        };
-        plantsString.push(plantString);
-      });
-    }
-    return plantsString;
-  }
   function update() {
     if (game.width !== window.innerWidth || game.height !== window.innerHeight) {
       onResize();
@@ -608,212 +855,8 @@ Uses: ${this._num_hotkey_uses}`;
   }
   var potWrapper = document.getElementById("inventory-pot-wrapper");
   if (potWrapper) {
-    let updateOverlay = function() {
-      overlay.textContent = `${potContents.length}/${game.greenhouse.NUM_ITEMS_PER_RECIPE}`;
-    }, updateCookButton = function() {
-      if (cookBtn) {
-        cookBtn.hidden = potContents.length < game.greenhouse.NUM_ITEMS_PER_RECIPE;
-      }
-    }, syncPotUI = function() {
-      updateOverlay();
-      updateCookButton();
-      refreshHighlights();
-    }, plantPotCount = function(plant) {
-      return potContents.filter((entry) => entry.plant === plant).length;
-    }, plantInventoryCount = function(plant) {
-      return game.greenhouse.harvestedPlants.find((p) => p._html_element === plant)?.count ?? 1;
-    }, updatePlantDisplay = function(plant) {
-      const unitPrice = parseInt(plant.dataset.price ?? "0", 10);
-      const displayCount = plantInventoryCount(plant) - plantPotCount(plant);
-      plant.querySelector(".plant-count-badge").textContent = String(displayCount);
-      plant.querySelector(".price-badge").textContent = `$${unitPrice * displayCount}`;
-    }, refreshHighlights = function() {
-      document.querySelectorAll("#keycrop .harvested-plant").forEach((p) => {
-        const canAdd = plantPotCount(p) < plantInventoryCount(p) && potContents.length < game.greenhouse.NUM_ITEMS_PER_RECIPE;
-        p.classList.toggle("highlighted", potActive && canAdd);
-      });
-    }, addToPot = function(plant) {
-      if (potContents.length >= game.greenhouse.NUM_ITEMS_PER_RECIPE) {
-        return;
-      }
-      const slot = document.createElement("div");
-      slot.className = "pot-tray-slot";
-      slot.style.backgroundImage = window.getComputedStyle(plant).backgroundImage;
-      slot.addEventListener("click", (e) => {
-        e.stopPropagation();
-        removeFromPot(plant, slot);
-      });
-      tray.appendChild(slot);
-      potContents.push({ plant, slot });
-      updatePlantDisplay(plant);
-      if (plantPotCount(plant) >= plantInventoryCount(plant)) {
-        plant.classList.add("in-pot");
-      }
-      syncPotUI();
-    }, removeFromPot = function(plant, slot) {
-      const idx = potContents.findIndex((entry) => entry.plant === plant);
-      if (idx !== -1) {
-        potContents.splice(idx, 1);
-      }
-      slot.remove();
-      plant.classList.remove("in-pot");
-      updatePlantDisplay(plant);
-      syncPotUI();
-    }, showContextMenu = function(x, y, target) {
-      contextMenuTarget = target;
-      const price = parseInt(target.dataset.price ?? "0", 10);
-      sellOption.textContent = `Sell ($${price})`;
-      contextMenu.style.left = `${x}px`;
-      contextMenu.style.top = `${y}px`;
-      contextMenu.hidden = false;
-    }, hideContextMenu = function() {
-      contextMenu.hidden = true;
-      contextMenuTarget = null;
-    };
-    updateOverlay2 = updateOverlay, updateCookButton2 = updateCookButton, syncPotUI2 = syncPotUI, plantPotCount2 = plantPotCount, plantInventoryCount2 = plantInventoryCount, updatePlantDisplay2 = updatePlantDisplay, refreshHighlights2 = refreshHighlights, addToPot2 = addToPot, removeFromPot2 = removeFromPot, showContextMenu2 = showContextMenu, hideContextMenu2 = hideContextMenu;
-    const overlay = potWrapper.querySelector(".inventory-pot-overlay");
-    const cookBtn = document.getElementById("cook-btn");
-    let potActive = false;
-    const potContents = [];
-    const tray = document.createElement("div");
-    tray.className = "pot-tray";
-    potWrapper.appendChild(tray);
-    let contextMenuTarget = null;
-    const contextMenu = document.createElement("div");
-    contextMenu.id = "item-context-menu";
-    contextMenu.hidden = true;
-    const sellOption = document.createElement("div");
-    sellOption.className = "context-menu-option";
-    sellOption.textContent = "Sell";
-    contextMenu.appendChild(sellOption);
-    document.body.appendChild(contextMenu);
-    game.div.addEventListener("click", (e) => {
-      const plant = e.target.closest(".harvested-plant");
-      if (!plant) {
-        return;
-      }
-      if (potActive && plantPotCount(plant) < plantInventoryCount(plant)) {
-        addToPot(plant);
-      } else if (!potActive) {
-        e.stopPropagation();
-        showContextMenu(e.clientX, e.clientY, plant);
-      }
-    });
-    document.getElementById("food-row")?.addEventListener("click", (e) => {
-      const food = e.target.closest(".cooked-food");
-      if (!food) {
-        return;
-      }
-      e.stopPropagation();
-      showContextMenu(e.clientX, e.clientY, food);
-    });
-    sellOption.addEventListener("click", () => {
-      if (!contextMenuTarget) {
-        return;
-      }
-      const target = contextMenuTarget;
-      hideContextMenu();
-      if (target.classList.contains("harvested-plant")) {
-        sellItem(target, target.dataset.species, void 0);
-        game.greenhouse.consumeHarvestedPlant(target);
-      } else if (target.classList.contains("cooked-food")) {
-        sellItem(target, void 0, target.dataset.recipeKey);
-        game.greenhouse.consumeCookedFood(target);
-      }
-    });
-    document.addEventListener("click", () => hideContextMenu());
-    potWrapper.addEventListener("click", () => {
-      const isCooking = progressWrapper && !progressWrapper.hidden;
-      if (isCooking || potContents.length > 0) {
-        return;
-      }
-      potActive = !potActive;
-      overlay.hidden = !potActive;
-      if (potActive) {
-        updateOverlay();
-      }
-      refreshHighlights();
-    });
-    const progressWrapper = document.getElementById("cook-progress-wrapper");
-    const progressBar = document.getElementById("cook-progress-bar");
-    cookBtn?.addEventListener("click", () => {
-      if (potContents.length < game.greenhouse.NUM_ITEMS_PER_RECIPE) {
-        return;
-      }
-      const potImg = potWrapper.querySelector(".inventory-pot");
-      if (cookBtn) {
-        cookBtn.disabled = true;
-      }
-      potWrapper.style.pointerEvents = "none";
-      const entries = [...potContents];
-      let completed = 0;
-      entries.forEach(({ slot }, i) => {
-        slot.style.animationDelay = `${i * 80}ms`;
-        slot.classList.add("falling");
-        slot.addEventListener("animationend", () => {
-          completed++;
-          if (completed === entries.length) {
-            const species1 = entries[0].plant.dataset.species ?? "";
-            const species2 = entries[1].plant.dataset.species ?? "";
-            const recipeKey = [species1, species2].sort().join("+");
-            entries.forEach(({ plant: p, slot: s }) => {
-              s.remove();
-              p.classList.remove("in-pot");
-              game.greenhouse.consumeHarvestedPlant(p);
-            });
-            potContents.length = 0;
-            potImg.src = potImg.dataset.closedSrc;
-            potActive = false;
-            overlay.hidden = true;
-            syncPotUI();
-            potWrapper.style.pointerEvents = "";
-            if (cookBtn) {
-              cookBtn.hidden = true;
-            }
-            if (progressWrapper && progressBar) {
-              progressWrapper.hidden = false;
-              progressBar.style.transition = "none";
-              progressBar.style.width = "100%";
-              requestAnimationFrame(() => {
-                requestAnimationFrame(() => {
-                  progressBar.style.transition = `width ${game.greenhouse.COOK_DURATION_MS}ms linear`;
-                  progressBar.style.width = "0%";
-                });
-              });
-              progressBar.addEventListener("transitionend", () => {
-                progressWrapper.hidden = true;
-                if (cookBtn) {
-                  cookBtn.disabled = false;
-                }
-                potImg.src = potImg.dataset.openSrc;
-                const recipe = RECIPES[recipeKey];
-                if (recipe) {
-                  const foodBase = document.getElementById("inventory-bottom-right")?.dataset.foodBase ?? "";
-                  const foodRow = document.getElementById("food-row");
-                  if (foodRow) {
-                    foodRow.hidden = false;
-                  }
-                  game.greenhouse.addCookedFood(recipeKey, recipe.name, `${foodBase}/${recipe.filename}`);
-                  vscode.postMessage({ type: "cooked", recipeKey, species: [species1, species2] });
-                }
-              }, { once: true });
-            }
-          }
-        }, { once: true });
-      });
-    });
+    new PotController(potWrapper, game.div, game.greenhouse, vscode, sellItem);
   }
-  var updateOverlay2;
-  var updateCookButton2;
-  var syncPotUI2;
-  var plantPotCount2;
-  var plantInventoryCount2;
-  var updatePlantDisplay2;
-  var refreshHighlights2;
-  var addToPot2;
-  var removeFromPot2;
-  var showContextMenu2;
-  var hideContextMenu2;
   var plantDetailPanel = document.createElement("div");
   plantDetailPanel.id = "plant-detail";
   plantDetailPanel.hidden = true;

@@ -48,34 +48,40 @@ export class Greenhouse {
     this.harvestedPlants.push(new HarvestedPlant(species, count));
   }
 
-  consumeCookedFood(element: HTMLElement): void {
-    const idx = this.cookedFoods.findIndex(f => f._html_element === element);
-    if (idx === -1) { return; }
-    const fullyConsumed = this.cookedFoods[idx].useOne();
-    if (fullyConsumed) {
-      this.cookedFoods.splice(idx, 1);
-    }
-  }
-
   consumeHarvestedPlant(element: HTMLElement): void {
-    const idx = this.harvestedPlants.findIndex(p => p._html_element === element);
-    if (idx === -1) { return; }
-    const fullyConsumed = this.harvestedPlants[idx].useOne();
-    if (fullyConsumed) {
-      this.harvestedPlants.splice(idx, 1);
-    }
+    this.consumeItem(this.harvestedPlants, element);
   }
 
-  addCookedFood(recipeKey: string, name: string, imgSrc: string): void {
+  consumeCookedFood(element: HTMLElement): void {
+    this.consumeItem(this.cookedFoods, element);
+  }
+
+  private consumeItem<T extends { _html_element: HTMLElement; useOne(): boolean }>(
+    list: T[], element: HTMLElement
+  ): void {
+    const idx = list.findIndex(item => item._html_element === element);
+    if (idx === -1) { return; }
+    if (list[idx].useOne()) { list.splice(idx, 1); }
+  }
+
+  addCookedFood(recipeKey: string, name: string, imgSrc: string, count = 1): void {
     const existing = this.cookedFoods.find(f => f.recipeKey === recipeKey);
     if (existing) {
       existing.incrementCount();
       return;
     }
-    this.cookedFoods.push(new CookedFood(recipeKey, name, imgSrc, 1));
+    this.cookedFoods.push(new CookedFood(recipeKey, name, imgSrc, count));
   }
 
-  loadCookedFood(recipeKey: string, name: string, imgSrc: string, count: number): void {
-    this.cookedFoods.push(new CookedFood(recipeKey, name, imgSrc, count));
+  serialize(): object[] {
+    // FIXME: de-duplication guard — plants are being double-added somewhere upstream
+    return [...new Set(this.plants)].map(plant => ({
+      key: plant.key,
+      species: plant.species,
+      size: plant.size,
+      harvested: plant.html_element.classList.contains('harvested-plant'),
+      hotkey_uses: plant.num_hotkey_uses,
+      num_mashes: plant.num_mashes,
+    }));
   }
 }

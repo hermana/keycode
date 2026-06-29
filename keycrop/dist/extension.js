@@ -330,14 +330,18 @@ function growPlant(key) {
     plants = plants.filter((p) => p.key !== key);
     const availableSpecies = ALL_SPECIES;
     const toLabel = (s) => s.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+    const plantingCost = (s) => {
+      const d = PLANTS[s];
+      return !d || d.category === "vegetable" ? 0 : d.price;
+    };
     const unlocked = availableSpecies.filter((s) => {
       const data = PLANTS[s];
       return !data || data.category === "vegetable" || playerMoney >= data.price;
-    });
+    }).sort((a, b) => plantingCost(a) - plantingCost(b));
     const locked = availableSpecies.filter((s) => {
       const data = PLANTS[s];
       return data && data.category !== "vegetable" && playerMoney < data.price;
-    });
+    }).sort((a, b) => PLANTS[a].price - PLANTS[b].price);
     const speciesItems = [
       ...unlocked.map((s) => {
         const data = PLANTS[s];
@@ -620,19 +624,14 @@ var GreenhouseWebViewProvider = class {
           }
           break;
         case "save_plants": {
-          plants = message.content.map((p) => ({
-            key: p.key,
-            species: p.species,
-            size: p.size,
-            harvested: p.harvested,
-            hotkey_uses: p.hotkey_uses
-          }));
-          fs.writeFileSync(plantsPath, JSON.stringify({
-            plants: message.content,
-            harvestedCounts: Object.fromEntries(harvestedCounts),
-            cookedFoodCounts: Object.fromEntries(cookedFoodCounts),
-            playerMoney
-          }));
+          for (const saved of message.content) {
+            const existing = plants.find((p) => p.key === saved.key);
+            if (existing) {
+              existing.size = saved.size;
+              existing.hotkey_uses = saved.hotkey_uses;
+            }
+          }
+          writePlantsToDisk();
           instructions.postMessage({ action: "update_counts", counts: getHotkeyCounts() });
           break;
         }
@@ -758,8 +757,8 @@ var InventoryWebViewProvider = class {
   getHtmlContent(webview) {
     const style = webview.asWebviewUri(vscode2.Uri.joinPath(this.context.extensionUri, "dist/media", "style.css"));
     const webviewJS = webview.asWebviewUri(vscode2.Uri.joinPath(this.context.extensionUri, "dist/media", "webview.js"));
-    const openPot = webview.asWebviewUri(vscode2.Uri.joinPath(this.context.extensionUri, "dist/media/recipes", "open_pot.png"));
-    const closedPot = webview.asWebviewUri(vscode2.Uri.joinPath(this.context.extensionUri, "dist/media/recipes", "closed_pot.png"));
+    const openPot = webview.asWebviewUri(vscode2.Uri.joinPath(this.context.extensionUri, "dist/media/recipes", "open_pot_2.png"));
+    const closedPot = webview.asWebviewUri(vscode2.Uri.joinPath(this.context.extensionUri, "dist/media/recipes", "closed_pot_2.png"));
     const foodBase = webview.asWebviewUri(vscode2.Uri.joinPath(this.context.extensionUri, "dist/media/recipes/food"));
     return `
         <!DOCTYPE html>
