@@ -157,14 +157,13 @@ function growPlant(key: string) {
   if (existingPlant && !existingPlant.harvested) {
     greenhouse.postMessage({
       action: 'grow',
-      species: existingPlant.species
+      key: existingPlant.key
     });
     requestWebviewSave();
   } else {
     // No plant for this key, or it has been harvested — free the key and let user pick
     plants = plants.filter(p => p.key !== key);
-    const usedSpecies = new Set(plants.filter(p => !p.harvested).map(p => p.species));
-    const availableSpecies = ALL_SPECIES.filter(s => !usedSpecies.has(s));
+    const availableSpecies = ALL_SPECIES;
 
     type PlantPickItem = vscode.QuickPickItem & { species: string; locked: boolean };
     const toLabel = (s: string) => s.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
@@ -529,7 +528,7 @@ export class GreenhouseWebViewProvider implements vscode.WebviewViewProvider {
 
     private getHtmlContent(webview: vscode.Webview): string {
 
-      const style = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'src/media', 'style.css'));
+      const style = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'dist/media', 'style.css'));
       const webviewJS = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'dist/media', 'webview.js'));
 
       return `
@@ -630,11 +629,11 @@ export class InventoryWebViewProvider implements vscode.WebviewViewProvider {
 
   private getHtmlContent(webview: vscode.Webview): string {
 
-      const style = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'src/media', 'style.css'));
+      const style = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'dist/media', 'style.css'));
       const webviewJS = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'dist/media', 'webview.js'));
-      const openPot = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'src/media/recipes', 'open_pot.png'));
-      const closedPot = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'src/media/recipes', 'closed_pot.png'));
-      const foodBase = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'src/media/recipes/food'));
+      const openPot = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'dist/media/recipes', 'open_pot.png'));
+      const closedPot = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'dist/media/recipes', 'closed_pot.png'));
+      const foodBase = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'dist/media/recipes/food'));
 
       return `
         <!DOCTYPE html>

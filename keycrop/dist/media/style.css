@@ -1,0 +1,921 @@
+@keyframes confetti-fall {
+  0%   { transform: translateY(-10px) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}
+
+.confetti-piece {
+  position: fixed;
+  top: -10px;
+  border-radius: 2px;
+  animation: confetti-fall linear forwards;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+#keycrop[background="dirt"]{
+    background: url(./backgrounds/dirt.png) repeat;
+    width:100%;
+    min-height:100%;
+    position: absolute;
+  }
+  
+#keycrop[background="inventory"]{
+    background: none;
+    width:100%;
+    min-height:100%;
+    overflow-y: auto;
+  }
+  
+  #keycrop[background="blackout"]{
+    background: #000000;
+    width:100%;
+    height:100%;
+    position: absolute;
+  }
+
+#generator-instructions{
+  font-family: monospace;
+  margin:5px;
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 10px);
+}
+
+.table-scroll {
+  flex: 1;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.table-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.key-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.75rem;
+}
+
+.key-table th,
+.key-table td {
+  text-align: left;
+  padding: 4px 6px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  vertical-align: top;
+}
+
+.key-table thead th {
+  font-weight: bold;
+  position: sticky;
+  top: 0;
+  background: var(--vscode-sideBar-background, #1e1e1e);
+  z-index: 1;
+}
+
+.key-table td:first-child {
+  font-weight: bold;
+  white-space: nowrap;
+  padding-right: 10px;
+}
+
+.instructions{
+  font-size:0.8rem;
+  margin:5px;
+}
+
+.key-instructions{
+  font-size: 0.5rem;
+  font-family: monospace;
+}
+
+.category-btn-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 6px;
+}
+
+.category-btn {
+  padding: 3px 8px;
+  font-size: 0.7rem;
+  font-family: monospace;
+  background: transparent;
+  color: var(--vscode-foreground, #ccc);
+  border: 1px solid rgba(255,255,255,0.25);
+  cursor: pointer;
+  border-radius: 2px;
+}
+
+.category-btn.selected {
+  background: rgba(255,255,255,0.15);
+  border-color: rgba(255,255,255,0.6);
+  font-weight: bold;
+}
+
+.instructions-bold{
+  font-weight:bold;
+}
+
+.btn-wrapper{
+  position:absolute;
+  bottom:0px;
+  margin-left:10vw;
+}
+
+.btn{
+  float:left;
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.btn.selected{
+  background-color: #005999 !important;
+}
+
+.plant {
+    float: left;
+    margin-top:30vh;
+    margin-left:5vw;
+    width:50px;
+    height:50px;
+}
+
+.harvested-plant {
+  float: left;
+  margin-top:8px;
+  margin-bottom:14px;
+  width:64px;
+  height:64px;
+  position: relative;
+}
+
+#food-row {
+  clear: both;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 8px 0 4px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin-top: 8px;
+}
+
+.cooked-food {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  margin-bottom: 14px;
+}
+
+.cooked-food-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  image-rendering: pixelated;
+  display: block;
+}
+
+.plant-count-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: #555;
+  color: #fff;
+  font-size: 10px;
+  font-weight: bold;
+  min-width: 16px;
+  height: 16px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  box-sizing: border-box;
+  pointer-events: none;
+}
+
+.price-badge {
+  position: absolute;
+  bottom: -8px;
+  right: -8px;
+  background: #7a6200;
+  color: #ffd700;
+  font-size: 10px;
+  font-weight: bold;
+  min-width: 16px;
+  height: 16px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  box-sizing: border-box;
+  pointer-events: none;
+}
+
+/* Fixme: Update the images when you get them... */
+.corn.start {
+  background: url(./vegetables/bean_start.png);
+}
+
+.corn.small {
+    background: url(./vegetables/bean_small.png);
+  }
+
+.corn.medium {
+    background: url(./vegetables/bean_medium.png);
+}
+
+.corn.large {
+  background: url(./vegetables/bean_large.png);
+}
+
+.corn.harvested-plant {
+  background: url(./vegetables/bean_harvested.png);
+}
+
+.strawberry.start {
+  background: url(./vegetables/broccoli_start.png);
+}
+
+.strawberry.small {
+  background: url(./vegetables/broccoli_small.png);
+}
+
+.strawberry.medium {
+  background: url(./vegetables/broccoli_medium.png);
+}
+
+.strawberry.large {
+background: url(./vegetables/broccoli_large.png);
+}
+
+.strawberry.harvested-plant {
+  background: url(./vegetables/broccoli_harvested.png);
+  }
+
+.mango.start.start {
+  background: url(./vegetables/mango_start.png);
+}
+
+.mango.small {
+  background: url(./vegetables/chili_small.png);
+}
+
+.mango.medium {
+  background: url(./vegetables/chili_medium.png);
+}
+
+.mango.large {
+background: url(./vegetables/chili_large.png);
+}
+
+.mango.harvested-plant {
+  background: url(./vegetables/chili_harvested.png);
+  }  
+
+.poppy.start {
+  background: url(./vegetables/grape_start.png);
+}
+
+.poppy.small {
+  background: url(./vegetables/grape_small.png);
+}
+
+.poppy.medium {
+  background: url(./vegetables/grape_medium.png);
+}
+
+.poppy.large {
+background: url(./vegetables/grape_large.png);
+}
+
+.poppy.harvested-plant {
+  background: url(./vegetables/grape_harvested.png);
+  }
+
+.sunflower.start {
+  background: url(./vegetables/grape_start.png);
+}
+
+.sunflower.small {
+  background: url(./vegetables/grape_small.png);
+}
+
+.sunflower.medium {
+  background: url(./vegetables/grape_medium.png);
+}
+
+.sunflower.large {
+background: url(./vegetables/grape_large.png);
+}
+
+.sunflower.harvested-plant {
+  background: url(./vegetables/grape_harvested.png);
+  }
+
+
+.snappea.start {
+  background: url(./vegetables/lettuce_start.png);
+}
+
+.snappea.small {
+  background: url(./vegetables/lettuce_small.png);
+}
+
+.snappea.medium {
+  background: url(./vegetables/lettuce_medium.png);
+}
+
+.snappea.large {
+background: url(./vegetables/lettuce_large.png);
+}
+
+.snappea.harvested-plant {
+  background: url(./vegetables/lettuce_harvested.png);
+}
+
+.okra.start {
+  background: url(./vegetables/okra_start.png);
+}
+
+.okra.small {
+  background: url(./vegetables/okra_small.png);
+}
+
+.okra.medium {
+  background: url(./vegetables/okra_medium.png);
+}
+
+.okra.large {
+background: url(./vegetables/okra_large.png);
+}
+
+.okra.harvested-plant {
+  background: url(./vegetables/okra_harvested.png);
+}
+
+.carrot.start {
+  background: url(./vegetables/raspberry_start.png);
+}
+
+.carrot.small {
+  background: url(./vegetables/raspberry_small.png);
+}
+
+.carrot.medium {
+  background: url(./vegetables/raspberry_medium.png);
+}
+
+.carrot.large {
+background: url(./vegetables/raspberry_large.png);
+}
+
+.carrot.harvested-plant {
+  background: url(./vegetables/raspberry_harvested.png);
+}
+
+.canola.start {
+  background: url(./vegetables/rhubarb_start.png);
+}
+
+.canola.small {
+  background: url(./vegetables/rhubarb_small.png);
+}
+
+.canola.medium {
+  background: url(./vegetables/rhubarb_medium.png);
+}
+
+.canola.large {
+background: url(./vegetables/rhubarb_large.png);
+}
+
+.canola.harvested-plant {
+  background: url(./vegetables/rhubarb_harvested.png);
+}
+
+
+.apple_tree.start {
+  background: url(./vegetables/tomato_start.png);
+}
+
+.apple_tree.small {
+  background: url(./vegetables/tomato_small.png);
+}
+
+.apple_tree.medium {
+  background: url(./vegetables/tomato_medium.png);
+}
+
+.apple_tree.large {
+background: url(./vegetables/tomato_large.png);
+}
+
+.apple_tree.harvested-plant {
+  background: url(./vegetables/tomato_harvested.png);
+}
+
+.cherry_tree.start {
+  background: url(./vegetables/watermelon_start.png);
+}
+
+.cherry_tree.small {
+  background: url(./vegetables/watermelon_small.png);
+}
+
+.cherry_tree.medium {
+  background: url(./vegetables/watermelon_medium.png);
+}
+
+.cherry_tree.large {
+background: url(./vegetables/watermelon_large.png);
+}
+
+.cherry_tree.harvested-plant {
+  background: url(./vegetables/watermelon_harvested.png);
+}
+
+.sphagettifern.start {
+  background: url(./vegetables/watermelon_start.png);
+}
+
+.sphagettifern.small {
+  background: url(./vegetables/watermelon_small.png);
+}
+
+.sphagettifern.medium {
+  background: url(./vegetables/watermelon_medium.png);
+}
+
+.sphagettifern.large {
+background: url(./vegetables/watermelon_large.png);
+}
+
+.sphagettifern.harvested-plant {
+  background: url(./vegetables/watermelon_harvested.png);
+}
+
+
+
+.bean.stage-1  { background: url(./midjourney-interpolated-vegetables/bean_1.png); background-size: contain; background-repeat: no-repeat; }
+.bean.stage-2  { background: url(./midjourney-interpolated-vegetables/bean_2.png); background-size: contain; background-repeat: no-repeat; }
+.bean.stage-3  { background: url(./midjourney-interpolated-vegetables/bean_3.png); background-size: contain; background-repeat: no-repeat; }
+.bean.stage-4  { background: url(./midjourney-interpolated-vegetables/bean_4.png); background-size: contain; background-repeat: no-repeat; }
+.bean.stage-5  { background: url(./midjourney-interpolated-vegetables/bean_5.png); background-size: contain; background-repeat: no-repeat; }
+.bean.stage-6  { background: url(./midjourney-interpolated-vegetables/bean_6.png); background-size: contain; background-repeat: no-repeat; }
+.bean.stage-7  { background: url(./midjourney-interpolated-vegetables/bean_7.png); background-size: contain; background-repeat: no-repeat; }
+.bean.stage-8  { background: url(./midjourney-interpolated-vegetables/bean_8.png); background-size: contain; background-repeat: no-repeat; }
+.bean.stage-9  { background: url(./midjourney-interpolated-vegetables/bean_9.png); background-size: contain; background-repeat: no-repeat; }
+.bean.stage-10 { background: url(./midjourney-interpolated-vegetables/bean_10.png); background-size: contain; background-repeat: no-repeat; }
+.bean.stage-11 { background: url(./midjourney-interpolated-vegetables/bean_11.png); background-size: contain; background-repeat: no-repeat; }
+.bean.stage-12 { background: url(./midjourney-interpolated-vegetables/bean_12.png); background-size: contain; background-repeat: no-repeat; }
+.bean.stage-13 { background: url(./midjourney-interpolated-vegetables/bean_13.png); background-size: contain; background-repeat: no-repeat; }
+.bean.stage-14 { background: url(./midjourney-interpolated-vegetables/bean_14.png); background-size: contain; background-repeat: no-repeat; }
+.bean.harvested-plant { background: url(./midjourney-interpolated-vegetables/bean_harvested.png); background-size: contain; background-repeat: no-repeat; }
+
+.tomato.stage-1  { background: url(./midjourney-interpolated-vegetables/tomato_1.png); background-size: contain; background-repeat: no-repeat; }
+.tomato.stage-2  { background: url(./midjourney-interpolated-vegetables/tomato_2.png); background-size: contain; background-repeat: no-repeat; }
+.tomato.stage-3  { background: url(./midjourney-interpolated-vegetables/tomato_3.png); background-size: contain; background-repeat: no-repeat; }
+.tomato.stage-4  { background: url(./midjourney-interpolated-vegetables/tomato_4.png); background-size: contain; background-repeat: no-repeat; }
+.tomato.stage-5  { background: url(./midjourney-interpolated-vegetables/tomato_5.png); background-size: contain; background-repeat: no-repeat; }
+.tomato.stage-6  { background: url(./midjourney-interpolated-vegetables/tomato_6.png); background-size: contain; background-repeat: no-repeat; }
+.tomato.stage-7  { background: url(./midjourney-interpolated-vegetables/tomato_7.png); background-size: contain; background-repeat: no-repeat; }
+.tomato.stage-8  { background: url(./midjourney-interpolated-vegetables/tomato_8.png); background-size: contain; background-repeat: no-repeat; }
+.tomato.stage-9  { background: url(./midjourney-interpolated-vegetables/tomato_9.png); background-size: contain; background-repeat: no-repeat; }
+.tomato.stage-10 { background: url(./midjourney-interpolated-vegetables/tomato_10.png); background-size: contain; background-repeat: no-repeat; }
+.tomato.stage-11 { background: url(./midjourney-interpolated-vegetables/tomato_11.png); background-size: contain; background-repeat: no-repeat; }
+.tomato.stage-12 { background: url(./midjourney-interpolated-vegetables/tomato_12.png); background-size: contain; background-repeat: no-repeat; }
+.tomato.stage-13 { background: url(./midjourney-interpolated-vegetables/tomato_13.png); background-size: contain; background-repeat: no-repeat; }
+.tomato.stage-14 { background: url(./midjourney-interpolated-vegetables/tomato_14.png); background-size: contain; background-repeat: no-repeat; }
+.tomato.harvested-plant { background: url(./midjourney-interpolated-vegetables/tomato_harvested.png); background-size: contain; background-repeat: no-repeat; }
+
+.broccoli.stage-1  { background: url(./midjourney-interpolated-vegetables/broccoli_1.png); background-size: contain; background-repeat: no-repeat; }
+.broccoli.stage-2  { background: url(./midjourney-interpolated-vegetables/broccoli_2.png); background-size: contain; background-repeat: no-repeat; }
+.broccoli.stage-3  { background: url(./midjourney-interpolated-vegetables/broccoli_3.png); background-size: contain; background-repeat: no-repeat; }
+.broccoli.stage-4  { background: url(./midjourney-interpolated-vegetables/broccoli_4.png); background-size: contain; background-repeat: no-repeat; }
+.broccoli.stage-5  { background: url(./midjourney-interpolated-vegetables/broccoli_5.png); background-size: contain; background-repeat: no-repeat; }
+.broccoli.stage-6  { background: url(./midjourney-interpolated-vegetables/broccoli_6.png); background-size: contain; background-repeat: no-repeat; }
+.broccoli.stage-7  { background: url(./midjourney-interpolated-vegetables/broccoli_7.png); background-size: contain; background-repeat: no-repeat; }
+.broccoli.stage-8  { background: url(./midjourney-interpolated-vegetables/broccoli_8.png); background-size: contain; background-repeat: no-repeat; }
+.broccoli.stage-9  { background: url(./midjourney-interpolated-vegetables/broccoli_9.png); background-size: contain; background-repeat: no-repeat; }
+.broccoli.stage-10 { background: url(./midjourney-interpolated-vegetables/broccoli_10.png); background-size: contain; background-repeat: no-repeat; }
+.broccoli.stage-11 { background: url(./midjourney-interpolated-vegetables/broccoli_11.png); background-size: contain; background-repeat: no-repeat; }
+.broccoli.stage-12 { background: url(./midjourney-interpolated-vegetables/broccoli_12.png); background-size: contain; background-repeat: no-repeat; }
+.broccoli.stage-13 { background: url(./midjourney-interpolated-vegetables/broccoli_13.png); background-size: contain; background-repeat: no-repeat; }
+.broccoli.stage-14 { background: url(./midjourney-interpolated-vegetables/broccoli_14.png); background-size: contain; background-repeat: no-repeat; }
+.broccoli.harvested-plant { background: url(./midjourney-interpolated-vegetables/broccoli_harvested.png); background-size: contain; background-repeat: no-repeat; }
+
+.chili.stage-1  { background: url(./midjourney-interpolated-vegetables/chili_1.png); background-size: contain; background-repeat: no-repeat; }
+.chili.stage-2  { background: url(./midjourney-interpolated-vegetables/chili_2.png); background-size: contain; background-repeat: no-repeat; }
+.chili.stage-3  { background: url(./midjourney-interpolated-vegetables/chili_3.png); background-size: contain; background-repeat: no-repeat; }
+.chili.stage-4  { background: url(./midjourney-interpolated-vegetables/chili_4.png); background-size: contain; background-repeat: no-repeat; }
+.chili.stage-5  { background: url(./midjourney-interpolated-vegetables/chili_5.png); background-size: contain; background-repeat: no-repeat; }
+.chili.stage-6  { background: url(./midjourney-interpolated-vegetables/chili_6.png); background-size: contain; background-repeat: no-repeat; }
+.chili.stage-7  { background: url(./midjourney-interpolated-vegetables/chili_7.png); background-size: contain; background-repeat: no-repeat; }
+.chili.stage-8  { background: url(./midjourney-interpolated-vegetables/chili_8.png); background-size: contain; background-repeat: no-repeat; }
+.chili.stage-9  { background: url(./midjourney-interpolated-vegetables/chili_9.png); background-size: contain; background-repeat: no-repeat; }
+.chili.stage-10 { background: url(./midjourney-interpolated-vegetables/chili_10.png); background-size: contain; background-repeat: no-repeat; }
+.chili.stage-11 { background: url(./midjourney-interpolated-vegetables/chili_11.png); background-size: contain; background-repeat: no-repeat; }
+.chili.stage-12 { background: url(./midjourney-interpolated-vegetables/chili_12.png); background-size: contain; background-repeat: no-repeat; }
+.chili.stage-13 { background: url(./midjourney-interpolated-vegetables/chili_13.png); background-size: contain; background-repeat: no-repeat; }
+.chili.stage-14 { background: url(./midjourney-interpolated-vegetables/chili_14.png); background-size: contain; background-repeat: no-repeat; }
+.chili.harvested-plant { background: url(./midjourney-interpolated-vegetables/chili_harvested.png); background-size: contain; background-repeat: no-repeat; }
+
+.bulbino.stage-1  { background: url(./midjourney-interpolated-vegetables/bulbino_1.png); background-size: contain; background-repeat: no-repeat; }
+.bulbino.stage-2  { background: url(./midjourney-interpolated-vegetables/bulbino_2.png); background-size: contain; background-repeat: no-repeat; }
+.bulbino.stage-3  { background: url(./midjourney-interpolated-vegetables/bulbino_3.png); background-size: contain; background-repeat: no-repeat; }
+.bulbino.stage-4  { background: url(./midjourney-interpolated-vegetables/bulbino_4.png); background-size: contain; background-repeat: no-repeat; }
+.bulbino.stage-5  { background: url(./midjourney-interpolated-vegetables/bulbino_5.png); background-size: contain; background-repeat: no-repeat; }
+.bulbino.stage-6  { background: url(./midjourney-interpolated-vegetables/bulbino_6.png); background-size: contain; background-repeat: no-repeat; }
+.bulbino.stage-7  { background: url(./midjourney-interpolated-vegetables/bulbino_7.png); background-size: contain; background-repeat: no-repeat; }
+.bulbino.stage-8  { background: url(./midjourney-interpolated-vegetables/bulbino_8.png); background-size: contain; background-repeat: no-repeat; }
+.bulbino.stage-9  { background: url(./midjourney-interpolated-vegetables/bulbino_9.png); background-size: contain; background-repeat: no-repeat; }
+.bulbino.stage-10 { background: url(./midjourney-interpolated-vegetables/bulbino_10.png); background-size: contain; background-repeat: no-repeat; }
+.bulbino.stage-11 { background: url(./midjourney-interpolated-vegetables/bulbino_11.png); background-size: contain; background-repeat: no-repeat; }
+.bulbino.stage-12 { background: url(./midjourney-interpolated-vegetables/bulbino_12.png); background-size: contain; background-repeat: no-repeat; }
+.bulbino.stage-13 { background: url(./midjourney-interpolated-vegetables/bulbino_13.png); background-size: contain; background-repeat: no-repeat; }
+.bulbino.stage-14 { background: url(./midjourney-interpolated-vegetables/bulbino_14.png); background-size: contain; background-repeat: no-repeat; }
+.bulbino.harvested-plant { background: url(./midjourney-interpolated-vegetables/bulbino_harvested.png); background-size: contain; background-repeat: no-repeat; }
+
+.cucumber.stage-1  { background: url(./midjourney-interpolated-vegetables/cucumber_1.png); background-size: contain; background-repeat: no-repeat; }
+.cucumber.stage-2  { background: url(./midjourney-interpolated-vegetables/cucumber_2.png); background-size: contain; background-repeat: no-repeat; }
+.cucumber.stage-3  { background: url(./midjourney-interpolated-vegetables/cucumber_3.png); background-size: contain; background-repeat: no-repeat; }
+.cucumber.stage-4  { background: url(./midjourney-interpolated-vegetables/cucumber_4.png); background-size: contain; background-repeat: no-repeat; }
+.cucumber.stage-5  { background: url(./midjourney-interpolated-vegetables/cucumber_5.png); background-size: contain; background-repeat: no-repeat; }
+.cucumber.stage-6  { background: url(./midjourney-interpolated-vegetables/cucumber_6.png); background-size: contain; background-repeat: no-repeat; }
+.cucumber.stage-7  { background: url(./midjourney-interpolated-vegetables/cucumber_7.png); background-size: contain; background-repeat: no-repeat; }
+.cucumber.stage-8  { background: url(./midjourney-interpolated-vegetables/cucumber_8.png); background-size: contain; background-repeat: no-repeat; }
+.cucumber.stage-9  { background: url(./midjourney-interpolated-vegetables/cucumber_9.png); background-size: contain; background-repeat: no-repeat; }
+.cucumber.stage-10 { background: url(./midjourney-interpolated-vegetables/cucumber_10.png); background-size: contain; background-repeat: no-repeat; }
+.cucumber.stage-11 { background: url(./midjourney-interpolated-vegetables/cucumber_11.png); background-size: contain; background-repeat: no-repeat; }
+.cucumber.stage-12 { background: url(./midjourney-interpolated-vegetables/cucumber_12.png); background-size: contain; background-repeat: no-repeat; }
+.cucumber.stage-13 { background: url(./midjourney-interpolated-vegetables/cucumber_13.png); background-size: contain; background-repeat: no-repeat; }
+.cucumber.stage-14 { background: url(./midjourney-interpolated-vegetables/cucumber_14.png); background-size: contain; background-repeat: no-repeat; }
+.cucumber.harvested-plant { background: url(./midjourney-interpolated-vegetables/cucumber_harvested.png); background-size: contain; background-repeat: no-repeat; }
+
+.fiddlehead_fern.stage-1  { background: url(./midjourney-interpolated-vegetables/fiddlehead_fern_1.png); background-size: contain; background-repeat: no-repeat; }
+.fiddlehead_fern.stage-2  { background: url(./midjourney-interpolated-vegetables/fiddlehead_fern_2.png); background-size: contain; background-repeat: no-repeat; }
+.fiddlehead_fern.stage-3  { background: url(./midjourney-interpolated-vegetables/fiddlehead_fern_3.png); background-size: contain; background-repeat: no-repeat; }
+.fiddlehead_fern.stage-4  { background: url(./midjourney-interpolated-vegetables/fiddlehead_fern_4.png); background-size: contain; background-repeat: no-repeat; }
+.fiddlehead_fern.stage-5  { background: url(./midjourney-interpolated-vegetables/fiddlehead_fern_5.png); background-size: contain; background-repeat: no-repeat; }
+.fiddlehead_fern.stage-6  { background: url(./midjourney-interpolated-vegetables/fiddlehead_fern_6.png); background-size: contain; background-repeat: no-repeat; }
+.fiddlehead_fern.stage-7  { background: url(./midjourney-interpolated-vegetables/fiddlehead_fern_7.png); background-size: contain; background-repeat: no-repeat; }
+.fiddlehead_fern.stage-8  { background: url(./midjourney-interpolated-vegetables/fiddlehead_fern_8.png); background-size: contain; background-repeat: no-repeat; }
+.fiddlehead_fern.stage-9  { background: url(./midjourney-interpolated-vegetables/fiddlehead_fern_9.png); background-size: contain; background-repeat: no-repeat; }
+.fiddlehead_fern.stage-10 { background: url(./midjourney-interpolated-vegetables/fiddlehead_fern_10.png); background-size: contain; background-repeat: no-repeat; }
+.fiddlehead_fern.stage-11 { background: url(./midjourney-interpolated-vegetables/fiddlehead_fern_11.png); background-size: contain; background-repeat: no-repeat; }
+.fiddlehead_fern.stage-12 { background: url(./midjourney-interpolated-vegetables/fiddlehead_fern_12.png); background-size: contain; background-repeat: no-repeat; }
+.fiddlehead_fern.stage-13 { background: url(./midjourney-interpolated-vegetables/fiddlehead_fern_13.png); background-size: contain; background-repeat: no-repeat; }
+.fiddlehead_fern.stage-14 { background: url(./midjourney-interpolated-vegetables/fiddlehead_fern_14.png); background-size: contain; background-repeat: no-repeat; }
+.fiddlehead_fern.harvested-plant { background: url(./midjourney-interpolated-vegetables/fiddlehead_fern_harvested.png); background-size: contain; background-repeat: no-repeat; }
+
+.flame_lily.stage-1  { background: url(./midjourney-interpolated-vegetables/flame_lily_1.png); background-size: contain; background-repeat: no-repeat; }
+.flame_lily.stage-2  { background: url(./midjourney-interpolated-vegetables/flame_lily_2.png); background-size: contain; background-repeat: no-repeat; }
+.flame_lily.stage-3  { background: url(./midjourney-interpolated-vegetables/flame_lily_3.png); background-size: contain; background-repeat: no-repeat; }
+.flame_lily.stage-4  { background: url(./midjourney-interpolated-vegetables/flame_lily_4.png); background-size: contain; background-repeat: no-repeat; }
+.flame_lily.stage-5  { background: url(./midjourney-interpolated-vegetables/flame_lily_5.png); background-size: contain; background-repeat: no-repeat; }
+.flame_lily.stage-6  { background: url(./midjourney-interpolated-vegetables/flame_lily_6.png); background-size: contain; background-repeat: no-repeat; }
+.flame_lily.stage-7  { background: url(./midjourney-interpolated-vegetables/flame_lily_7.png); background-size: contain; background-repeat: no-repeat; }
+.flame_lily.stage-8  { background: url(./midjourney-interpolated-vegetables/flame_lily_8.png); background-size: contain; background-repeat: no-repeat; }
+.flame_lily.stage-9  { background: url(./midjourney-interpolated-vegetables/flame_lily_9.png); background-size: contain; background-repeat: no-repeat; }
+.flame_lily.stage-10 { background: url(./midjourney-interpolated-vegetables/flame_lily_10.png); background-size: contain; background-repeat: no-repeat; }
+.flame_lily.stage-11 { background: url(./midjourney-interpolated-vegetables/flame_lily_11.png); background-size: contain; background-repeat: no-repeat; }
+.flame_lily.stage-12 { background: url(./midjourney-interpolated-vegetables/flame_lily_12.png); background-size: contain; background-repeat: no-repeat; }
+.flame_lily.stage-13 { background: url(./midjourney-interpolated-vegetables/flame_lily_13.png); background-size: contain; background-repeat: no-repeat; }
+.flame_lily.stage-14 { background: url(./midjourney-interpolated-vegetables/flame_lily_14.png); background-size: contain; background-repeat: no-repeat; }
+.flame_lily.harvested-plant { background: url(./midjourney-interpolated-vegetables/flame_lily_harvested.png); background-size: contain; background-repeat: no-repeat; }
+
+.glowberry.stage-1  { background: url(./midjourney-interpolated-vegetables/glowberry_1.png); background-size: contain; background-repeat: no-repeat; }
+.glowberry.stage-2  { background: url(./midjourney-interpolated-vegetables/glowberry_2.png); background-size: contain; background-repeat: no-repeat; }
+.glowberry.stage-3  { background: url(./midjourney-interpolated-vegetables/glowberry_3.png); background-size: contain; background-repeat: no-repeat; }
+.glowberry.stage-4  { background: url(./midjourney-interpolated-vegetables/glowberry_4.png); background-size: contain; background-repeat: no-repeat; }
+.glowberry.stage-5  { background: url(./midjourney-interpolated-vegetables/glowberry_5.png); background-size: contain; background-repeat: no-repeat; }
+.glowberry.stage-6  { background: url(./midjourney-interpolated-vegetables/glowberry_6.png); background-size: contain; background-repeat: no-repeat; }
+.glowberry.stage-7  { background: url(./midjourney-interpolated-vegetables/glowberry_7.png); background-size: contain; background-repeat: no-repeat; }
+.glowberry.stage-8  { background: url(./midjourney-interpolated-vegetables/glowberry_8.png); background-size: contain; background-repeat: no-repeat; }
+.glowberry.stage-9  { background: url(./midjourney-interpolated-vegetables/glowberry_9.png); background-size: contain; background-repeat: no-repeat; }
+.glowberry.stage-10 { background: url(./midjourney-interpolated-vegetables/glowberry_10.png); background-size: contain; background-repeat: no-repeat; }
+.glowberry.stage-11 { background: url(./midjourney-interpolated-vegetables/glowberry_11.png); background-size: contain; background-repeat: no-repeat; }
+.glowberry.stage-12 { background: url(./midjourney-interpolated-vegetables/glowberry_12.png); background-size: contain; background-repeat: no-repeat; }
+.glowberry.stage-13 { background: url(./midjourney-interpolated-vegetables/glowberry_13.png); background-size: contain; background-repeat: no-repeat; }
+.glowberry.stage-14 { background: url(./midjourney-interpolated-vegetables/glowberry_14.png); background-size: contain; background-repeat: no-repeat; }
+.glowberry.harvested-plant { background: url(./midjourney-interpolated-vegetables/glowberry_harvested.png); background-size: contain; background-repeat: no-repeat; }
+
+.grape.stage-1  { background: url(./midjourney-interpolated-vegetables/grape_1.png); background-size: contain; background-repeat: no-repeat; }
+.grape.stage-2  { background: url(./midjourney-interpolated-vegetables/grape_2.png); background-size: contain; background-repeat: no-repeat; }
+.grape.stage-3  { background: url(./midjourney-interpolated-vegetables/grape_3.png); background-size: contain; background-repeat: no-repeat; }
+.grape.stage-4  { background: url(./midjourney-interpolated-vegetables/grape_4.png); background-size: contain; background-repeat: no-repeat; }
+.grape.stage-5  { background: url(./midjourney-interpolated-vegetables/grape_5.png); background-size: contain; background-repeat: no-repeat; }
+.grape.stage-6  { background: url(./midjourney-interpolated-vegetables/grape_6.png); background-size: contain; background-repeat: no-repeat; }
+.grape.stage-7  { background: url(./midjourney-interpolated-vegetables/grape_7.png); background-size: contain; background-repeat: no-repeat; }
+.grape.stage-8  { background: url(./midjourney-interpolated-vegetables/grape_8.png); background-size: contain; background-repeat: no-repeat; }
+.grape.stage-9  { background: url(./midjourney-interpolated-vegetables/grape_9.png); background-size: contain; background-repeat: no-repeat; }
+.grape.stage-10 { background: url(./midjourney-interpolated-vegetables/grape_10.png); background-size: contain; background-repeat: no-repeat; }
+.grape.stage-11 { background: url(./midjourney-interpolated-vegetables/grape_11.png); background-size: contain; background-repeat: no-repeat; }
+.grape.stage-12 { background: url(./midjourney-interpolated-vegetables/grape_12.png); background-size: contain; background-repeat: no-repeat; }
+.grape.stage-13 { background: url(./midjourney-interpolated-vegetables/grape_13.png); background-size: contain; background-repeat: no-repeat; }
+.grape.stage-14 { background: url(./midjourney-interpolated-vegetables/grape_14.png); background-size: contain; background-repeat: no-repeat; }
+.grape.harvested-plant { background: url(./midjourney-interpolated-vegetables/grape_harvested.png); background-size: contain; background-repeat: no-repeat; }
+
+.ivy.stage-1  { background: url(./midjourney-interpolated-vegetables/ivy_1.png); background-size: contain; background-repeat: no-repeat; }
+.ivy.stage-2  { background: url(./midjourney-interpolated-vegetables/ivy_2.png); background-size: contain; background-repeat: no-repeat; }
+.ivy.stage-3  { background: url(./midjourney-interpolated-vegetables/ivy_3.png); background-size: contain; background-repeat: no-repeat; }
+.ivy.stage-4  { background: url(./midjourney-interpolated-vegetables/ivy_4.png); background-size: contain; background-repeat: no-repeat; }
+.ivy.stage-5  { background: url(./midjourney-interpolated-vegetables/ivy_5.png); background-size: contain; background-repeat: no-repeat; }
+.ivy.stage-6  { background: url(./midjourney-interpolated-vegetables/ivy_6.png); background-size: contain; background-repeat: no-repeat; }
+.ivy.stage-7  { background: url(./midjourney-interpolated-vegetables/ivy_7.png); background-size: contain; background-repeat: no-repeat; }
+.ivy.stage-8  { background: url(./midjourney-interpolated-vegetables/ivy_8.png); background-size: contain; background-repeat: no-repeat; }
+.ivy.stage-9  { background: url(./midjourney-interpolated-vegetables/ivy_9.png); background-size: contain; background-repeat: no-repeat; }
+.ivy.stage-10 { background: url(./midjourney-interpolated-vegetables/ivy_10.png); background-size: contain; background-repeat: no-repeat; }
+.ivy.stage-11 { background: url(./midjourney-interpolated-vegetables/ivy_11.png); background-size: contain; background-repeat: no-repeat; }
+.ivy.stage-12 { background: url(./midjourney-interpolated-vegetables/ivy_12.png); background-size: contain; background-repeat: no-repeat; }
+.ivy.stage-13 { background: url(./midjourney-interpolated-vegetables/ivy_13.png); background-size: contain; background-repeat: no-repeat; }
+.ivy.stage-14 { background: url(./midjourney-interpolated-vegetables/ivy_14.png); background-size: contain; background-repeat: no-repeat; }
+.ivy.harvested-plant { background: url(./midjourney-interpolated-vegetables/ivy_harvested.png); background-size: contain; background-repeat: no-repeat; }
+
+.jacaranda_tree.stage-1  { background: url(./midjourney-interpolated-vegetables/jacaranda_tree_1.png); background-size: contain; background-repeat: no-repeat; }
+.jacaranda_tree.stage-2  { background: url(./midjourney-interpolated-vegetables/jacaranda_tree_2.png); background-size: contain; background-repeat: no-repeat; }
+.jacaranda_tree.stage-3  { background: url(./midjourney-interpolated-vegetables/jacaranda_tree_3.png); background-size: contain; background-repeat: no-repeat; }
+.jacaranda_tree.stage-4  { background: url(./midjourney-interpolated-vegetables/jacaranda_tree_4.png); background-size: contain; background-repeat: no-repeat; }
+.jacaranda_tree.stage-5  { background: url(./midjourney-interpolated-vegetables/jacaranda_tree_5.png); background-size: contain; background-repeat: no-repeat; }
+.jacaranda_tree.stage-6  { background: url(./midjourney-interpolated-vegetables/jacaranda_tree_6.png); background-size: contain; background-repeat: no-repeat; }
+.jacaranda_tree.stage-7  { background: url(./midjourney-interpolated-vegetables/jacaranda_tree_7.png); background-size: contain; background-repeat: no-repeat; }
+.jacaranda_tree.stage-8  { background: url(./midjourney-interpolated-vegetables/jacaranda_tree_8.png); background-size: contain; background-repeat: no-repeat; }
+.jacaranda_tree.stage-9  { background: url(./midjourney-interpolated-vegetables/jacaranda_tree_9.png); background-size: contain; background-repeat: no-repeat; }
+.jacaranda_tree.stage-10 { background: url(./midjourney-interpolated-vegetables/jacaranda_tree_10.png); background-size: contain; background-repeat: no-repeat; }
+.jacaranda_tree.stage-11 { background: url(./midjourney-interpolated-vegetables/jacaranda_tree_11.png); background-size: contain; background-repeat: no-repeat; }
+.jacaranda_tree.stage-12 { background: url(./midjourney-interpolated-vegetables/jacaranda_tree_12.png); background-size: contain; background-repeat: no-repeat; }
+.jacaranda_tree.stage-13 { background: url(./midjourney-interpolated-vegetables/jacaranda_tree_13.png); background-size: contain; background-repeat: no-repeat; }
+.jacaranda_tree.stage-14 { background: url(./midjourney-interpolated-vegetables/jacaranda_tree_14.png); background-size: contain; background-repeat: no-repeat; }
+.jacaranda_tree.harvested-plant { background: url(./midjourney-interpolated-vegetables/jacaranda_tree_harvested.png); background-size: contain; background-repeat: no-repeat; }
+
+.lettuce.stage-1  { background: url(./midjourney-interpolated-vegetables/lettuce_1.png); background-size: contain; background-repeat: no-repeat; }
+.lettuce.stage-2  { background: url(./midjourney-interpolated-vegetables/lettuce_2.png); background-size: contain; background-repeat: no-repeat; }
+.lettuce.stage-3  { background: url(./midjourney-interpolated-vegetables/lettuce_3.png); background-size: contain; background-repeat: no-repeat; }
+.lettuce.stage-4  { background: url(./midjourney-interpolated-vegetables/lettuce_4.png); background-size: contain; background-repeat: no-repeat; }
+.lettuce.stage-5  { background: url(./midjourney-interpolated-vegetables/lettuce_5.png); background-size: contain; background-repeat: no-repeat; }
+.lettuce.stage-6  { background: url(./midjourney-interpolated-vegetables/lettuce_6.png); background-size: contain; background-repeat: no-repeat; }
+.lettuce.stage-7  { background: url(./midjourney-interpolated-vegetables/lettuce_7.png); background-size: contain; background-repeat: no-repeat; }
+.lettuce.stage-8  { background: url(./midjourney-interpolated-vegetables/lettuce_8.png); background-size: contain; background-repeat: no-repeat; }
+.lettuce.stage-9  { background: url(./midjourney-interpolated-vegetables/lettuce_9.png); background-size: contain; background-repeat: no-repeat; }
+.lettuce.stage-10 { background: url(./midjourney-interpolated-vegetables/lettuce_10.png); background-size: contain; background-repeat: no-repeat; }
+.lettuce.stage-11 { background: url(./midjourney-interpolated-vegetables/lettuce_11.png); background-size: contain; background-repeat: no-repeat; }
+.lettuce.stage-12 { background: url(./midjourney-interpolated-vegetables/lettuce_12.png); background-size: contain; background-repeat: no-repeat; }
+.lettuce.stage-13 { background: url(./midjourney-interpolated-vegetables/lettuce_13.png); background-size: contain; background-repeat: no-repeat; }
+.lettuce.stage-14 { background: url(./midjourney-interpolated-vegetables/lettuce_14.png); background-size: contain; background-repeat: no-repeat; }
+.lettuce.harvested-plant { background: url(./midjourney-interpolated-vegetables/lettuce_harvested.png); background-size: contain; background-repeat: no-repeat; }
+
+.neon_mould.stage-1  { background: url(./midjourney-interpolated-vegetables/neon_mould_1.png); background-size: contain; background-repeat: no-repeat; }
+.neon_mould.stage-2  { background: url(./midjourney-interpolated-vegetables/neon_mould_2.png); background-size: contain; background-repeat: no-repeat; }
+.neon_mould.stage-3  { background: url(./midjourney-interpolated-vegetables/neon_mould_3.png); background-size: contain; background-repeat: no-repeat; }
+.neon_mould.stage-4  { background: url(./midjourney-interpolated-vegetables/neon_mould_4.png); background-size: contain; background-repeat: no-repeat; }
+.neon_mould.stage-5  { background: url(./midjourney-interpolated-vegetables/neon_mould_5.png); background-size: contain; background-repeat: no-repeat; }
+.neon_mould.stage-6  { background: url(./midjourney-interpolated-vegetables/neon_mould_6.png); background-size: contain; background-repeat: no-repeat; }
+.neon_mould.stage-7  { background: url(./midjourney-interpolated-vegetables/neon_mould_7.png); background-size: contain; background-repeat: no-repeat; }
+.neon_mould.stage-8  { background: url(./midjourney-interpolated-vegetables/neon_mould_8.png); background-size: contain; background-repeat: no-repeat; }
+.neon_mould.stage-9  { background: url(./midjourney-interpolated-vegetables/neon_mould_9.png); background-size: contain; background-repeat: no-repeat; }
+.neon_mould.stage-10 { background: url(./midjourney-interpolated-vegetables/neon_mould_10.png); background-size: contain; background-repeat: no-repeat; }
+.neon_mould.stage-11 { background: url(./midjourney-interpolated-vegetables/neon_mould_11.png); background-size: contain; background-repeat: no-repeat; }
+.neon_mould.stage-12 { background: url(./midjourney-interpolated-vegetables/neon_mould_12.png); background-size: contain; background-repeat: no-repeat; }
+.neon_mould.stage-13 { background: url(./midjourney-interpolated-vegetables/neon_mould_13.png); background-size: contain; background-repeat: no-repeat; }
+.neon_mould.stage-14 { background: url(./midjourney-interpolated-vegetables/neon_mould_14.png); background-size: contain; background-repeat: no-repeat; }
+.neon_mould.harvested-plant { background: url(./midjourney-interpolated-vegetables/neon_mould_harvested.png); background-size: contain; background-repeat: no-repeat; }
+
+.poison_cabbage.stage-1  { background: url(./midjourney-interpolated-vegetables/poison_cabbage_1.png); background-size: contain; background-repeat: no-repeat; }
+.poison_cabbage.stage-2  { background: url(./midjourney-interpolated-vegetables/poison_cabbage_2.png); background-size: contain; background-repeat: no-repeat; }
+.poison_cabbage.stage-3  { background: url(./midjourney-interpolated-vegetables/poison_cabbage_3.png); background-size: contain; background-repeat: no-repeat; }
+.poison_cabbage.stage-4  { background: url(./midjourney-interpolated-vegetables/poison_cabbage_4.png); background-size: contain; background-repeat: no-repeat; }
+.poison_cabbage.stage-5  { background: url(./midjourney-interpolated-vegetables/poison_cabbage_5.png); background-size: contain; background-repeat: no-repeat; }
+.poison_cabbage.stage-6  { background: url(./midjourney-interpolated-vegetables/poison_cabbage_6.png); background-size: contain; background-repeat: no-repeat; }
+.poison_cabbage.stage-7  { background: url(./midjourney-interpolated-vegetables/poison_cabbage_7.png); background-size: contain; background-repeat: no-repeat; }
+.poison_cabbage.stage-8  { background: url(./midjourney-interpolated-vegetables/poison_cabbage_8.png); background-size: contain; background-repeat: no-repeat; }
+.poison_cabbage.stage-9  { background: url(./midjourney-interpolated-vegetables/poison_cabbage_9.png); background-size: contain; background-repeat: no-repeat; }
+.poison_cabbage.stage-10 { background: url(./midjourney-interpolated-vegetables/poison_cabbage_10.png); background-size: contain; background-repeat: no-repeat; }
+.poison_cabbage.stage-11 { background: url(./midjourney-interpolated-vegetables/poison_cabbage_11.png); background-size: contain; background-repeat: no-repeat; }
+.poison_cabbage.stage-12 { background: url(./midjourney-interpolated-vegetables/poison_cabbage_12.png); background-size: contain; background-repeat: no-repeat; }
+.poison_cabbage.stage-13 { background: url(./midjourney-interpolated-vegetables/poison_cabbage_13.png); background-size: contain; background-repeat: no-repeat; }
+.poison_cabbage.stage-14 { background: url(./midjourney-interpolated-vegetables/poison_cabbage_14.png); background-size: contain; background-repeat: no-repeat; }
+.poison_cabbage.harvested-plant { background: url(./midjourney-interpolated-vegetables/poison_cabbage_harvested.png); background-size: contain; background-repeat: no-repeat; }
+
+.raspberry.stage-1  { background: url(./midjourney-interpolated-vegetables/raspberry_1.png); background-size: contain; background-repeat: no-repeat; }
+.raspberry.stage-2  { background: url(./midjourney-interpolated-vegetables/raspberry_2.png); background-size: contain; background-repeat: no-repeat; }
+.raspberry.stage-3  { background: url(./midjourney-interpolated-vegetables/raspberry_3.png); background-size: contain; background-repeat: no-repeat; }
+.raspberry.stage-4  { background: url(./midjourney-interpolated-vegetables/raspberry_4.png); background-size: contain; background-repeat: no-repeat; }
+.raspberry.stage-5  { background: url(./midjourney-interpolated-vegetables/raspberry_5.png); background-size: contain; background-repeat: no-repeat; }
+.raspberry.stage-6  { background: url(./midjourney-interpolated-vegetables/raspberry_6.png); background-size: contain; background-repeat: no-repeat; }
+.raspberry.stage-7  { background: url(./midjourney-interpolated-vegetables/raspberry_7.png); background-size: contain; background-repeat: no-repeat; }
+.raspberry.stage-8  { background: url(./midjourney-interpolated-vegetables/raspberry_8.png); background-size: contain; background-repeat: no-repeat; }
+.raspberry.stage-9  { background: url(./midjourney-interpolated-vegetables/raspberry_9.png); background-size: contain; background-repeat: no-repeat; }
+.raspberry.stage-10 { background: url(./midjourney-interpolated-vegetables/raspberry_10.png); background-size: contain; background-repeat: no-repeat; }
+.raspberry.stage-11 { background: url(./midjourney-interpolated-vegetables/raspberry_11.png); background-size: contain; background-repeat: no-repeat; }
+.raspberry.stage-12 { background: url(./midjourney-interpolated-vegetables/raspberry_12.png); background-size: contain; background-repeat: no-repeat; }
+.raspberry.stage-13 { background: url(./midjourney-interpolated-vegetables/raspberry_13.png); background-size: contain; background-repeat: no-repeat; }
+.raspberry.stage-14 { background: url(./midjourney-interpolated-vegetables/raspberry_14.png); background-size: contain; background-repeat: no-repeat; }
+.raspberry.harvested-plant { background: url(./midjourney-interpolated-vegetables/raspberry_harvested.png); background-size: contain; background-repeat: no-repeat; }
+
+.rhubarb.stage-1  { background: url(./midjourney-interpolated-vegetables/rhubarb_1.png); background-size: contain; background-repeat: no-repeat; }
+.rhubarb.stage-2  { background: url(./midjourney-interpolated-vegetables/rhubarb_2.png); background-size: contain; background-repeat: no-repeat; }
+.rhubarb.stage-3  { background: url(./midjourney-interpolated-vegetables/rhubarb_3.png); background-size: contain; background-repeat: no-repeat; }
+.rhubarb.stage-4  { background: url(./midjourney-interpolated-vegetables/rhubarb_4.png); background-size: contain; background-repeat: no-repeat; }
+.rhubarb.stage-5  { background: url(./midjourney-interpolated-vegetables/rhubarb_5.png); background-size: contain; background-repeat: no-repeat; }
+.rhubarb.stage-6  { background: url(./midjourney-interpolated-vegetables/rhubarb_6.png); background-size: contain; background-repeat: no-repeat; }
+.rhubarb.stage-7  { background: url(./midjourney-interpolated-vegetables/rhubarb_7.png); background-size: contain; background-repeat: no-repeat; }
+.rhubarb.stage-8  { background: url(./midjourney-interpolated-vegetables/rhubarb_8.png); background-size: contain; background-repeat: no-repeat; }
+.rhubarb.stage-9  { background: url(./midjourney-interpolated-vegetables/rhubarb_9.png); background-size: contain; background-repeat: no-repeat; }
+.rhubarb.stage-10 { background: url(./midjourney-interpolated-vegetables/rhubarb_10.png); background-size: contain; background-repeat: no-repeat; }
+.rhubarb.stage-11 { background: url(./midjourney-interpolated-vegetables/rhubarb_11.png); background-size: contain; background-repeat: no-repeat; }
+.rhubarb.stage-12 { background: url(./midjourney-interpolated-vegetables/rhubarb_12.png); background-size: contain; background-repeat: no-repeat; }
+.rhubarb.stage-13 { background: url(./midjourney-interpolated-vegetables/rhubarb_13.png); background-size: contain; background-repeat: no-repeat; }
+.rhubarb.stage-14 { background: url(./midjourney-interpolated-vegetables/rhubarb_14.png); background-size: contain; background-repeat: no-repeat; }
+.rhubarb.harvested-plant { background: url(./midjourney-interpolated-vegetables/rhubarb_harvested.png); background-size: contain; background-repeat: no-repeat; }
+
+.strawberry.stage-1  { background: url(./midjourney-interpolated-vegetables/strawberry_1.png); background-size: contain; background-repeat: no-repeat; }
+.strawberry.stage-2  { background: url(./midjourney-interpolated-vegetables/strawberry_2.png); background-size: contain; background-repeat: no-repeat; }
+.strawberry.stage-3  { background: url(./midjourney-interpolated-vegetables/strawberry_3.png); background-size: contain; background-repeat: no-repeat; }
+.strawberry.stage-4  { background: url(./midjourney-interpolated-vegetables/strawberry_4.png); background-size: contain; background-repeat: no-repeat; }
+.strawberry.stage-5  { background: url(./midjourney-interpolated-vegetables/strawberry_5.png); background-size: contain; background-repeat: no-repeat; }
+.strawberry.stage-6  { background: url(./midjourney-interpolated-vegetables/strawberry_6.png); background-size: contain; background-repeat: no-repeat; }
+.strawberry.stage-7  { background: url(./midjourney-interpolated-vegetables/strawberry_7.png); background-size: contain; background-repeat: no-repeat; }
+.strawberry.stage-8  { background: url(./midjourney-interpolated-vegetables/strawberry_8.png); background-size: contain; background-repeat: no-repeat; }
+.strawberry.stage-9  { background: url(./midjourney-interpolated-vegetables/strawberry_9.png); background-size: contain; background-repeat: no-repeat; }
+.strawberry.stage-10 { background: url(./midjourney-interpolated-vegetables/strawberry_10.png); background-size: contain; background-repeat: no-repeat; }
+.strawberry.stage-11 { background: url(./midjourney-interpolated-vegetables/strawberry_11.png); background-size: contain; background-repeat: no-repeat; }
+.strawberry.stage-12 { background: url(./midjourney-interpolated-vegetables/strawberry_12.png); background-size: contain; background-repeat: no-repeat; }
+.strawberry.stage-13 { background: url(./midjourney-interpolated-vegetables/strawberry_13.png); background-size: contain; background-repeat: no-repeat; }
+.strawberry.stage-14 { background: url(./midjourney-interpolated-vegetables/strawberry_14.png); background-size: contain; background-repeat: no-repeat; }
+.strawberry.harvested-plant { background: url(./midjourney-interpolated-vegetables/strawberry_harvested.png); background-size: contain; background-repeat: no-repeat; }
+
+.watermelon.stage-1  { background: url(./midjourney-interpolated-vegetables/watermelon_1.png); background-size: contain; background-repeat: no-repeat; }
+.watermelon.stage-2  { background: url(./midjourney-interpolated-vegetables/watermelon_2.png); background-size: contain; background-repeat: no-repeat; }
+.watermelon.stage-3  { background: url(./midjourney-interpolated-vegetables/watermelon_3.png); background-size: contain; background-repeat: no-repeat; }
+.watermelon.stage-4  { background: url(./midjourney-interpolated-vegetables/watermelon_4.png); background-size: contain; background-repeat: no-repeat; }
+.watermelon.stage-5  { background: url(./midjourney-interpolated-vegetables/watermelon_5.png); background-size: contain; background-repeat: no-repeat; }
+.watermelon.stage-6  { background: url(./midjourney-interpolated-vegetables/watermelon_6.png); background-size: contain; background-repeat: no-repeat; }
+.watermelon.stage-7  { background: url(./midjourney-interpolated-vegetables/watermelon_7.png); background-size: contain; background-repeat: no-repeat; }
+.watermelon.stage-8  { background: url(./midjourney-interpolated-vegetables/watermelon_8.png); background-size: contain; background-repeat: no-repeat; }
+.watermelon.stage-9  { background: url(./midjourney-interpolated-vegetables/watermelon_9.png); background-size: contain; background-repeat: no-repeat; }
+.watermelon.stage-10 { background: url(./midjourney-interpolated-vegetables/watermelon_10.png); background-size: contain; background-repeat: no-repeat; }
+.watermelon.stage-11 { background: url(./midjourney-interpolated-vegetables/watermelon_11.png); background-size: contain; background-repeat: no-repeat; }
+.watermelon.stage-12 { background: url(./midjourney-interpolated-vegetables/watermelon_12.png); background-size: contain; background-repeat: no-repeat; }
+.watermelon.stage-13 { background: url(./midjourney-interpolated-vegetables/watermelon_13.png); background-size: contain; background-repeat: no-repeat; }
+.watermelon.stage-14 { background: url(./midjourney-interpolated-vegetables/watermelon_14.png); background-size: contain; background-repeat: no-repeat; }
+.watermelon.harvested-plant { background: url(./midjourney-interpolated-vegetables/watermelon_harvested.png); background-size: contain; background-repeat: no-repeat; }
+
+#item-context-menu {
+  position: fixed;
+  background: var(--vscode-menu-background, #2d2d2d);
+  border: 1px solid var(--vscode-menu-border, rgba(255,255,255,0.2));
+  border-radius: 4px;
+  padding: 4px 0;
+  z-index: 10000;
+  min-width: 120px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+
+.context-menu-option {
+  padding: 6px 14px;
+  font-family: monospace;
+  font-size: 0.85rem;
+  cursor: pointer;
+  color: var(--vscode-menu-foreground, #ccc);
+}
+
+.context-menu-option:hover {
+  background: var(--vscode-menu-selectionBackground, rgba(255,255,255,0.1));
+  color: var(--vscode-menu-selectionForeground, #fff);
+}
+
+#money-display {
+  position: fixed;
+  bottom: 8px;
+  left: 8px;
+  font-family: monospace;
+  font-size: 1rem;
+  font-weight: bold;
+  color: #ffd700;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 4px 8px;
+  border-radius: 4px;
+  pointer-events: none;
+}
+
+#inventory-bottom-right {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.inventory-pot-wrapper {
+  position: relative;
+  cursor: pointer;
+  display: inline-block;
+}
+
+#cook-btn {
+  width: 100%;
+  padding: 6px 12px;
+  background: #4a7c59;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-family: monospace;
+  font-size: 0.85rem;
+}
+
+#cook-btn:hover {
+  background: #3a6145;
+}
+
+#cook-progress-wrapper {
+  width: 64px;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+#cook-progress-bar {
+  height: 100%;
+  width: 100%;
+  background: #4a7c59;
+}
+
+.inventory-pot {
+  width: 64px;
+  height: 64px;
+  image-rendering: pixelated;
+  display: block;
+  pointer-events: none;
+}
+
+.inventory-pot-overlay {
+  position: absolute;
+  bottom: 6px;
+  right: 6px;
+  font-size: 10px;
+  font-family: monospace;
+  font-weight: bold;
+  color: #fff;
+  text-shadow: 1px 1px 2px #000;
+  pointer-events: none;
+}
+
+.harvested-plant.highlighted .plant-count-badge {
+  background: #f5c400;
+  color: #000;
+}
+
+.harvested-plant.in-pot {
+  display: none;
+}
+
+.pot-tray {
+  position: absolute;
+  bottom: 64px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding-bottom: 4px;
+}
+
+.pot-tray-slot {
+  width: 36px;
+  height: 36px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  image-rendering: pixelated;
+  cursor: pointer;
+  opacity: 0.95;
+}
+
+.pot-tray-slot:hover {
+  opacity: 0.5;
+}
+
+@keyframes fall-into-pot {
+  0%   { transform: translateY(0) scale(1); opacity: 1; }
+  100% { transform: translateY(72px) scale(0.1); opacity: 0; }
+}
+
+.pot-tray-slot.falling {
+  animation: fall-into-pot 0.35s ease-in forwards;
+  pointer-events: none;
+}
+
+.chili-icon{
+  max-width: 100%;
+  height: auto;
+  background: url(./vegetables/chili_harvested.png);
+  height:20px;
+  width:20px;
+  display:block;
+}

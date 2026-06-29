@@ -35,7 +35,7 @@ export class InstructionsWebViewProvider implements vscode.WebviewViewProvider {
 
   private getHtmlContent(webview: vscode.Webview): string {
 
-    const style = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'src/media', 'style.css'));
+    const style = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'dist/media', 'style.css'));
 
     const categories = [...new Set(KEY_MAP.map(k => k.category))];
 

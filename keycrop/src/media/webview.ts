@@ -61,7 +61,7 @@ window.addEventListener('message', (event: MessageEvent) => {
       game.greenhouse.addPlant(message.key,message.species);
       break;
     case 'grow':
-      game.greenhouse.grow(message.species, vscode);
+      game.greenhouse.grow(message.key, vscode);
       checkAcheivements();
       break;
     case 'save_plants': {
@@ -252,14 +252,6 @@ if (potWrapper) {
     syncPotUI();
   }
 
-  game.div.addEventListener('click', (e) => {
-    if (!potActive) { return; }
-    const plant = (e.target as HTMLElement).closest('.harvested-plant') as HTMLElement | null;
-    if (!plant || plantPotCount(plant) >= plantInventoryCount(plant)) { return; }
-    addToPot(plant);
-  });
-
-  // Right-click context menu for selling
   let contextMenuTarget: HTMLElement | null = null;
 
   const contextMenu = document.createElement('div');
@@ -285,13 +277,22 @@ if (potWrapper) {
     contextMenuTarget = null;
   }
 
-  document.addEventListener('contextmenu', (e) => {
+  game.div.addEventListener('click', (e) => {
     const plant = (e.target as HTMLElement).closest('.harvested-plant') as HTMLElement | null;
+    if (!plant) { return; }
+    if (potActive && plantPotCount(plant) < plantInventoryCount(plant)) {
+      addToPot(plant);
+    } else if (!potActive) {
+      e.stopPropagation();
+      showContextMenu(e.clientX, e.clientY, plant);
+    }
+  });
+
+  document.getElementById('food-row')?.addEventListener('click', (e) => {
     const food = (e.target as HTMLElement).closest('.cooked-food') as HTMLElement | null;
-    const item = plant ?? food;
-    if (!item) { return; }
-    e.preventDefault();
-    showContextMenu(e.clientX, e.clientY, item);
+    if (!food) { return; }
+    e.stopPropagation();
+    showContextMenu(e.clientX, e.clientY, food);
   });
 
   sellOption.addEventListener('click', () => {
@@ -308,10 +309,6 @@ if (potWrapper) {
   });
 
   document.addEventListener('click', () => hideContextMenu());
-  document.addEventListener('contextmenu', (e) => {
-    const item = (e.target as HTMLElement).closest('.harvested-plant, .cooked-food');
-    if (!item) { hideContextMenu(); }
-  });
 
   potWrapper.addEventListener('click', () => {
     const isCooking = progressWrapper && !progressWrapper.hidden;

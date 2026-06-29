@@ -9,7 +9,7 @@ function copyDir(src, dest) {
 		const destPath = path.join(dest, entry.name);
 		if (entry.isDirectory()) {
 			copyDir(srcPath, destPath);
-		} else if (/\.(png|jpg|jpeg|gif|svg|webp)$/i.test(entry.name)) {
+		} else if (/\.(png|jpg|jpeg|gif|svg|webp|css)$/i.test(entry.name)) {
 			fs.copyFileSync(srcPath, destPath);
 		}
 	}

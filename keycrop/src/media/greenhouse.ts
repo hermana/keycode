@@ -17,9 +17,9 @@ export class Greenhouse {
     this.plants.push(new Plant(key, species));
   }
 
-  grow(species: string, vscode: { postMessage(msg: unknown): void }): void {
+  grow(key: string, vscode: { postMessage(msg: unknown): void }): void {
     this.plants.forEach(plant => {
-      if (plant.species === species && !plant.html_element.classList.contains('harvested-plant')) {
+      if (plant.key === key && !plant.html_element.classList.contains('harvested-plant')) {
         plant.grow(vscode);
       }
     });
