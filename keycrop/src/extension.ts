@@ -167,15 +167,16 @@ function growPlant(key: string) {
 
     type PlantPickItem = vscode.QuickPickItem & { species: string; locked: boolean };
     const toLabel = (s: string) => s.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+    const plantingCost = (s: string) => { const d = PLANTS[s]; return (!d || d.category === 'vegetable') ? 0 : d.price; };
 
     const unlocked = availableSpecies.filter(s => {
       const data = PLANTS[s];
       return !data || data.category === 'vegetable' || playerMoney >= data.price;
-    });
+    }).sort((a, b) => plantingCost(a) - plantingCost(b));
     const locked = availableSpecies.filter(s => {
       const data = PLANTS[s];
       return data && data.category !== 'vegetable' && playerMoney < data.price;
-    });
+    }).sort((a, b) => PLANTS[a].price - PLANTS[b].price);
 
     const speciesItems: PlantPickItem[] = [
       ...unlocked.map(s => {
