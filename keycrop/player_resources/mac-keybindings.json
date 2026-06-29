@@ -13,7 +13,7 @@
         }
     },
     {
-        "key": "cmd+shift+k",
+        "key": "cmd+k",
         "command": "runCommands",
         "args": {
             "commands": [
