@@ -387,6 +387,24 @@ if (potWrapper) {
 }
 
 //Start loop
+// Plant detail panel — greenhouse only (.plant elements don't exist in inventory)
+const plantDetailPanel = document.createElement('div');
+plantDetailPanel.id = 'plant-detail';
+plantDetailPanel.hidden = true;
+document.body.appendChild(plantDetailPanel);
+
+game.div.addEventListener('click', (e) => {
+  const plant = (e.target as HTMLElement).closest('.plant:not(.harvested-plant)') as HTMLElement | null;
+  if (!plant || !plant.title) { return; }
+  e.stopPropagation();
+  plantDetailPanel.textContent = plant.title;
+  plantDetailPanel.style.left = `${e.clientX + 8}px`;
+  plantDetailPanel.style.top = `${e.clientY + 8}px`;
+  plantDetailPanel.hidden = false;
+});
+
+document.addEventListener('click', () => { plantDetailPanel.hidden = true; });
+
 setInterval(update, 1000 / game.fps);
 
 //Tell vscode game loaded

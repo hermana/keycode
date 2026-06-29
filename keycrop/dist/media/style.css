@@ -117,6 +117,19 @@
   font-weight:bold;
 }
 
+#plant-detail {
+  position: fixed;
+  background: var(--vscode-editor-background, #1e1e1e);
+  color: var(--vscode-foreground, #cccccc);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 6px 10px;
+  font-size: 0.8rem;
+  font-family: monospace;
+  white-space: pre;
+  pointer-events: none;
+  z-index: 100;
+}
+
 .btn-wrapper{
   position:absolute;
   bottom:0px;
