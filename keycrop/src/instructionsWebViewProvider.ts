@@ -8,7 +8,8 @@ export class InstructionsWebViewProvider implements vscode.WebviewViewProvider {
 
   constructor(
     private readonly context: vscode.ExtensionContext,
-    private readonly getHotkeyCounts: () => Record<string, number>
+    private readonly getHotkeyCounts: () => Record<string, number>,
+    private readonly onViewEvent?: (event: 'opened' | 'closed') => void
   ) {}
 
   public postMessage(message: any): void {
@@ -17,6 +18,9 @@ export class InstructionsWebViewProvider implements vscode.WebviewViewProvider {
 
   public resolveWebviewView(webviewView: vscode.WebviewView, _context: vscode.WebviewViewResolveContext, _token: vscode.CancellationToken): Thenable<void> | void {
     this._view = webviewView;
+    this.onViewEvent?.('opened');
+    webviewView.onDidChangeVisibility(() => this.onViewEvent?.(webviewView.visible ? 'opened' : 'closed'));
+    webviewView.onDidDispose(() => this.onViewEvent?.('closed'));
 
     const webview = webviewView.webview;
 

@@ -4,6 +4,7 @@ import * as path from 'path';
 import { MODE } from './mode';
 import { InstructionsWebViewProvider } from './instructionsWebViewProvider';
 import { PLANTS } from './media/plants';
+import { KEY_MAP } from './keyMap';
 
 const CURRENT_MODE: MODE = MODE.GAME;
 
@@ -15,6 +16,12 @@ let extensionStorageFolder: string = '';
 let plantsPath: string;
 let keyTrackingPath: string;
 let keyTrackingString: { key: string; time: number; }[] = [];
+let hotkeysPath: string;
+type HotkeyEntry = { hotkey: string; species: string; timestamp: string; file: string };
+let hotkeyLog: HotkeyEntry[] = [];
+let pluginDataPath: string;
+type PluginDataEntry = { view: string; event: 'opened' | 'closed'; timestamp: string };
+let pluginDataLog: PluginDataEntry[] = [];
 let studyOutputPath: string = './output';
 let plantsStudyOutputPath: string;
 let keytrackingStudyOutputPath: string;
@@ -155,6 +162,7 @@ function addPlant(plant: Plant) {
 function growPlant(key: string) {
   const existingPlant = plants.find(p => p.key === key);
   if (existingPlant && !existingPlant.harvested) {
+    logHotkeyUse(key, existingPlant.species);
     greenhouse.postMessage({
       action: 'grow',
       key: existingPlant.key
@@ -223,6 +231,22 @@ function growPlant(key: string) {
   }
 }
 
+function logViewEvent(view: string, event: 'opened' | 'closed'): void {
+  pluginDataLog.push({ view, event, timestamp: new Date().toISOString() });
+  fs.writeFileSync(pluginDataPath, JSON.stringify(pluginDataLog, null, 2));
+}
+
+function logHotkeyUse(key: string, species: string): void {
+  const keyEntry = KEY_MAP.find(k => k.command === key);
+  hotkeyLog.push({
+    hotkey: keyEntry?.capital_key ?? key,
+    species,
+    timestamp: new Date().toISOString(),
+    file: vscode.window.activeTextEditor?.document.fileName ?? ''
+  });
+  fs.writeFileSync(hotkeysPath, JSON.stringify(hotkeyLog, null, 2));
+}
+
 function logKeyPress(plant: string) {
   keyTrackingString.push({
     key: plant,
@@ -238,6 +262,15 @@ export function activate(context: vscode.ExtensionContext) {
   plantsPath = path.join(extensionStorageFolder, 'plants.json');
   // plantsStudyOutputPath = path.join(studyOutputPath, 'plants.json');
   keyTrackingPath = path.join(extensionStorageFolder, 'keytracking.json');
+  hotkeysPath = path.join(extensionStorageFolder, 'hotkeys.json');
+  if (fs.existsSync(hotkeysPath)) {
+    try { hotkeyLog = JSON.parse(fs.readFileSync(hotkeysPath, 'utf8')); } catch { hotkeyLog = []; }
+  }
+  pluginDataPath = path.join(extensionStorageFolder, 'plugin_data.json');
+  if (fs.existsSync(pluginDataPath)) {
+    try { pluginDataLog = JSON.parse(fs.readFileSync(pluginDataPath, 'utf8')); } catch { pluginDataLog = []; }
+  }
+  logViewEvent('vscode', 'opened');
   // keytrackingStudyOutputPath = path.join(studyOutputPath, 'keytracking.json');
 
   // if (!fs.existsSync(studyOutputPath)){
@@ -246,7 +279,7 @@ export function activate(context: vscode.ExtensionContext) {
 
   readPlantsFromDisk();
 
-  instructions = new InstructionsWebViewProvider(context, getHotkeyCounts);
+  instructions = new InstructionsWebViewProvider(context, getHotkeyCounts, (event) => logViewEvent('instructions', event));
 	context.subscriptions.push(vscode.window.registerWebviewViewProvider(InstructionsWebViewProvider.viewType, instructions));
 
 	if (CURRENT_MODE === MODE.GAME) {
@@ -453,6 +486,9 @@ export class GreenhouseWebViewProvider implements vscode.WebviewViewProvider {
   
     public resolveWebviewView(webviewView: vscode.WebviewView, context: vscode.WebviewViewResolveContext, _token: vscode.CancellationToken) {
       this.view = webviewView; //Needed so we can use it in postMessageToWebview
+      logViewEvent('greenhouse', 'opened');
+      webviewView.onDidChangeVisibility(() => logViewEvent('greenhouse', webviewView.visible ? 'opened' : 'closed'));
+      webviewView.onDidDispose(() => logViewEvent('greenhouse', 'closed'));
   
       const webview = webviewView.webview;
   
@@ -574,6 +610,9 @@ export class InventoryWebViewProvider implements vscode.WebviewViewProvider {
     
     public resolveWebviewView(webviewView: vscode.WebviewView, context: vscode.WebviewViewResolveContext, token: vscode.CancellationToken): Thenable<void> | void {
       this.view = webviewView;
+      logViewEvent('inventory', 'opened');
+      webviewView.onDidChangeVisibility(() => logViewEvent('inventory', webviewView.visible ? 'opened' : 'closed'));
+      webviewView.onDidDispose(() => logViewEvent('inventory', 'closed'));
 
       const webview = webviewView.webview;
 

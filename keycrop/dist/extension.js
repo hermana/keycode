@@ -73,9 +73,10 @@ var KEY_MAP = [
 
 // src/instructionsWebViewProvider.ts
 var InstructionsWebViewProvider = class {
-  constructor(context, getHotkeyCounts2) {
+  constructor(context, getHotkeyCounts2, onViewEvent) {
     this.context = context;
     this.getHotkeyCounts = getHotkeyCounts2;
+    this.onViewEvent = onViewEvent;
   }
   static viewType = "instructions";
   _view;
@@ -84,6 +85,9 @@ var InstructionsWebViewProvider = class {
   }
   resolveWebviewView(webviewView, _context, _token) {
     this._view = webviewView;
+    this.onViewEvent?.("opened");
+    webviewView.onDidChangeVisibility(() => this.onViewEvent?.(webviewView.visible ? "opened" : "closed"));
+    webviewView.onDidDispose(() => this.onViewEvent?.("closed"));
     const webview = webviewView.webview;
     webview.options = {
       enableScripts: true
@@ -204,6 +208,10 @@ var extensionStorageFolder = "";
 var plantsPath;
 var keyTrackingPath;
 var keyTrackingString = [];
+var hotkeysPath;
+var hotkeyLog = [];
+var pluginDataPath;
+var pluginDataLog = [];
 function readPlantsFromDisk() {
   if (!fs.existsSync(extensionStorageFolder)) {
     fs.mkdirSync(extensionStorageFolder, { recursive: true });
@@ -321,6 +329,7 @@ function addPlant(plant) {
 function growPlant(key) {
   const existingPlant = plants.find((p) => p.key === key);
   if (existingPlant && !existingPlant.harvested) {
+    logHotkeyUse(key, existingPlant.species);
     greenhouse.postMessage({
       action: "grow",
       key: existingPlant.key
@@ -387,6 +396,20 @@ function growPlant(key) {
     });
   }
 }
+function logViewEvent(view, event) {
+  pluginDataLog.push({ view, event, timestamp: (/* @__PURE__ */ new Date()).toISOString() });
+  fs.writeFileSync(pluginDataPath, JSON.stringify(pluginDataLog, null, 2));
+}
+function logHotkeyUse(key, species) {
+  const keyEntry = KEY_MAP.find((k) => k.command === key);
+  hotkeyLog.push({
+    hotkey: keyEntry?.capital_key ?? key,
+    species,
+    timestamp: (/* @__PURE__ */ new Date()).toISOString(),
+    file: vscode2.window.activeTextEditor?.document.fileName ?? ""
+  });
+  fs.writeFileSync(hotkeysPath, JSON.stringify(hotkeyLog, null, 2));
+}
 function logKeyPress(plant) {
   keyTrackingString.push({
     key: plant,
@@ -398,8 +421,25 @@ function activate(context) {
   extensionStorageFolder = context.globalStorageUri.path.substring(1);
   plantsPath = path.join(extensionStorageFolder, "plants.json");
   keyTrackingPath = path.join(extensionStorageFolder, "keytracking.json");
+  hotkeysPath = path.join(extensionStorageFolder, "hotkeys.json");
+  if (fs.existsSync(hotkeysPath)) {
+    try {
+      hotkeyLog = JSON.parse(fs.readFileSync(hotkeysPath, "utf8"));
+    } catch {
+      hotkeyLog = [];
+    }
+  }
+  pluginDataPath = path.join(extensionStorageFolder, "plugin_data.json");
+  if (fs.existsSync(pluginDataPath)) {
+    try {
+      pluginDataLog = JSON.parse(fs.readFileSync(pluginDataPath, "utf8"));
+    } catch {
+      pluginDataLog = [];
+    }
+  }
+  logViewEvent("vscode", "opened");
   readPlantsFromDisk();
-  instructions = new InstructionsWebViewProvider(context, getHotkeyCounts);
+  instructions = new InstructionsWebViewProvider(context, getHotkeyCounts, (event) => logViewEvent("instructions", event));
   context.subscriptions.push(vscode2.window.registerWebviewViewProvider(InstructionsWebViewProvider.viewType, instructions));
   if (CURRENT_MODE === 0 /* GAME */) {
     greenhouse = new GreenhouseWebViewProvider(context);
@@ -592,6 +632,9 @@ var GreenhouseWebViewProvider = class {
   }
   resolveWebviewView(webviewView, context, _token) {
     this.view = webviewView;
+    logViewEvent("greenhouse", "opened");
+    webviewView.onDidChangeVisibility(() => logViewEvent("greenhouse", webviewView.visible ? "opened" : "closed"));
+    webviewView.onDidDispose(() => logViewEvent("greenhouse", "closed"));
     const webview = webviewView.webview;
     webview.options = {
       enableScripts: true
@@ -693,6 +736,9 @@ var InventoryWebViewProvider = class {
   }
   resolveWebviewView(webviewView, context, token) {
     this.view = webviewView;
+    logViewEvent("inventory", "opened");
+    webviewView.onDidChangeVisibility(() => logViewEvent("inventory", webviewView.visible ? "opened" : "closed"));
+    webviewView.onDidDispose(() => logViewEvent("inventory", "closed"));
     const webview = webviewView.webview;
     webview.options = {
       enableScripts: true
