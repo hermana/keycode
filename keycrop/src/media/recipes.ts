@@ -9,6 +9,7 @@ export type Recipe = {
 // To add a recipe: find the alphabetically-first species, join with '+', set name and price.
 export const RECIPES: Record<string, Recipe> = {
   'bean+bean':                  { filename: 'bean_bean.png',                  name: 'Refried Beans',                            price: 6   },
+  'bean+lettuce':               { filename: 'bean_lettuce.png',               name: 'Bean Salad',                               price: 6   },
   'bean+broccoli':              { filename: 'bean_broccoli.png',              name: 'Vegetable Stir Fry',                       price: 6   },
   'bean+bulbino':               { filename: 'bean_bulbino.png',               name: 'Farmer Bulbino',                           price: 70  },
   'bean+chili':                 { filename: 'chili_bean.png',                 name: 'Spicy Bean Jar',                           price: 6   },
@@ -39,7 +40,8 @@ export const RECIPES: Record<string, Recipe> = {
   'broccoli+watermelon':        { filename: 'broccoli_watermelon.png',        name: 'Green Gazpacho',                           price: 10  },
 
   'bulbino+bulbino':            { filename: 'bulbino-bulbino.png',            name: 'Royal Bulbino',                            price: 100 },
-  'bulbino+chili':              { filename: 'chili_bulbino.png',              name: 'Flame Bulbino',                            price: 70  },
+  'bulbino+raspberry':          { filename: 'raspberry_bulbino.png',          name: 'Berry Bulbino',                            price: 100 },
+  'bulbino+chili':              { filename: 'chili_bulbino.png',              name: 'Flame Bulbino',                            price: 100  },
   'bulbino+glowberry':          { filename: 'glowberry_bulbino.png',          name: 'Blue Bulbino',                             price: 100 },
   'bulbino+ivy':                { filename: 'bulbino_ivy.png',                name: 'Fancy Bulbino',                            price: 100 },
   'bulbino+jacaranda_tree':     { filename: 'bulbino_jacaranda.png',          name: 'Purple Bulbino',                           price: 100 },
@@ -47,9 +49,9 @@ export const RECIPES: Record<string, Recipe> = {
   'bulbino+neon_mould':         { filename: 'bulbino_neon_mould.png',         name: 'Neon Bulbino',                             price: 100 },
   'bulbino+poison_cabbage':     { filename: 'bulbino_poison_cabbage.png',     name: 'Sinister Bulbino',                         price: 100 },
   'bulbino+rhubarb':            { filename: 'bulbino_rhubarb.png',            name: 'Rustic Bulbino',                           price: 100 },
-  'bulbino+strawberry':         { filename: 'bulbino_strawberry.png',         name: 'Sweet Bulbino',                            price: 80  },
-  'bulbino+tomato':             { filename: 'bulbino_tomato.png',             name: 'Bulbino with Spaghetti',                   price: 70  },
-  'bulbino+watermelon':         { filename: 'bulbino_watermelon.png',         name: 'Summer Bulbino',                           price: 80  },
+  'bulbino+strawberry':         { filename: 'bulbino_strawberry.png',         name: 'Sweet Bulbino',                            price: 100  },
+  'bulbino+tomato':             { filename: 'bulbino_tomato.png',             name: 'Bulbino with Spaghetti',                   price: 100  },
+  'bulbino+watermelon':         { filename: 'bulbino_watermelon.png',         name: 'Summer Bulbino',                           price: 100  },
 
   'chili+chili':                { filename: 'chili-chili.png',                name: 'Chili Flakes',                             price: 6   },
   'chili+glowberry':            { filename: 'chili_glowberry.png',            name: 'Blue Chili Jam',                           price: 70  },
@@ -114,6 +116,7 @@ export const RECIPES: Record<string, Recipe> = {
   'neon_mould+tomato':          { filename: 'tomato_neon_mould.png',          name: 'Strangely Glowing Rotten Tomato',          price: 70  },
   'neon_mould+watermelon':      { filename: 'neon_mould_watermelon.png',      name: 'Neon Granita',                             price: 80  },
 
+  'poison_cabbage+poison_cabbage': { filename: 'poison_cabbage-poison_cabbage.png', name: 'Deadly Potion',                          price: 80  },
   'poison_cabbage+raspberry':   { filename: 'raspberry_poison_cabbage.png',   name: 'Disgusting Tart',                          price: 80  },
   'poison_cabbage+rhubarb':     { filename: 'rhubarb_poison_cabbage.png',     name: 'Poison Red Coleslaw',                      price: 100 },
   'poison_cabbage+strawberry':  { filename: 'strawberry_cabbage.png',         name: 'Strawberry Cabbage Sludge',                price: 80  },
