@@ -517,8 +517,193 @@
                     },
                     "keycrop.growShowHover"
                 ]
-            }    
+            }
     },
+    {
+        "key": "ctrl+k v",
+        "command": "runCommands",
+        "args": {
+            "commands": [
+                {
+                    "command": "markdown.showPreviewToSide",
+                    "when": "editorFocus && !notebookEditorFocused && editorLangId =~ /^(markdown|prompt|instructions|chatagent|skill)$/"
+                },
+                "keycrop.growOpenMarkdownSide"
+            ]
+        }
+    },
+    {
+        "key": "ctrl+shift+v",
+        "command": "runCommands",
+        "args": {
+            "commands": [
+                {
+                    "command": "notebook.cell.pasteAbove",
+                    "when": "notebookEditorFocused && !inputFocus"
+                },
+                {
+                    "command": "workbench.action.terminal.paste",
+                    "when": "terminalFocus && terminalHasBeenCreated || terminalFocus && terminalProcessSupported"
+                },
+                {
+                    "command": "markdown.togglePreview",
+                    "when": "!terminalFocus && activeCustomEditorId == 'vscode.markdown.preview.editor' || editorFocus && !notebookEditorFocused && !terminalFocus && resourceLangId =~ /^(markdown|prompt|instructions|chatagent|skill)$/"
+                },
+                {
+                    "command": "java.action.clipboardPasteAction",
+                    "when": "javaLSReady && editorLangId == 'java'"
+                },
+                {
+                     "command": "java.action.filesExplorerPasteAction",
+                     "when": "config.editor.pasteAs.enabled && explorerViewletFocus"
+                },
+                "keycrop.growOpenMarkdownPreview"
+            ]
+        }
+    },
+    {
+        "key": "ctrl+h",
+        "command": "runCommands",
+        "args": {
+            "commands": [
+                {
+                     "command": "editor.action.startFindReplaceAction",
+                     "when": "editorFocus || editorIsOpen"
+                },
+                {
+                    "command": "workbench.action.browser.showHistory",
+                    "when": "activeEditor == 'workbench.editor.browser' && browserStorageScope != 'ephemeral'"
+                },
+                "keycrop.growReplace"
+            ]
+        }
+    },
+    {
+        "key": "shift+alt+down",
+        "command": "runCommands",
+        "args": {
+            "commands": [
+                {
+                     "command": "editor.action.insertCursorBelow",
+                     "when": "editorTextFocus"
+                },
+                {
+                     "command": "notebook.cell.copyDown",
+                     "when": "notebookEditorFocused && !inputFocus"
+                },
+                "keycrop.growCopyLineBelow"
+            ]
+        }
+    },
+    {
+        "key": "shift+alt+up",
+        "command": "runCommands",
+        "args": {
+            "commands": [
+                {
+                    "command": "editor.action.insertCursorAbove",
+                    "when": "editorTextFocus"
+                },
+                {
+                    "command": "notebook.cell.copyUp",
+                    "when": "notebookEditorFocused && !inputFocus" 
+                },
+                "keycrop.growCopyLineAbove"
+            ]
+        }
+    },
+    {
+        "key": "ctrl+f",
+        "command": "runCommands",
+        "args": {
+            "commands": [
+                {
+                    "command": "actions.find",
+                    "when": "editorFocus || editorIsOpen"
+                },
+                {
+                    "command": "editor.action.extensioneditor.showfind",
+                    "when": "!editorFocus && activeEditor == 'workbench.editor.extension'"
+                },
+                {
+                    "command": "editor.action.webvieweditor.showFind",
+                    "when": "webviewFindWidgetEnabled && !editorFocus && activeEditor == 'WebviewEditor'"
+                },
+                {
+                    "command": "repl.action.filter",
+                    "when": "inDebugRepl && textInputFocus"
+                },
+                {
+                     "command": "settings.action.search",
+                     "when": "inSettingsEditor"
+                },
+                {
+                    "command": "workbench.action.browser.showFind",
+                    "when": "browserHasUrl && !browserHasError && activeEditor == 'workbench.editor.browser'"
+                },
+                {
+                    "command": "commentsFocusFilter",
+                    "when": "focusedView == 'workbench.panel.comments'"
+                },
+                {
+                     "command": "keybindings.editor.searchKeybindings",
+                     "when": "inKeybindings"
+                },
+                {
+                    "command": "notebook.find",
+                    "when": "notebookEditorFocused && !editorFocus && activeEditor == 'workbench.editor.interactive' || notebookEditorFocused && !editorFocus && activeEditor == 'workbench.editor.notebook'" 
+                },
+                {
+                    "command": "problems.action.focusFilter",
+                    "when": "focusedView == 'workbench.panel.markers.view'"
+                },
+                {
+                     "command": "workbench.action.terminal.focusFind",
+                     "when": "terminalFindFocused && terminalHasBeenCreated || terminalFindFocused && terminalProcessSupported || terminalFocusInAny && terminalHasBeenCreated || terminalFocusInAny && terminalProcessSupported"
+                },
+                "keycrop.growFind"
+            ]
+        }
+    },
+    {
+        "key": "shift+alt+right",
+        "command": "runCommands",
+        "args": {
+            "commands": [
+                {
+                    "command": "editor.action.smartSelect.expand",
+                    "when": "editorTextFocus"
+                },
+                "keycrop.growExpandSelection"
+            ]
+        }
+    },
+    {
+        "key": "shift+alt+left",
+        "command": "runCommands",
+        "args": {
+            "commands": [
+                {
+                   "command": "editor.action.smartSelect.shrink",
+                   "when": "editorTextFocus"
+                },
+                "keycrop.growReduceSelection"
+            ]
+        }
+    },
+    {
+        "key": "ctrl+shift+a",
+        "command": "runCommands",
+        "args": {
+            "commands": [
+                {
+                    "command": "editor.action.blockComment",
+                    "when": "editorTextFocus && !editorReadonly" 
+                },
+                "keycrop.growToggleBlockComment"
+            ]
+        }
+    }
 ]
 
 

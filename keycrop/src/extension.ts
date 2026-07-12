@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { MODE } from './mode';
 import { InstructionsWebViewProvider } from './instructionsWebViewProvider';
-import { PLANTS } from './media/plants';
+import { PLANTS, ALL_SPECIES } from './media/plants';
 import { KEY_MAP } from './keyMap';
 
 const CURRENT_MODE: MODE = MODE.GAME;
@@ -132,25 +132,6 @@ function getHotkeyCounts(): Record<string, number> {
   return counts;
 }
 
-const SPECIES_DESCRIPTIONS: Record<string, string> = {
-  'bean': "A humble unassuming legume.",
-  'tomato': 'This crop has a wide variety of culinary uses.',
-  'broccoli': 'Nutritious',
-  'chili': 'Spicy and flavorful.',
-  'bulbino': 'A mysterious plant.',
-  'glowberry': 'Glowberries emit a soft bioluminescent hue.',
-  'ivy': 'A decorative ground cover.',
-  'jacaranda_tree': 'A tree with purple leaves.',
-  'lettuce': 'Great in salads',
-  'neon_mould': 'Radioactive mould.',
-  'poison_cabbage': 'Closely related to regular cabbage.',
-  'raspberry': 'A sweet and tart fruit.',
-  'rhubarb': 'The stalks are edible.',
-  'strawberry': 'A sweet and juicy fruit.',
-  'watermelon': 'Great with hotkeys in the summer.',
-};
-const ALL_SPECIES = ['bean', 'tomato', 'broccoli', 'chili', 'bulbino', 'glowberry', 'ivy', 'jacaranda_tree', 'lettuce', 'neon_mould', 'poison_cabbage', 'raspberry', 'rhubarb', 'strawberry', 'watermelon'];
-
 function addPlant(plant: Plant) {
   greenhouse.postMessage({
     action: 'add',
@@ -160,6 +141,12 @@ function addPlant(plant: Plant) {
 }
 
 function growPlant(key: string) {
+  const keyEntry = KEY_MAP.find(k => k.command === key);
+  if (keyEntry && !keyEntry.active) {
+    logHotkeyUse(key, 'none');
+    return;
+  }
+
   const existingPlant = plants.find(p => p.key === key);
   if (existingPlant && !existingPlant.harvested) {
     logHotkeyUse(key, existingPlant.species);
@@ -192,7 +179,7 @@ function growPlant(key: string) {
         const isFree = !data || data.category === 'vegetable';
         return {
           label: toLabel(s),
-          description: isFree ? SPECIES_DESCRIPTIONS[s] : `$${data.price} · ${SPECIES_DESCRIPTIONS[s]}`,
+          description: isFree ? PLANTS[s].description : `$${data.price} · ${PLANTS[s].description}`,
           species: s,
           locked: false
         };
@@ -201,7 +188,7 @@ function growPlant(key: string) {
         { label: 'Locked', kind: vscode.QuickPickItemKind.Separator, species: '', locked: false },
         ...locked.map(s => ({
           label: `$(lock) ${toLabel(s)}`,
-          description: `$${PLANTS[s].price} required · ${SPECIES_DESCRIPTIONS[s]}`,
+          description: `$${PLANTS[s].price} required · ${PLANTS[s].description}`,
           species: s,
           locked: true
         }))
@@ -465,7 +452,70 @@ export function activate(context: vscode.ExtensionContext) {
       logKeyPress("show_hover");
     }
   });
-  context.subscriptions.push(growCommandPalette, growJumpToBracket, growShowAllSymbols, growGoToSymbol, growViewProblems, growSelectAllOccurrences, growTriggerParameterHints, growSplitEditor, growOpenLastUsedEditorInGroup, growToggleTerminal, growCreateNewTerminal, growDeleteCurrentLine, growGoToLine, growQuickFix, growSaveFileAs, growMoveLineUp, growMoveLineDown, growSelectLine, growInsertCursorAtEndOfEachLineSelected, growAddCursorAbove, growAddCursorBelow, growTriggerSuggest, growShowHover);
+  const growOpenMarkdownSide = vscode.commands.registerCommand("keycrop.growOpenMarkdownSide", () => {
+    if (CURRENT_MODE === 0 /* GAME */) {
+      growPlant("open_markdown_side");
+    } else {
+      logKeyPress("open_markdown_side");
+    }
+  });
+  const growOpenMarkdownPreview = vscode.commands.registerCommand("keycrop.growOpenMarkdownPreview", () => {
+    if (CURRENT_MODE === 0 /* GAME */) {
+      growPlant("open_markdown_preview");
+    } else {
+      logKeyPress("open_markdown_preview");
+    }
+  });
+  const growReplace = vscode.commands.registerCommand("keycrop.growReplace", () => {
+    if (CURRENT_MODE === 0 /* GAME */) {
+      growPlant("replace");
+    } else {
+      logKeyPress("replace");
+    }
+  });
+  const growCopyLineBelow = vscode.commands.registerCommand("keycrop.growCopyLineBelow", () => {
+    if (CURRENT_MODE === 0 /* GAME */) {
+      growPlant("copy_line_below");
+    } else {
+      logKeyPress("copy_line_below");
+    }
+  });
+  const growCopyLineAbove = vscode.commands.registerCommand("keycrop.growCopyLineAbove", () => {
+    if (CURRENT_MODE === 0 /* GAME */) {
+      growPlant("copy_line_above");
+    } else {
+      logKeyPress("copy_line_above");
+    }
+  });
+  const growFind = vscode.commands.registerCommand("keycrop.growFind", () => {
+    if (CURRENT_MODE === 0 /* GAME */) {
+      growPlant("find");
+    } else {
+      logKeyPress("find");
+    }
+  });
+  const growExpandSelection = vscode.commands.registerCommand("keycrop.growExpandSelection", () => {
+    if (CURRENT_MODE === 0 /* GAME */) {
+      growPlant("expand_selection");
+    } else {
+      logKeyPress("expand_selection");
+    }
+  });
+  const growReduceSelection = vscode.commands.registerCommand("keycrop.growReduceSelection", () => {
+    if (CURRENT_MODE === 0 /* GAME */) {
+      growPlant("reduce_selection");
+    } else {
+      logKeyPress("reduce_selection");
+    }
+  });
+  const growToggleBlockComment = vscode.commands.registerCommand("keycrop.growToggleBlockComment", () => {
+    if (CURRENT_MODE === 0 /* GAME */) {
+      growPlant("toggle_block_comment");
+    } else {
+      logKeyPress("toggle_block_comment");
+    }
+  });
+  context.subscriptions.push(growCommandPalette, growJumpToBracket, growShowAllSymbols, growGoToSymbol, growViewProblems, growSelectAllOccurrences, growTriggerParameterHints, growSplitEditor, growOpenLastUsedEditorInGroup, growToggleTerminal, growCreateNewTerminal, growDeleteCurrentLine, growGoToLine, growQuickFix, growSaveFileAs, growMoveLineUp, growMoveLineDown, growSelectLine, growInsertCursorAtEndOfEachLineSelected, growAddCursorAbove, growAddCursorBelow, growTriggerSuggest, growShowHover, growOpenMarkdownSide, growOpenMarkdownPreview, growReplace, growCopyLineBelow, growCopyLineAbove, growFind, growExpandSelection, growReduceSelection, growToggleBlockComment);
 
 }
 

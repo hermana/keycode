@@ -2,30 +2,39 @@
 (() => {
   // src/keyMap.ts
   var KEY_MAP = [
-    { key: "ctrl+shift+p", category: "Using VSCode", capital_key: "CTRL+SHIFT+P", command: "command_palette", description: "Show command palette" },
-    { key: "ctrl+shift+k", category: "Editing", capital_key: "CTRL+SHIFT+K", command: "delete_current_line", description: "Delete current line" },
-    { key: "ctrl+shift+\\", category: "Navigating Code", capital_key: "CTRL+SHIFT+\\", command: "jump_to_bracket", description: "Jump to bracket" },
-    { key: "ctrl+t", category: "Navigating Code", capital_key: "CTRL+T", command: "show_all_symbols", description: "Show all symbols" },
-    { key: "ctrl+shift+o", category: "Navigating Code", capital_key: "CTRL+SHIFT+O", command: "go_to_symbol", description: "Go to symbol" },
-    { key: "ctrl+shift+m", category: "Debugging", capital_key: "CTRL+SHIFT+M", command: "view_problems", description: "View problems" },
-    { key: "ctrl+shift+l", category: "Multicursor", capital_key: "CTRL+SHIFT+L", command: "cursor_at_all_occurrences", description: "Add a cursor at all occurrences" },
-    { key: "ctrl+shift+space", category: "IntelliSense", capital_key: "CTRL+SHIFT+SPACE", command: "trigger_parameter_hints", description: "Trigger parameter hints" },
-    { key: "ctrl+\\", category: "Using VSCode", capital_key: "CTRL+\\", command: "split_editor", description: "Split editor" },
-    { key: "ctrl+shift+tab", category: "Using VSCode", capital_key: "CTRL+SHIFT+TAB", command: "open_last_used_editor_in_group", description: "Open last used editor in group" },
-    { key: "ctrl+`", category: "Terminal", capital_key: "CTRL+`", command: "toggle_terminal", description: "Toggle terminal" },
-    { key: "ctrl+shift+`", category: "Terminal", capital_key: "CTRL+SHIFT+`", command: "create_new_terminal", description: "Create new terminal" },
-    { key: "ctrl+g", category: "Navigating Code", capital_key: "CTRL+G", command: "go_to_line", description: "Go to line" },
+    { key: "ctrl+shift+p", category: "Using VSCode", capital_key: "CTRL+SHIFT+P", command: "command_palette", description: "Show command palette", active: false },
+    { key: "ctrl+shift+k", category: "Editing", capital_key: "CTRL+SHIFT+K", command: "delete_current_line", description: "Delete current line", active: false },
+    { key: "ctrl+shift+\\", category: "Navigating Code", capital_key: "CTRL+SHIFT+\\", command: "jump_to_bracket", description: "Jump to bracket", active: false },
+    { key: "ctrl+t", category: "Navigating Code", capital_key: "CTRL+T", command: "show_all_symbols", description: "Show all symbols", active: false },
+    { key: "ctrl+shift+o", category: "Navigating Code", capital_key: "CTRL+SHIFT+O", command: "go_to_symbol", description: "Go to symbol", active: false },
+    { key: "ctrl+shift+m", category: "Debugging", capital_key: "CTRL+SHIFT+M", command: "view_problems", description: "View problems", active: false },
+    { key: "ctrl+shift+l", category: "Multicursor", capital_key: "CTRL+SHIFT+L", command: "cursor_at_all_occurrences", description: "Add a cursor at all occurrences", active: false },
+    { key: "ctrl+shift+space", category: "IntelliSense", capital_key: "CTRL+SHIFT+SPACE", command: "trigger_parameter_hints", description: "Trigger parameter hints", active: false },
+    { key: "ctrl+\\", category: "Using VSCode", capital_key: "CTRL+\\", command: "split_editor", description: "Split editor", active: false },
+    { key: "ctrl+shift+tab", category: "Using VSCode", capital_key: "CTRL+SHIFT+TAB", command: "open_last_used_editor_in_group", description: "Open last used editor in group", active: false },
+    { key: "ctrl+`", category: "Terminal", capital_key: "CTRL+`", command: "toggle_terminal", description: "Toggle terminal", active: false },
+    { key: "ctrl+shift+`", category: "Terminal", capital_key: "CTRL+SHIFT+`", command: "create_new_terminal", description: "Create new terminal", active: false },
+    { key: "ctrl+g", category: "Navigating Code", capital_key: "CTRL+G", command: "go_to_line", description: "Go to line", active: false },
     // this is where I started adding new stuff
-    { key: "ctrl+.", category: "Navigating Code", capital_key: "CTRL+.", command: "quick_fix", description: "Quick Fix" },
-    { key: "ctrl+shift+s", category: "Using VSCode", capital_key: "CTRL+SHIFT+S", command: "save_file_as", description: "Save File As" },
-    { key: "alt+up", category: "Editing", capital_key: "ALT+UP", command: "move_line_up", description: "Move line up" },
-    { key: "alt+down", category: "Editing", capital_key: "ALT+DOWN", command: "move_line_down", description: "Move line down" },
-    { key: "ctrl+l", category: "Editing", capital_key: "CTRL+L", command: "select_line", description: "Select line" },
-    { key: "shift+alt+i", category: "Multicursor", capital_key: "SHIFT+ALT+I", command: "insert_cursor_at_end_of_each_line_selected", description: "Insert cursor at end of each line selected" },
-    { key: "ctrl+shift+up", category: "Multicursor", capital_key: "CTRL+SHIFT+UP", command: "add_cursor_above", description: "Add cursor above" },
-    { key: "ctrl+shift+down", category: "Multicursor", capital_key: "CTRL+SHIFT+DOWN", command: "add_cursor_below", description: "Add cursor below" },
-    { key: "ctrl+space", category: "IntelliSense", capital_key: "CTRL+SPACE", command: "trigger_suggest", description: "Trigger suggestions" },
-    { key: "ctrl+k ctrl+i", category: "IntelliSense", capital_key: "CTRL+K CTRL+I", command: "show_hover", description: "Show hover with function details" }
+    { key: "ctrl+.", category: "Navigating Code", capital_key: "CTRL+.", command: "quick_fix", description: "Quick Fix", active: false },
+    { key: "ctrl+shift+s", category: "Using VSCode", capital_key: "CTRL+SHIFT+S", command: "save_file_as", description: "Save File As", active: false },
+    { key: "alt+up", category: "Editing", capital_key: "ALT+UP", command: "move_line_up", description: "Move line up", active: false },
+    { key: "alt+down", category: "Editing", capital_key: "ALT+DOWN", command: "move_line_down", description: "Move line down", active: false },
+    { key: "ctrl+l", category: "Editing", capital_key: "CTRL+L", command: "select_line", description: "Select line", active: false },
+    { key: "shift+alt+i", category: "Multicursor", capital_key: "SHIFT+ALT+I", command: "insert_cursor_at_end_of_each_line_selected", description: "Insert cursor at end of each line selected", active: false },
+    { key: "ctrl+shift+up", category: "Multicursor", capital_key: "CTRL+SHIFT+UP", command: "add_cursor_above", description: "Add cursor above", active: true },
+    { key: "ctrl+shift+down", category: "Multicursor", capital_key: "CTRL+SHIFT+DOWN", command: "add_cursor_below", description: "Add cursor below", active: true },
+    { key: "ctrl+space", category: "IntelliSense", capital_key: "CTRL+SPACE", command: "trigger_suggest", description: "Trigger suggestions", active: false },
+    { key: "ctrl+k ctrl+i", category: "IntelliSense", capital_key: "CTRL+K CTRL+I", command: "show_hover", description: "Show hover with function details", active: false },
+    { key: "ctrl+k v", category: "Markdown", capital_key: "CTRL+K V", command: "open_markdown_side", description: "Open markdown to the side", active: true },
+    { key: "ctrl+shift+v", category: "Markdown", capital_key: "CTRL+SHIFT+V", command: "open_markdown_preview", description: "Open markdown preview", active: true },
+    { key: "ctrl+h", category: "Search", capital_key: "CTRL+H", command: "replace", description: "Replace", active: true },
+    { key: "shift+alt+down", category: "Editing", capital_key: "SHIFT+ALT+DOWN", command: "copy_line_below", description: "Copy line below", active: true },
+    { key: "shift+alt+up", category: "Editing", capital_key: "SHIFT+ALT+UP", command: "copy_line_above", description: "Copy line above", active: true },
+    { key: "ctrl+f", category: "Search", capital_key: "CTRL+F", command: "find", description: "Find", active: true },
+    { key: "shift+alt+right", category: "Editing", capital_key: "SHIFT+ALT+RIGHT", command: "expand_selection", description: "Expand selection", active: true },
+    { key: "shift+alt+left", category: "Editing", capital_key: "SHIFT+ALT+LEFT", command: "reduce_selection", description: "Reduce selection", active: true },
+    { key: "ctrl+shift+a", category: "Editing", capital_key: "CTRL+SHIFT+A", command: "toggle_block_comment", description: "Toggle block comment", active: true }
   ];
 
   // src/media/plant.ts
@@ -199,22 +208,23 @@ Uses: ${this._num_hotkey_uses}`;
 
   // src/media/plants.ts
   var PLANTS = {
-    bean: { price: 2, category: "vegetable" },
-    tomato: { price: 2, category: "vegetable" },
-    broccoli: { price: 2, category: "vegetable" },
-    chili: { price: 2, category: "vegetable" },
-    lettuce: { price: 2, category: "vegetable" },
-    rhubarb: { price: 2, category: "vegetable" },
-    ivy: { price: 25, category: "decorative" },
-    jacaranda_tree: { price: 25, category: "decorative" },
-    raspberry: { price: 4, category: "fruit" },
-    strawberry: { price: 4, category: "fruit" },
-    watermelon: { price: 4, category: "fruit" },
-    glowberry: { price: 50, category: "exotic" },
-    bulbino: { price: 50, category: "exotic" },
-    poison_cabbage: { price: 50, category: "exotic" },
-    neon_mould: { price: 50, category: "exotic" }
+    bean: { price: 2, category: "vegetable", description: "A humble unassuming legume." },
+    tomato: { price: 2, category: "vegetable", description: "This crop has a wide variety of culinary uses." },
+    broccoli: { price: 2, category: "vegetable", description: "Nutritious" },
+    chili: { price: 2, category: "vegetable", description: "Spicy and flavorful." },
+    lettuce: { price: 2, category: "vegetable", description: "Great in salads" },
+    rhubarb: { price: 2, category: "vegetable", description: "The stalks are edible." },
+    ivy: { price: 25, category: "decorative", description: "A decorative ground cover." },
+    jacaranda_tree: { price: 25, category: "decorative", description: "A tree with purple leaves." },
+    raspberry: { price: 4, category: "fruit", description: "A sweet and tart fruit." },
+    strawberry: { price: 4, category: "fruit", description: "A sweet and juicy fruit." },
+    watermelon: { price: 4, category: "fruit", description: "Great with hotkeys in the summer." },
+    glowberry: { price: 50, category: "exotic", description: "Glowberries emit a soft bioluminescent hue." },
+    bulbino: { price: 50, category: "exotic", description: "A mysterious plant." },
+    poison_cabbage: { price: 50, category: "exotic", description: "Closely related to regular cabbage." },
+    neon_mould: { price: 50, category: "exotic", description: "Radioactive mould." }
   };
+  var ALL_SPECIES = Object.keys(PLANTS);
 
   // src/media/harvestedPlant.ts
   var HarvestedPlant = class extends InventoryItem {

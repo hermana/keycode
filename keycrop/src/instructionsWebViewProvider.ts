@@ -41,13 +41,15 @@ export class InstructionsWebViewProvider implements vscode.WebviewViewProvider {
 
     const style = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'dist/media', 'style.css'));
 
-    const categories = [...new Set(KEY_MAP.map(k => k.category))];
+    const activeKeys = KEY_MAP.filter(k => k.active);
+
+    const categories = [...new Set(activeKeys.map(k => k.category))];
 
     const categoryButtons = categories.map(cat =>
       `<button class="category-btn" data-category="${cat}">${cat}</button>`
     ).join('\n        ');
 
-    const tableRows = KEY_MAP.map(k =>
+    const tableRows = activeKeys.map(k =>
       `<tr data-category="${k.category}" data-command="${k.command}"><td>${k.capital_key}</td><td>${k.description}</td><td class="use-count">0</td></tr>`
     ).join('\n                ');
 
