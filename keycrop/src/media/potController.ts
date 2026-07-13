@@ -128,7 +128,8 @@ export class PotController {
 
   private onPotWrapperClick(): void {
     const isCooking = this.progressWrapper && !this.progressWrapper.hidden;
-    const hasEnough = this.greenhouse.harvestedPlants.length >= this.greenhouse.NUM_ITEMS_PER_RECIPE;
+    const totalHarvested = this.greenhouse.harvestedPlants.reduce((sum, p) => sum + p.count, 0);
+    const hasEnough = totalHarvested >= this.greenhouse.NUM_ITEMS_PER_RECIPE;
     if (isCooking || this.potContents.length > 0 || !hasEnough) { return; }
     this.potActive = !this.potActive;
     this.overlay.hidden = !this.potActive;
