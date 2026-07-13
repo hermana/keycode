@@ -549,14 +549,6 @@
                     "command": "markdown.showPreview",
                     "when": "editorFocus && !notebookEditorFocused && !terminalFocus && resourceLangId =~ /^(markdown|prompt|instructions|chatagent|skill)$/"
                 },
-                {
-                    "command": "java.action.clipboardPasteAction",
-                    "when": "javaLSReady && editorLangId == 'java'"
-                },
-                {
-                     "command": "java.action.filesExplorerPasteAction",
-                     "when": "config.editor.pasteAs.enabled && explorerViewletFocus"
-                },
                 "keycrop.growOpenMarkdownPreview"
             ]
         }
