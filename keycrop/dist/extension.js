@@ -77,7 +77,9 @@ var KEY_MAP = [
   { key: "ctrl+f", category: "Search", capital_key: "CTRL+F", command: "find", description: "Find", active: true },
   { key: "shift+alt+right", category: "Editing", capital_key: "SHIFT+ALT+RIGHT", command: "expand_selection", description: "Expand selection", active: true },
   { key: "shift+alt+left", category: "Editing", capital_key: "SHIFT+ALT+LEFT", command: "reduce_selection", description: "Reduce selection", active: true },
-  { key: "ctrl+shift+a", category: "Editing", capital_key: "CTRL+SHIFT+A", command: "toggle_block_comment", description: "Toggle block comment", active: true }
+  { key: "ctrl+shift+a", category: "Editing", capital_key: "CTRL+SHIFT+A", command: "toggle_block_comment", description: "Toggle block comment", active: true },
+  { key: "ctrl+c", category: "Editing", capital_key: "CTRL+C", command: "copy", description: "Copy", active: false },
+  { key: "ctrl+v", category: "Editing", capital_key: "CTRL+V", command: "paste", description: "Paste", active: false }
 ];
 
 // src/instructionsWebViewProvider.ts
@@ -217,8 +219,6 @@ var inventory;
 var config = vscode2.workspace.getConfiguration("keycrop");
 var extensionStorageFolder = "";
 var plantsPath;
-var keyTrackingPath;
-var keyTrackingString = [];
 var hotkeysPath;
 var hotkeyLog = [];
 var pluginDataPath;
@@ -320,9 +320,13 @@ function addPlant(plant) {
   });
 }
 function growPlant(key) {
+  if (CURRENT_MODE !== 0 /* GAME */) {
+    logHotkeyUse(key, "None");
+    return;
+  }
   const keyEntry = KEY_MAP.find((k) => k.command === key);
   if (keyEntry && !keyEntry.active) {
-    logHotkeyUse(key, "none");
+    logHotkeyUse(key, "None");
     return;
   }
   const existingPlant = plants.find((p) => p.key === key);
@@ -334,6 +338,7 @@ function growPlant(key) {
     });
     requestWebviewSave();
   } else {
+    logHotkeyUse(key, "None");
     plants = plants.filter((p) => p.key !== key);
     const availableSpecies = ALL_SPECIES;
     const toLabel = (s) => s.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
@@ -408,17 +413,9 @@ function logHotkeyUse(key, species) {
   });
   fs.writeFileSync(hotkeysPath, JSON.stringify(hotkeyLog, null, 2));
 }
-function logKeyPress(plant) {
-  keyTrackingString.push({
-    key: plant,
-    time: Date.now()
-  });
-  fs.writeFileSync(keyTrackingPath, JSON.stringify(keyTrackingString));
-}
 function activate(context) {
   extensionStorageFolder = context.globalStorageUri.path.substring(1);
   plantsPath = path.join(extensionStorageFolder, "plants.json");
-  keyTrackingPath = path.join(extensionStorageFolder, "keytracking.json");
   hotkeysPath = path.join(extensionStorageFolder, "hotkeys.json");
   if (fs.existsSync(hotkeysPath)) {
     try {
@@ -455,230 +452,108 @@ function activate(context) {
     }
   });
   const growCommandPalette = vscode2.commands.registerCommand("keycrop.growCommandPalette", () => {
-    if (CURRENT_MODE === 0) {
-      growPlant("command_palette");
-    } else {
-      logKeyPress("command_palette");
-    }
+    growPlant("command_palette");
   });
   const growDeleteCurrentLine = vscode2.commands.registerCommand("keycrop.growDeleteCurrentLine", () => {
-    if (CURRENT_MODE === 0) {
-      growPlant("delete_current_line");
-    } else {
-      logKeyPress("delete_current_line");
-    }
+    growPlant("delete_current_line");
   });
   const growJumpToBracket = vscode2.commands.registerCommand("keycrop.growJumpToBracket", () => {
-    if (CURRENT_MODE === 0) {
-      growPlant("jump_to_bracket");
-    } else {
-      logKeyPress("jump_to_bracket");
-    }
+    growPlant("jump_to_bracket");
   });
   const growShowAllSymbols = vscode2.commands.registerCommand("keycrop.growShowAllSymbols", () => {
-    if (CURRENT_MODE === 0) {
-      growPlant("show_all_symbols");
-    } else {
-      logKeyPress("show_all_symbols");
-    }
+    growPlant("show_all_symbols");
   });
   const growGoToSymbol = vscode2.commands.registerCommand("keycrop.growGoToSymbol", () => {
-    if (CURRENT_MODE === 0) {
-      growPlant("go_to_symbol");
-    } else {
-      logKeyPress("go_to_symbol");
-    }
+    growPlant("go_to_symbol");
   });
   const growViewProblems = vscode2.commands.registerCommand("keycrop.growViewProblems", () => {
-    if (CURRENT_MODE === 0) {
-      growPlant("view_problems");
-    } else {
-      logKeyPress("view_problems");
-    }
+    growPlant("view_problems");
   });
   const growSelectAllOccurrences = vscode2.commands.registerCommand("keycrop.growCursorAtAllOccurrences", () => {
-    if (CURRENT_MODE === 0) {
-      growPlant("cursor_at_all_occurrences");
-    } else {
-      logKeyPress("cursor_at_all_occurrences");
-    }
+    growPlant("cursor_at_all_occurrences");
   });
   const growTriggerParameterHints = vscode2.commands.registerCommand("keycrop.growTriggerParameterHints", () => {
-    if (CURRENT_MODE === 0) {
-      growPlant("trigger_parameter_hints");
-    } else {
-      logKeyPress("trigger_parameter_hints");
-    }
+    growPlant("trigger_parameter_hints");
   });
   const growSplitEditor = vscode2.commands.registerCommand("keycrop.growSplitEditor", () => {
-    if (CURRENT_MODE === 0) {
-      growPlant("split_editor");
-    } else {
-      logKeyPress("split_editor");
-    }
+    growPlant("split_editor");
   });
   const growOpenLastUsedEditorInGroup = vscode2.commands.registerCommand("keycrop.growOpenLastUsedEditorInGroup", () => {
-    if (CURRENT_MODE === 0) {
-      growPlant("open_last_used_editor_in_group");
-    } else {
-      logKeyPress("open_last_used_editor_in_group");
-    }
+    growPlant("open_last_used_editor_in_group");
   });
   const growToggleTerminal = vscode2.commands.registerCommand("keycrop.growToggleTerminal", () => {
-    if (CURRENT_MODE === 0) {
-      growPlant("toggle_terminal");
-    } else {
-      logKeyPress("toggle_terminal");
-    }
+    growPlant("toggle_terminal");
   });
   const growCreateNewTerminal = vscode2.commands.registerCommand("keycrop.growCreateNewTerminal", () => {
-    if (CURRENT_MODE === 0) {
-      growPlant("create_new_terminal");
-    } else {
-      logKeyPress("create_new_terminal");
-    }
+    growPlant("create_new_terminal");
   });
   const growGoToLine = vscode2.commands.registerCommand("keycrop.growGoToLine", () => {
-    if (CURRENT_MODE === 0) {
-      growPlant("go_to_line");
-    } else {
-      logKeyPress("go_to_line");
-    }
+    growPlant("go_to_line");
   });
   const growQuickFix = vscode2.commands.registerCommand("keycrop.growQuickFix", () => {
-    if (CURRENT_MODE === 0) {
-      growPlant("quick_fix");
-    } else {
-      logKeyPress("quick_fix");
-    }
+    growPlant("quick_fix");
   });
   const growSaveFileAs = vscode2.commands.registerCommand("keycrop.growSaveFileAs", () => {
-    if (CURRENT_MODE === 0) {
-      growPlant("save_file_as");
-    } else {
-      logKeyPress("save_file_as");
-    }
+    growPlant("save_file_as");
   });
   const growMoveLineUp = vscode2.commands.registerCommand("keycrop.growMoveLineUp", () => {
-    if (CURRENT_MODE === 0) {
-      growPlant("move_line_up");
-    } else {
-      logKeyPress("move_line_up");
-    }
+    growPlant("move_line_up");
   });
   const growMoveLineDown = vscode2.commands.registerCommand("keycrop.growMoveLineDown", () => {
-    if (CURRENT_MODE === 0) {
-      growPlant("move_line_down");
-    } else {
-      logKeyPress("move_line_down");
-    }
+    growPlant("move_line_down");
   });
   const growSelectLine = vscode2.commands.registerCommand("keycrop.growSelectLine", () => {
-    if (CURRENT_MODE === 0) {
-      growPlant("select_line");
-    } else {
-      logKeyPress("select_line");
-    }
+    growPlant("select_line");
   });
   const growInsertCursorAtEndOfEachLineSelected = vscode2.commands.registerCommand("keycrop.growInsertCursorAtEndOfEachLineSelected", () => {
-    if (CURRENT_MODE === 0) {
-      growPlant("insert_cursor_at_end_of_each_line_selected");
-    } else {
-      logKeyPress("insert_cursor_at_end_of_each_line_selected");
-    }
+    growPlant("insert_cursor_at_end_of_each_line_selected");
   });
   const growAddCursorAbove = vscode2.commands.registerCommand("keycrop.growInsertCursorAbove", () => {
-    if (CURRENT_MODE === 0) {
-      growPlant("add_cursor_above");
-    } else {
-      logKeyPress("add_cursor_above");
-    }
+    growPlant("add_cursor_above");
   });
   const growAddCursorBelow = vscode2.commands.registerCommand("keycrop.growInsertCursorBelow", () => {
-    if (CURRENT_MODE === 0) {
-      growPlant("add_cursor_below");
-    } else {
-      logKeyPress("add_cursor_below");
-    }
+    growPlant("add_cursor_below");
   });
   const growTriggerSuggest = vscode2.commands.registerCommand("keycrop.growTriggerSuggest", () => {
-    if (CURRENT_MODE === 0) {
-      growPlant("trigger_suggest");
-    } else {
-      logKeyPress("trigger_suggest");
-    }
+    growPlant("trigger_suggest");
   });
   const growShowHover = vscode2.commands.registerCommand("keycrop.growShowHover", () => {
-    if (CURRENT_MODE === 0) {
-      growPlant("show_hover");
-    } else {
-      logKeyPress("show_hover");
-    }
+    growPlant("show_hover");
   });
   const growOpenMarkdownSide = vscode2.commands.registerCommand("keycrop.growOpenMarkdownSide", () => {
-    if (CURRENT_MODE === 0) {
-      growPlant("open_markdown_side");
-    } else {
-      logKeyPress("open_markdown_side");
-    }
+    growPlant("open_markdown_side");
   });
   const growOpenMarkdownPreview = vscode2.commands.registerCommand("keycrop.growOpenMarkdownPreview", () => {
-    if (CURRENT_MODE === 0) {
-      growPlant("open_markdown_preview");
-    } else {
-      logKeyPress("open_markdown_preview");
-    }
+    growPlant("open_markdown_preview");
   });
   const growReplace = vscode2.commands.registerCommand("keycrop.growReplace", () => {
-    if (CURRENT_MODE === 0) {
-      growPlant("replace");
-    } else {
-      logKeyPress("replace");
-    }
+    growPlant("replace");
   });
   const growCopyLineBelow = vscode2.commands.registerCommand("keycrop.growCopyLineBelow", () => {
-    if (CURRENT_MODE === 0) {
-      growPlant("copy_line_below");
-    } else {
-      logKeyPress("copy_line_below");
-    }
+    growPlant("copy_line_below");
   });
   const growCopyLineAbove = vscode2.commands.registerCommand("keycrop.growCopyLineAbove", () => {
-    if (CURRENT_MODE === 0) {
-      growPlant("copy_line_above");
-    } else {
-      logKeyPress("copy_line_above");
-    }
+    growPlant("copy_line_above");
   });
   const growFind = vscode2.commands.registerCommand("keycrop.growFind", () => {
-    if (CURRENT_MODE === 0) {
-      growPlant("find");
-    } else {
-      logKeyPress("find");
-    }
+    growPlant("find");
   });
   const growExpandSelection = vscode2.commands.registerCommand("keycrop.growExpandSelection", () => {
-    if (CURRENT_MODE === 0) {
-      growPlant("expand_selection");
-    } else {
-      logKeyPress("expand_selection");
-    }
+    growPlant("expand_selection");
   });
   const growReduceSelection = vscode2.commands.registerCommand("keycrop.growReduceSelection", () => {
-    if (CURRENT_MODE === 0) {
-      growPlant("reduce_selection");
-    } else {
-      logKeyPress("reduce_selection");
-    }
+    growPlant("reduce_selection");
   });
   const growToggleBlockComment = vscode2.commands.registerCommand("keycrop.growToggleBlockComment", () => {
-    if (CURRENT_MODE === 0) {
-      growPlant("toggle_block_comment");
-    } else {
-      logKeyPress("toggle_block_comment");
-    }
+    growPlant("toggle_block_comment");
   });
-  context.subscriptions.push(growCommandPalette, growJumpToBracket, growShowAllSymbols, growGoToSymbol, growViewProblems, growSelectAllOccurrences, growTriggerParameterHints, growSplitEditor, growOpenLastUsedEditorInGroup, growToggleTerminal, growCreateNewTerminal, growDeleteCurrentLine, growGoToLine, growQuickFix, growSaveFileAs, growMoveLineUp, growMoveLineDown, growSelectLine, growInsertCursorAtEndOfEachLineSelected, growAddCursorAbove, growAddCursorBelow, growTriggerSuggest, growShowHover, growOpenMarkdownSide, growOpenMarkdownPreview, growReplace, growCopyLineBelow, growCopyLineAbove, growFind, growExpandSelection, growReduceSelection, growToggleBlockComment);
+  const growCopy = vscode2.commands.registerCommand("keycrop.growCopy", () => {
+    growPlant("copy");
+  });
+  const growPaste = vscode2.commands.registerCommand("keycrop.growPaste", () => {
+    growPlant("paste");
+  });
+  context.subscriptions.push(growCommandPalette, growJumpToBracket, growShowAllSymbols, growGoToSymbol, growViewProblems, growSelectAllOccurrences, growTriggerParameterHints, growSplitEditor, growOpenLastUsedEditorInGroup, growToggleTerminal, growCreateNewTerminal, growDeleteCurrentLine, growGoToLine, growQuickFix, growSaveFileAs, growMoveLineUp, growMoveLineDown, growSelectLine, growInsertCursorAtEndOfEachLineSelected, growAddCursorAbove, growAddCursorBelow, growTriggerSuggest, growShowHover, growOpenMarkdownSide, growOpenMarkdownPreview, growReplace, growCopyLineBelow, growCopyLineAbove, growFind, growExpandSelection, growReduceSelection, growToggleBlockComment, growCopy, growPaste);
 }
 function deactivate() {
 }

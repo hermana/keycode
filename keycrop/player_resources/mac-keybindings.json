@@ -698,9 +698,35 @@
             "commands": [
                 {
                     "command": "editor.action.blockComment",
-                    "when": "editorTextFocus && !editorReadonly" 
+                    "when": "editorTextFocus && !editorReadonly"
                 },
                 "keycrop.growToggleBlockComment"
+            ]
+        }
+    },
+    {
+        "key": "cmd+c",
+        "command": "runCommands",
+        "args": {
+            "commands": [
+                {
+                    "command": "editor.action.clipboardCopyAction",
+                    "when": "textInputFocus"
+                },
+                "keycrop.growCopy"
+            ]
+        }
+    },
+    {
+        "key": "cmd+v",
+        "command": "runCommands",
+        "args": {
+            "commands": [
+                {
+                    "command": "editor.action.clipboardPasteAction",
+                    "when": "textInputFocus && !editorReadonly"
+                },
+                "keycrop.growPaste"
             ]
         }
     }

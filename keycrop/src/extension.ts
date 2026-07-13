@@ -14,8 +14,6 @@ let inventory: InventoryWebViewProvider;
 let config = vscode.workspace.getConfiguration('keycrop');
 let extensionStorageFolder: string = '';
 let plantsPath: string;
-let keyTrackingPath: string;
-let keyTrackingString: { key: string; time: number; }[] = [];
 let hotkeysPath: string;
 type HotkeyEntry = { hotkey: string; species: string; timestamp: string; file: string };
 let hotkeyLog: HotkeyEntry[] = [];
@@ -24,7 +22,6 @@ type PluginDataEntry = { view: string; event: 'opened' | 'closed'; timestamp: st
 let pluginDataLog: PluginDataEntry[] = [];
 let studyOutputPath: string = './output';
 let plantsStudyOutputPath: string;
-let keytrackingStudyOutputPath: string;
 
 type Plant = {
   key: string;
@@ -141,9 +138,14 @@ function addPlant(plant: Plant) {
 }
 
 function growPlant(key: string) {
+  if (CURRENT_MODE !== MODE.GAME) {
+    logHotkeyUse(key, 'None');
+    return;
+  }
+
   const keyEntry = KEY_MAP.find(k => k.command === key);
   if (keyEntry && !keyEntry.active) {
-    logHotkeyUse(key, 'none');
+    logHotkeyUse(key, 'None');
     return;
   }
 
@@ -156,6 +158,7 @@ function growPlant(key: string) {
     });
     requestWebviewSave();
   } else {
+    logHotkeyUse(key, 'None');
     // No plant for this key, or it has been harvested — free the key and let user pick
     plants = plants.filter(p => p.key !== key);
     const availableSpecies = ALL_SPECIES;
@@ -234,21 +237,11 @@ function logHotkeyUse(key: string, species: string): void {
   fs.writeFileSync(hotkeysPath, JSON.stringify(hotkeyLog, null, 2));
 }
 
-function logKeyPress(plant: string) {
-  keyTrackingString.push({
-    key: plant,
-    time: Date.now()
-  });
-  // fs.writeFileSync(keytrackingStudyOutputPath, JSON.stringify(keyTrackingString))
-  fs.writeFileSync(keyTrackingPath, JSON.stringify(keyTrackingString));
-}
-
 export function activate(context: vscode.ExtensionContext) {
 
   extensionStorageFolder = context.globalStorageUri.path.substring(1);
   plantsPath = path.join(extensionStorageFolder, 'plants.json');
   // plantsStudyOutputPath = path.join(studyOutputPath, 'plants.json');
-  keyTrackingPath = path.join(extensionStorageFolder, 'keytracking.json');
   hotkeysPath = path.join(extensionStorageFolder, 'hotkeys.json');
   if (fs.existsSync(hotkeysPath)) {
     try { hotkeyLog = JSON.parse(fs.readFileSync(hotkeysPath, 'utf8')); } catch { hotkeyLog = []; }
@@ -258,7 +251,6 @@ export function activate(context: vscode.ExtensionContext) {
     try { pluginDataLog = JSON.parse(fs.readFileSync(pluginDataPath, 'utf8')); } catch { pluginDataLog = []; }
   }
   logViewEvent('vscode', 'opened');
-  // keytrackingStudyOutputPath = path.join(studyOutputPath, 'keytracking.json');
 
   // if (!fs.existsSync(studyOutputPath)){
   //   fs.mkdirSync(studyOutputPath, { recursive: true });
@@ -292,230 +284,108 @@ export function activate(context: vscode.ExtensionContext) {
   });
 
   const growCommandPalette = vscode.commands.registerCommand("keycrop.growCommandPalette", () => {
-    if (CURRENT_MODE === 0 /* GAME */) {
-      growPlant("command_palette");
-    } else {
-      logKeyPress("command_palette");
-    }
+    growPlant("command_palette");
   });
   const growDeleteCurrentLine = vscode.commands.registerCommand("keycrop.growDeleteCurrentLine", () => {
-    if (CURRENT_MODE === 0 /* GAME */) {
-      growPlant("delete_current_line");
-    } else {
-      logKeyPress("delete_current_line");
-    }
+    growPlant("delete_current_line");
   });
   const growJumpToBracket = vscode.commands.registerCommand("keycrop.growJumpToBracket", () => {
-    if (CURRENT_MODE === 0 /* GAME */) {
-      growPlant("jump_to_bracket");
-    } else {
-      logKeyPress("jump_to_bracket");
-    }
+    growPlant("jump_to_bracket");
   });
   const growShowAllSymbols = vscode.commands.registerCommand("keycrop.growShowAllSymbols", () => {
-    if (CURRENT_MODE === 0 /* GAME */) {
-      growPlant("show_all_symbols");
-    } else {
-      logKeyPress("show_all_symbols");
-    }
+    growPlant("show_all_symbols");
   });
   const growGoToSymbol = vscode.commands.registerCommand("keycrop.growGoToSymbol", () => {
-    if (CURRENT_MODE === 0 /* GAME */) {
-      growPlant("go_to_symbol");
-    } else {
-      logKeyPress("go_to_symbol");
-    }
+    growPlant("go_to_symbol");
   });
   const growViewProblems = vscode.commands.registerCommand("keycrop.growViewProblems", () => {
-    if (CURRENT_MODE === 0 /* GAME */) {
-      growPlant("view_problems");
-    } else {
-      logKeyPress("view_problems");
-    }
+    growPlant("view_problems");
   });
   const growSelectAllOccurrences = vscode.commands.registerCommand("keycrop.growCursorAtAllOccurrences", () => {
-    if (CURRENT_MODE === 0 /* GAME */) {
-      growPlant("cursor_at_all_occurrences");
-    } else {
-      logKeyPress("cursor_at_all_occurrences");
-    }
+    growPlant("cursor_at_all_occurrences");
   });
   const growTriggerParameterHints = vscode.commands.registerCommand("keycrop.growTriggerParameterHints", () => {
-    if (CURRENT_MODE === 0 /* GAME */) {
-      growPlant("trigger_parameter_hints");
-    } else {
-      logKeyPress("trigger_parameter_hints");
-    }
+    growPlant("trigger_parameter_hints");
   });
   const growSplitEditor = vscode.commands.registerCommand("keycrop.growSplitEditor", () => {
-    if (CURRENT_MODE === 0 /* GAME */) {
-      growPlant("split_editor");
-    } else {
-      logKeyPress("split_editor");
-    }
+    growPlant("split_editor");
   });
   const growOpenLastUsedEditorInGroup = vscode.commands.registerCommand("keycrop.growOpenLastUsedEditorInGroup", () => {
-    if (CURRENT_MODE === 0 /* GAME */) {
-      growPlant("open_last_used_editor_in_group");
-    } else {
-      logKeyPress("open_last_used_editor_in_group");
-    }
+    growPlant("open_last_used_editor_in_group");
   });
   const growToggleTerminal = vscode.commands.registerCommand("keycrop.growToggleTerminal", () => {
-    if (CURRENT_MODE === 0 /* GAME */) {
-      growPlant("toggle_terminal");
-    } else {
-      logKeyPress("toggle_terminal");
-    }
+    growPlant("toggle_terminal");
   });
   const growCreateNewTerminal = vscode.commands.registerCommand("keycrop.growCreateNewTerminal", () => {
-    if (CURRENT_MODE === 0 /* GAME */) {
-      growPlant("create_new_terminal");
-    } else {
-      logKeyPress("create_new_terminal");
-    }
+    growPlant("create_new_terminal");
   });
   const growGoToLine = vscode.commands.registerCommand("keycrop.growGoToLine", () => {
-    if (CURRENT_MODE === 0 /* GAME */) {
-      growPlant("go_to_line");
-    } else {
-      logKeyPress("go_to_line");
-    }
+    growPlant("go_to_line");
   });
   const growQuickFix = vscode.commands.registerCommand("keycrop.growQuickFix", () => {
-    if (CURRENT_MODE === 0 /* GAME */) {
-      growPlant("quick_fix");
-    } else {
-      logKeyPress("quick_fix");
-    }
+    growPlant("quick_fix");
   });
   const growSaveFileAs = vscode.commands.registerCommand("keycrop.growSaveFileAs", () => {
-    if (CURRENT_MODE === 0 /* GAME */) {
-      growPlant("save_file_as");
-    } else {
-      logKeyPress("save_file_as");
-    }
+    growPlant("save_file_as");
   });
   const growMoveLineUp = vscode.commands.registerCommand("keycrop.growMoveLineUp", () => {
-    if (CURRENT_MODE === 0 /* GAME */) {
-      growPlant("move_line_up");
-    } else {
-      logKeyPress("move_line_up");
-    }
+    growPlant("move_line_up");
   });
   const growMoveLineDown = vscode.commands.registerCommand("keycrop.growMoveLineDown", () => {
-    if (CURRENT_MODE === 0 /* GAME */) {
-      growPlant("move_line_down");
-    } else {
-      logKeyPress("move_line_down");
-    }
+    growPlant("move_line_down");
   });
   const growSelectLine = vscode.commands.registerCommand("keycrop.growSelectLine", () => {
-    if (CURRENT_MODE === 0 /* GAME */) {
-      growPlant("select_line");
-    } else {
-      logKeyPress("select_line");
-    }
+    growPlant("select_line");
   });
   const growInsertCursorAtEndOfEachLineSelected = vscode.commands.registerCommand("keycrop.growInsertCursorAtEndOfEachLineSelected", () => {
-    if (CURRENT_MODE === 0 /* GAME */) {
-      growPlant("insert_cursor_at_end_of_each_line_selected");
-    } else {
-      logKeyPress("insert_cursor_at_end_of_each_line_selected");
-    }
+    growPlant("insert_cursor_at_end_of_each_line_selected");
   });
   const growAddCursorAbove = vscode.commands.registerCommand("keycrop.growInsertCursorAbove", () => {
-    if (CURRENT_MODE === 0 /* GAME */) {
-      growPlant("add_cursor_above");
-    } else {
-      logKeyPress("add_cursor_above");
-    }
+    growPlant("add_cursor_above");
   });
   const growAddCursorBelow = vscode.commands.registerCommand("keycrop.growInsertCursorBelow", () => {
-    if (CURRENT_MODE === 0 /* GAME */) {
-      growPlant("add_cursor_below");
-    } else {
-      logKeyPress("add_cursor_below");
-    }
+    growPlant("add_cursor_below");
   });
   const growTriggerSuggest = vscode.commands.registerCommand("keycrop.growTriggerSuggest", () => {
-    if (CURRENT_MODE === 0 /* GAME */) {
-      growPlant("trigger_suggest");
-    } else {
-      logKeyPress("trigger_suggest");
-    }
+    growPlant("trigger_suggest");
   });
   const growShowHover = vscode.commands.registerCommand("keycrop.growShowHover", () => {
-    if (CURRENT_MODE === 0 /* GAME */) {
-      growPlant("show_hover");
-    } else {
-      logKeyPress("show_hover");
-    }
+    growPlant("show_hover");
   });
   const growOpenMarkdownSide = vscode.commands.registerCommand("keycrop.growOpenMarkdownSide", () => {
-    if (CURRENT_MODE === 0 /* GAME */) {
-      growPlant("open_markdown_side");
-    } else {
-      logKeyPress("open_markdown_side");
-    }
+    growPlant("open_markdown_side");
   });
   const growOpenMarkdownPreview = vscode.commands.registerCommand("keycrop.growOpenMarkdownPreview", () => {
-    if (CURRENT_MODE === 0 /* GAME */) {
-      growPlant("open_markdown_preview");
-    } else {
-      logKeyPress("open_markdown_preview");
-    }
+    growPlant("open_markdown_preview");
   });
   const growReplace = vscode.commands.registerCommand("keycrop.growReplace", () => {
-    if (CURRENT_MODE === 0 /* GAME */) {
-      growPlant("replace");
-    } else {
-      logKeyPress("replace");
-    }
+    growPlant("replace");
   });
   const growCopyLineBelow = vscode.commands.registerCommand("keycrop.growCopyLineBelow", () => {
-    if (CURRENT_MODE === 0 /* GAME */) {
-      growPlant("copy_line_below");
-    } else {
-      logKeyPress("copy_line_below");
-    }
+    growPlant("copy_line_below");
   });
   const growCopyLineAbove = vscode.commands.registerCommand("keycrop.growCopyLineAbove", () => {
-    if (CURRENT_MODE === 0 /* GAME */) {
-      growPlant("copy_line_above");
-    } else {
-      logKeyPress("copy_line_above");
-    }
+    growPlant("copy_line_above");
   });
   const growFind = vscode.commands.registerCommand("keycrop.growFind", () => {
-    if (CURRENT_MODE === 0 /* GAME */) {
-      growPlant("find");
-    } else {
-      logKeyPress("find");
-    }
+    growPlant("find");
   });
   const growExpandSelection = vscode.commands.registerCommand("keycrop.growExpandSelection", () => {
-    if (CURRENT_MODE === 0 /* GAME */) {
-      growPlant("expand_selection");
-    } else {
-      logKeyPress("expand_selection");
-    }
+    growPlant("expand_selection");
   });
   const growReduceSelection = vscode.commands.registerCommand("keycrop.growReduceSelection", () => {
-    if (CURRENT_MODE === 0 /* GAME */) {
-      growPlant("reduce_selection");
-    } else {
-      logKeyPress("reduce_selection");
-    }
+    growPlant("reduce_selection");
   });
   const growToggleBlockComment = vscode.commands.registerCommand("keycrop.growToggleBlockComment", () => {
-    if (CURRENT_MODE === 0 /* GAME */) {
-      growPlant("toggle_block_comment");
-    } else {
-      logKeyPress("toggle_block_comment");
-    }
+    growPlant("toggle_block_comment");
   });
-  context.subscriptions.push(growCommandPalette, growJumpToBracket, growShowAllSymbols, growGoToSymbol, growViewProblems, growSelectAllOccurrences, growTriggerParameterHints, growSplitEditor, growOpenLastUsedEditorInGroup, growToggleTerminal, growCreateNewTerminal, growDeleteCurrentLine, growGoToLine, growQuickFix, growSaveFileAs, growMoveLineUp, growMoveLineDown, growSelectLine, growInsertCursorAtEndOfEachLineSelected, growAddCursorAbove, growAddCursorBelow, growTriggerSuggest, growShowHover, growOpenMarkdownSide, growOpenMarkdownPreview, growReplace, growCopyLineBelow, growCopyLineAbove, growFind, growExpandSelection, growReduceSelection, growToggleBlockComment);
+  const growCopy = vscode.commands.registerCommand("keycrop.growCopy", () => {
+    growPlant("copy");
+  });
+  const growPaste = vscode.commands.registerCommand("keycrop.growPaste", () => {
+    growPlant("paste");
+  });
+  context.subscriptions.push(growCommandPalette, growJumpToBracket, growShowAllSymbols, growGoToSymbol, growViewProblems, growSelectAllOccurrences, growTriggerParameterHints, growSplitEditor, growOpenLastUsedEditorInGroup, growToggleTerminal, growCreateNewTerminal, growDeleteCurrentLine, growGoToLine, growQuickFix, growSaveFileAs, growMoveLineUp, growMoveLineDown, growSelectLine, growInsertCursorAtEndOfEachLineSelected, growAddCursorAbove, growAddCursorBelow, growTriggerSuggest, growShowHover, growOpenMarkdownSide, growOpenMarkdownPreview, growReplace, growCopyLineBelow, growCopyLineAbove, growFind, growExpandSelection, growReduceSelection, growToggleBlockComment, growCopy, growPaste);
 
 }
 

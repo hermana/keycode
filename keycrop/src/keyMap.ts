@@ -31,4 +31,6 @@ export const KEY_MAP: { key: string; category: string; capital_key: string; comm
   { key: 'shift+alt+right', category: 'Editing', capital_key: "SHIFT+ALT+RIGHT", command: 'expand_selection', description: "Expand selection", active: true },
   { key: 'shift+alt+left', category: 'Editing', capital_key: "SHIFT+ALT+LEFT", command: 'reduce_selection', description: "Reduce selection", active: true },
   { key: 'ctrl+shift+a', category: 'Editing', capital_key: "CTRL+SHIFT+A", command: 'toggle_block_comment', description: "Toggle block comment", active: true },
+  { key: 'ctrl+c', category: 'Editing', capital_key: "CTRL+C", command: 'copy', description: "Copy", active: false },
+  { key: 'ctrl+v', category: 'Editing', capital_key: "CTRL+V", command: 'paste', description: "Paste", active: false },
 ];

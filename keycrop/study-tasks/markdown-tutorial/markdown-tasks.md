@@ -42,49 +42,28 @@ the level shown:
 
 ---
 
-## Task 3 — Build a reference table using multiple cursors
+## Task 3 — Comment out the diagrams without the author line
 
-Under the `### Text Formatting` heading you just created, add the following
-table:
+The tutorial contains three Mermaid diagram blocks (Class diagram, Sequence diagram, Flowchart) directly above the author credit line at the bottom of the file. In this task, you will comment out the diagrams. 
 
-```markdown
-| Syntax | Example | Output |
-|--------|---------|--------|
-| `**text**` | `**bold**` | **bold** |
-| `*text*` | `*italic*` | *italic* |
-| `~~text~~` | `~~strike~~` | ~~strike~~ |
-```
-
-1. Type (or paste) just the three data rows without any `|` characters:
-```
-**text**   **bold**   bold
-*text*     *italic*   italic
-~~text~~   ~~strike~~ strikethrough
-```
-2. Use **Add Cursor Above/Below** to place a cursor at the start of all three
-   lines simultaneously. Add Cursor Below is `Ctrl+Shift+Down` (Windows/Linux) or `Cmd+Shift+Down` (Mac).
-3. Type `| ` at the start of each line in one action.
-4. Repeat at the end of each value to close the columns, then add the header
-   row and separator row manually.
+1. Use **Find** to locate the text `classDiagram` in `study-task-day-<DAY>.md`. Find is `Ctrl+F` / `Cmd+F`.
+2. Select from the start of the "Class diagram" heading to the end of the Flowchart block using **Expand Selection** to grow your selection line by line. Expand Selection is `Shift+Alt+Right` (Windows/Linux) or `Shift+Ctrl+Right` (Mac).
+3. If your selection overshoots into the "Author" line below, use
+   **Reduce Selection** to shrink it back by one step at a time. Reduce Selection is `Shift+Alt+Left` (Windows/Linux) or `Shift+Ctrl+Left` (Mac).
+4. Once the selection covers only the three diagram blocks, use
+   **Toggle Block Comment** to wrap them in an HTML comment (`<!-- ... -->`), hiding them from the Markdown preview. Toggle Block Comment is `Ctrl+Shift+A` (Windows/Linux) or `Cmd+Shift+A` (Mac).
+5. Check the preview to confirm the diagrams have disappeared but the author line at the bottom of the file is still visible.
 
 ---
 
-## Task 4 — Comment out a section temporarily
+## Task 4 — Add a note to the badge links using multiple cursors
 
-The tutorial contains a section about editor tools (Stackedit, GitBook, etc.)
-near the top of file. You want to hide this section from the rendered
-output without deleting it.
+Near the bottom of the file, under "Useful notes," there are three badge links in a row (Java, HTML, CSS). In this task, you will add the same short comment after all three at once.
 
-<!-- maybe switch to go to line, not find? -->
-1. Use **Find** to locate the text `Stackedit` in `study-task-day-<DAY>.md`. Find is `Ctrl+F` / `Cmd+F`.
-2. Select from the start of that paragraph to the end of the editor tools list
-   using **Expand Selection** to grow your selection line by line. Expand Selection is
- `Shift+Alt+Right` (Windows/Linux) or `Shift+Ctrl+Right` (Mac).
-3. Use **Toggle Block Comment** to wrap the selected lines in an HTML comment
-   (`<!-- ... -->`), which hides them from the Markdown preview. Toggle Block Comment is `Ctrl+Shift+A` (Windows/Linux) or `Cmd+Shift+A` (Mac).
-4. Check the preview to confirm the section has disappeared from the rendered
-   output.
-5. Use **Toggle Block Comment** again on the same selection to restore it.
+1. Place your cursor at the end of the Java badge line.
+2. Use **Add Cursor Below** twice to place a cursor at the end of the HTML and CSS badge lines as well, so you have three cursors total, one per line. Add Cursor Below is `Ctrl+Shift+Down` (Windows/Linux) or `Cmd+Shift+Down` (Mac).
+3. Type `<!-- verified -->` once. It will be inserted at the end of all three lines simultaneously.
+4. Confirm all three lines now end with the same comment.
 
 ---
 
