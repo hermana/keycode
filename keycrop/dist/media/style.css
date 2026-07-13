@@ -789,6 +789,113 @@ background: url(./vegetables/watermelon_large.png);
   box-shadow: 0 4px 12px rgba(0,0,0,0.4);
 }
 
+#species-picker-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 10001;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 24px;
+  box-sizing: border-box;
+}
+
+#species-picker-overlay:not([hidden]) {
+  display: flex;
+}
+
+#species-picker {
+  background: var(--vscode-editor-background, #1e1e1e);
+  border: 1px solid var(--vscode-menu-border, rgba(255,255,255,0.2));
+  border-radius: 6px;
+  width: min(320px, 92%);
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  font-family: monospace;
+  color: var(--vscode-foreground, #ccc);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+}
+
+#species-picker-title {
+  padding: 10px 12px;
+  font-weight: bold;
+  font-size: 0.85rem;
+  border-bottom: 1px solid rgba(255,255,255,0.15);
+}
+
+#species-picker-list {
+  overflow-y: auto;
+  padding: 4px 0;
+}
+
+.species-picker-separator {
+  padding: 4px 12px;
+  font-size: 0.7rem;
+  opacity: 0.6;
+  text-transform: uppercase;
+}
+
+.species-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+.species-card:hover {
+  background: var(--vscode-menu-selectionBackground, rgba(255,255,255,0.1));
+}
+
+.species-card.locked {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.species-card.locked:hover {
+  background: none;
+}
+
+.species-card-thumb {
+  width: 36px;
+  height: 36px;
+  flex: none;
+}
+
+.species-card-thumb.locked-thumb {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px dashed rgba(255, 255, 255, 0.25);
+  border-radius: 4px;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+.species-card-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.species-card-label {
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+.species-card-desc {
+  font-size: 0.7rem;
+  opacity: 0.8;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .context-menu-option {
   padding: 6px 14px;
   font-family: monospace;

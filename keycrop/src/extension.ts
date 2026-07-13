@@ -161,64 +161,59 @@ function growPlant(key: string) {
     logHotkeyUse(key, 'None');
     // No plant for this key, or it has been harvested — free the key and let user pick
     plants = plants.filter(p => p.key !== key);
-    const availableSpecies = ALL_SPECIES;
-
-    type PlantPickItem = vscode.QuickPickItem & { species: string; locked: boolean };
-    const toLabel = (s: string) => s.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-    const plantingCost = (s: string) => { const d = PLANTS[s]; return (!d || d.category === 'vegetable') ? 0 : d.price; };
-
-    const unlocked = availableSpecies.filter(s => {
-      const data = PLANTS[s];
-      return !data || data.category === 'vegetable' || playerMoney >= data.price;
-    }).sort((a, b) => plantingCost(a) - plantingCost(b));
-    const locked = availableSpecies.filter(s => {
-      const data = PLANTS[s];
-      return data && data.category !== 'vegetable' && playerMoney < data.price;
-    }).sort((a, b) => PLANTS[a].price - PLANTS[b].price);
-
-    const speciesItems: PlantPickItem[] = [
-      ...unlocked.map(s => {
-        const data = PLANTS[s];
-        const isFree = !data || data.category === 'vegetable';
-        return {
-          label: toLabel(s),
-          description: isFree ? PLANTS[s].description : `$${data.price} · ${PLANTS[s].description}`,
-          species: s,
-          locked: false
-        };
-      }),
-      ...(locked.length > 0 ? [
-        { label: 'Locked', kind: vscode.QuickPickItemKind.Separator, species: '', locked: false },
-        ...locked.map(s => ({
-          label: `$(lock) ${toLabel(s)}`,
-          description: `$${PLANTS[s].price} required · ${PLANTS[s].description}`,
-          species: s,
-          locked: true
-        }))
-      ] : [])
-    ];
-
-    vscode.window.showQuickPick(speciesItems, {
-      placeHolder: 'Choose a species for your new plant'
-    }).then(item => {
-      if (!item) { return; }
-      if (item.locked) {
-        vscode.window.showInformationMessage(`You need $${PLANTS[item.species].price} to unlock ${toLabel(item.species)}.`);
-        return;
-      }
-      const { species } = item;
-      const plantData = PLANTS[species];
-      if (plantData && plantData.category !== 'vegetable') {
-        playerMoney -= plantData.price;
-        inventory.postMessage({ action: 'load_money', amount: playerMoney });
-      }
-      vscode.window.showInformationMessage(`A new ${species.replace(/_/g, ' ')} plant has sprouted in the greenhouse!`);
-      plants.push({ key: key, species: species, size: 'start', harvested: false, hotkey_uses: 1 });
-      addPlant({ key: key, species: species, size: 'start', harvested: false, hotkey_uses: 1 });
-      writePlantsToDisk();
-      requestWebviewSave();
+    greenhouse.postMessage({
+      action: 'choose_species',
+      key,
+      options: buildSpeciesOptions()
     });
   }
+}
+
+function toLabel(s: string): string {
+  return s.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+}
+
+function plantingCost(s: string): number {
+  const d = PLANTS[s];
+  return (!d || d.category === 'vegetable') ? 0 : d.price;
+}
+
+type SpeciesOption = {
+  species: string;
+  label: string;
+  description: string;
+  price: number;
+  isFree: boolean;
+  locked: boolean;
+};
+
+function buildSpeciesOptions(): SpeciesOption[] {
+  const toOption = (s: string, locked: boolean): SpeciesOption => {
+    const data = PLANTS[s];
+    const isFree = !data || data.category === 'vegetable';
+    return {
+      species: s,
+      label: toLabel(s),
+      description: data?.description ?? '',
+      price: data?.price ?? 0,
+      isFree,
+      locked
+    };
+  };
+
+  const unlocked = ALL_SPECIES.filter(s => {
+    const data = PLANTS[s];
+    return !data || data.category === 'vegetable' || playerMoney >= data.price;
+  }).sort((a, b) => plantingCost(a) - plantingCost(b));
+  const locked = ALL_SPECIES.filter(s => {
+    const data = PLANTS[s];
+    return data && data.category !== 'vegetable' && playerMoney < data.price;
+  }).sort((a, b) => PLANTS[a].price - PLANTS[b].price);
+
+  return [
+    ...unlocked.map(s => toOption(s, false)),
+    ...locked.map(s => toOption(s, true))
+  ];
 }
 
 function logViewEvent(view: string, event: 'opened' | 'closed'): void {
@@ -486,6 +481,29 @@ export class GreenhouseWebViewProvider implements vscode.WebviewViewProvider {
                 vscode.window.showInformationMessage("Achievement unlocked: you've grown one of every plant!");
                 inventory.postMessage({ action: 'achievement' });
               }
+            }
+            break;
+          }
+          case 'select_species': {
+            const species = message.species as string;
+            const key = message.key as string;
+            const plantData = PLANTS[species];
+            if (plantData && plantData.category !== 'vegetable') {
+              playerMoney -= plantData.price;
+              inventory.postMessage({ action: 'load_money', amount: playerMoney });
+            }
+            vscode.window.showInformationMessage(`A new ${species.replace(/_/g, ' ')} plant has sprouted in the greenhouse!`);
+            plants.push({ key, species, size: 'start', harvested: false, hotkey_uses: 1 });
+            addPlant({ key, species, size: 'start', harvested: false, hotkey_uses: 1 });
+            writePlantsToDisk();
+            requestWebviewSave();
+            break;
+          }
+          case 'locked_species_click': {
+            const species = message.species as string;
+            const data = PLANTS[species];
+            if (data) {
+              vscode.window.showInformationMessage(`You need $${data.price} to unlock ${toLabel(species)}.`);
             }
             break;
           }

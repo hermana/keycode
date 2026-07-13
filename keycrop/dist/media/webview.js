@@ -751,6 +751,88 @@ Uses: ${this._num_hotkey_uses}`;
     }
   };
 
+  // src/media/speciesPicker.ts
+  var SpeciesPicker = class {
+    constructor(onSelect, onLockedClick) {
+      this.onSelect = onSelect;
+      this.onLockedClick = onLockedClick;
+      this.overlay = document.createElement("div");
+      this.overlay.id = "species-picker-overlay";
+      this.overlay.hidden = true;
+      const panel = document.createElement("div");
+      panel.id = "species-picker";
+      const title = document.createElement("div");
+      title.id = "species-picker-title";
+      title.textContent = "Choose a species for your new plant";
+      panel.appendChild(title);
+      this.list = document.createElement("div");
+      this.list.id = "species-picker-list";
+      panel.appendChild(this.list);
+      this.overlay.appendChild(panel);
+      document.body.appendChild(this.overlay);
+      this.overlay.addEventListener("click", (e) => {
+        if (e.target === this.overlay) {
+          this.hide();
+        }
+      });
+    }
+    overlay;
+    list;
+    key = "";
+    show(key, options) {
+      this.key = key;
+      this.list.innerHTML = "";
+      let sawLocked = false;
+      for (const opt of options) {
+        if (opt.locked && !sawLocked) {
+          const sep = document.createElement("div");
+          sep.className = "species-picker-separator";
+          sep.textContent = "Locked";
+          this.list.appendChild(sep);
+          sawLocked = true;
+        }
+        this.list.appendChild(this.buildCard(opt));
+      }
+      this.overlay.hidden = false;
+    }
+    hide() {
+      this.overlay.hidden = true;
+      this.key = "";
+    }
+    buildCard(opt) {
+      const card = document.createElement("div");
+      card.className = "species-card" + (opt.locked ? " locked" : "");
+      const thumb = document.createElement("div");
+      if (opt.locked) {
+        thumb.className = "species-card-thumb locked-thumb";
+        thumb.textContent = "\u{1F512}";
+      } else {
+        thumb.className = `species-card-thumb ${opt.species} stage-1`;
+      }
+      card.appendChild(thumb);
+      const info = document.createElement("div");
+      info.className = "species-card-info";
+      const label = document.createElement("div");
+      label.className = "species-card-label";
+      label.textContent = opt.locked ? `\u{1F512} ${opt.label}` : opt.label;
+      info.appendChild(label);
+      const desc = document.createElement("div");
+      desc.className = "species-card-desc";
+      desc.textContent = opt.isFree ? opt.description : `$${opt.price} \xB7 ${opt.description}`;
+      info.appendChild(desc);
+      card.appendChild(info);
+      card.addEventListener("click", () => {
+        if (opt.locked) {
+          this.onLockedClick(opt.species);
+          return;
+        }
+        this.onSelect(this.key, opt.species);
+        this.hide();
+      });
+      return card;
+    }
+  };
+
   // src/media/webview.ts
   var vscode = acquireVsCodeApi();
   var game = {
@@ -763,6 +845,10 @@ Uses: ${this._num_hotkey_uses}`;
     greenhouse: new Greenhouse()
   };
   var playerMoney = 0;
+  var speciesPicker = new SpeciesPicker(
+    (key, species) => vscode.postMessage({ type: "select_species", key, species }),
+    (species) => vscode.postMessage({ type: "locked_species_click", species })
+  );
   function updateMoneyDisplay() {
     const el = document.getElementById("money-display");
     if (el) {
@@ -831,6 +917,9 @@ Uses: ${this._num_hotkey_uses}`;
       case "load_money":
         playerMoney = message.amount ?? 0;
         updateMoneyDisplay();
+        break;
+      case "choose_species":
+        speciesPicker.show(message.key, message.options);
         break;
       case "scale":
         switch (message.value.toLowerCase()) {

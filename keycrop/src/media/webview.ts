@@ -1,6 +1,7 @@
 import { Greenhouse } from './greenhouse';
 import { RECIPES } from './recipes';
 import { PotController } from './potController';
+import { SpeciesPicker } from './speciesPicker';
 
 interface VsCodeApi {
   postMessage(msg: unknown): void;
@@ -31,6 +32,11 @@ const game: GameState = {
 };
 
 let playerMoney = 0;
+
+const speciesPicker = new SpeciesPicker(
+  (key, species) => vscode.postMessage({ type: 'select_species', key, species }),
+  (species) => vscode.postMessage({ type: 'locked_species_click', species })
+);
 
 function updateMoneyDisplay(): void {
   const el = document.getElementById('money-display');
@@ -99,6 +105,9 @@ window.addEventListener('message', (event: MessageEvent) => {
     case 'load_money':
       playerMoney = message.amount ?? 0;
       updateMoneyDisplay();
+      break;
+    case 'choose_species':
+      speciesPicker.show(message.key, message.options);
       break;
     case 'scale':
       switch (message.value.toLowerCase()) {

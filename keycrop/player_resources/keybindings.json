@@ -546,8 +546,8 @@
                     "when": "terminalFocus && terminalHasBeenCreated || terminalFocus && terminalProcessSupported"
                 },
                 {
-                    "command": "markdown.togglePreview",
-                    "when": "!terminalFocus && activeCustomEditorId == 'vscode.markdown.preview.editor' || editorFocus && !notebookEditorFocused && !terminalFocus && resourceLangId =~ /^(markdown|prompt|instructions|chatagent|skill)$/"
+                    "command": "markdown.showPreview",
+                    "when": "editorFocus && !notebookEditorFocused && !terminalFocus && resourceLangId =~ /^(markdown|prompt|instructions|chatagent|skill)$/"
                 },
                 {
                     "command": "java.action.clipboardPasteAction",
