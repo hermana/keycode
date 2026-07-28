@@ -659,6 +659,7 @@ var GreenhouseWebViewProvider = class {
         <body>
           <div id="keycrop" background="${CURRENT_MODE === 0 /* GAME */ ? config.get("background") : "blackout"}">
           </div>
+          ${CURRENT_MODE === 0 /* GAME */ ? '<div id="fence-strip"></div>' : ""}
           <script src="${webviewJS}"></script>
         </body>
         </html>
