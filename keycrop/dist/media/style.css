@@ -3,6 +3,13 @@ html, body {
   padding: 0;
 }
 
+body {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
 @keyframes confetti-fall {
   0%   { transform: translateY(-10px) rotate(0deg); opacity: 1; }
   100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
@@ -27,11 +34,32 @@ html, body {
   }
 
 #keycrop[background="inventory"]{
-    background: none;
     width:100%;
-    min-height:100%;
+    flex: 1;
+    min-height: 0;
     overflow-y: auto;
+    position: relative;
   }
+
+#shelf-strip {
+  position: absolute;
+  left: 0;
+  top: 50px; /* fixed offset so the shelf sits under the plant row's feet regardless of plant count */
+  width: 100%;
+  overflow: hidden;
+  display: flex;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.shelf-tile {
+  flex: none;
+  width: 64px;
+  height: 64px;
+  background-image: url(./backgrounds/shelf.png);
+  background-repeat: no-repeat;
+  image-rendering: pixelated;
+}
 
   #keycrop[background="blackout"]{
     background: #000000;

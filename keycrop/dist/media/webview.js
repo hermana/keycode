@@ -882,6 +882,8 @@ Uses: ${this._num_hotkey_uses}`;
           hideGameElements();
         } else if (message.value === "dirt") {
           spawnBottomDecorations();
+        } else if (message.value === "inventory") {
+          renderShelfRow();
         }
         break;
       case "add":
@@ -960,13 +962,33 @@ Uses: ${this._num_hotkey_uses}`;
       piece.addEventListener("animationend", () => piece.remove());
     }
   }
+  function renderShelfRow() {
+    const strip = document.getElementById("shelf-strip");
+    if (!strip) {
+      return;
+    }
+    strip.innerHTML = "";
+    const TILE_WIDTH = 64;
+    const OVERLAP = 10;
+    const step = TILE_WIDTH - OVERLAP;
+    const count = Math.ceil(window.innerWidth / step) + 1;
+    for (let i = 0; i < count; i++) {
+      const tile = document.createElement("div");
+      tile.className = "shelf-tile";
+      if (i > 0) {
+        tile.style.marginLeft = `-${OVERLAP}px`;
+      }
+      strip.appendChild(tile);
+    }
+  }
   function spawnBottomDecorations() {
     const strip = document.getElementById("decoration-strip");
     if (!strip || strip.childElementCount > 0) {
       return;
     }
     const kinds = ["flower", "bush", "shrub"];
-    const maxLeft = Math.max(window.innerWidth - 48, 0);
+    const DECORATION_WIDTH = 48;
+    const maxLeft = Math.max(window.innerWidth - DECORATION_WIDTH, 0);
     for (const kind of kinds) {
       const count = 1 + Math.floor(Math.random() * 5);
       for (let i = 0; i < count; i++) {
@@ -984,6 +1006,7 @@ Uses: ${this._num_hotkey_uses}`;
   function onResize() {
     game.width = window.innerWidth;
     game.height = window.innerHeight;
+    renderShelfRow();
   }
   function update() {
     if (game.width !== window.innerWidth || game.height !== window.innerHeight) {

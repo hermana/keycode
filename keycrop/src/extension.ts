@@ -633,6 +633,7 @@ export class InventoryWebViewProvider implements vscode.WebviewViewProvider {
         </head>
         <body>
           <div id="keycrop">
+            <div id="shelf-strip"></div>
           </div>
           <div id="money-display">$0</div>
           <div id="empty-inventory-message" class="instructions">You currently don't have anything in your inventory.</div>
