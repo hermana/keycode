@@ -20,8 +20,6 @@ let hotkeyLog: HotkeyEntry[] = [];
 let pluginDataPath: string;
 type PluginDataEntry = { view: string; event: 'opened' | 'closed'; timestamp: string };
 let pluginDataLog: PluginDataEntry[] = [];
-let studyOutputPath: string = './output';
-let plantsStudyOutputPath: string;
 
 type Plant = {
   key: string;
@@ -399,7 +397,7 @@ export class GreenhouseWebViewProvider implements vscode.WebviewViewProvider {
       this.view?.webview.postMessage(message);
     }
   
-    public resolveWebviewView(webviewView: vscode.WebviewView, context: vscode.WebviewViewResolveContext, _token: vscode.CancellationToken) {
+    public resolveWebviewView(webviewView: vscode.WebviewView, _context: vscode.WebviewViewResolveContext, _token: vscode.CancellationToken) {
       this.view = webviewView; //Needed so we can use it in postMessageToWebview
       logViewEvent('greenhouse', 'opened');
       webviewView.onDidChangeVisibility(() => logViewEvent('greenhouse', webviewView.visible ? 'opened' : 'closed'));
@@ -546,7 +544,7 @@ export class InventoryWebViewProvider implements vscode.WebviewViewProvider {
     this.view?.webview.postMessage(message);
   }
     
-    public resolveWebviewView(webviewView: vscode.WebviewView, context: vscode.WebviewViewResolveContext, token: vscode.CancellationToken): Thenable<void> | void {
+    public resolveWebviewView(webviewView: vscode.WebviewView, _context: vscode.WebviewViewResolveContext, _token: vscode.CancellationToken): Thenable<void> | void {
       this.view = webviewView;
       logViewEvent('inventory', 'opened');
       webviewView.onDidChangeVisibility(() => logViewEvent('inventory', webviewView.visible ? 'opened' : 'closed'));

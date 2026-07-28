@@ -547,7 +547,7 @@ var GreenhouseWebViewProvider = class {
   postMessage(message) {
     this.view?.webview.postMessage(message);
   }
-  resolveWebviewView(webviewView, context, _token) {
+  resolveWebviewView(webviewView, _context, _token) {
     this.view = webviewView;
     logViewEvent("greenhouse", "opened");
     webviewView.onDidChangeVisibility(() => logViewEvent("greenhouse", webviewView.visible ? "opened" : "closed"));
@@ -674,7 +674,7 @@ var InventoryWebViewProvider = class {
   postMessage(message) {
     this.view?.webview.postMessage(message);
   }
-  resolveWebviewView(webviewView, context, token) {
+  resolveWebviewView(webviewView, _context, _token) {
     this.view = webviewView;
     logViewEvent("inventory", "opened");
     webviewView.onDidChangeVisibility(() => logViewEvent("inventory", webviewView.visible ? "opened" : "closed"));
