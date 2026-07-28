@@ -526,7 +526,7 @@ export class GreenhouseWebViewProvider implements vscode.WebviewViewProvider {
         <body>
           <div id="keycrop" background="${CURRENT_MODE === MODE.GAME ? config.get('background') : 'blackout'}">
           </div>
-          ${CURRENT_MODE === MODE.GAME ? '<div id="fence-strip"></div>' : ''}
+          ${CURRENT_MODE === MODE.GAME ? '<div id="fence-strip"></div><div id="decoration-strip"></div>' : ''}
           <script src="${webviewJS}"></script>
         </body>
         </html>

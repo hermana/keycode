@@ -54,6 +54,30 @@ html, body {
   z-index: 2;
 }
 
+#decoration-strip {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 50px;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.bottom-decoration {
+  position: absolute;
+  bottom: 0;
+  width: 48px;
+  height: 50px;
+  background-repeat: no-repeat;
+  background-position: bottom;
+  image-rendering: pixelated;
+}
+
+.bottom-decoration.flower { background-image: url(./backgrounds/flower.png); }
+.bottom-decoration.bush { background-image: url(./backgrounds/bush.png); }
+.bottom-decoration.shrub { background-image: url(./backgrounds/shrub.png); }
+
 #generator-instructions{
   font-family: monospace;
   margin:5px;

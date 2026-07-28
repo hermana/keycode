@@ -69,6 +69,8 @@ window.addEventListener('message', (event: MessageEvent) => {
       game.div.setAttribute('background', message.value);
       if (message.value === 'blackout') {
         hideGameElements();
+      } else if (message.value === 'dirt') {
+        spawnBottomDecorations();
       }
       break;
     case 'add':
@@ -147,6 +149,22 @@ function launchConfetti(): void {
     piece.style.height = (6 + Math.random() * 6) + 'px';
     document.body.appendChild(piece);
     piece.addEventListener('animationend', () => piece.remove());
+  }
+}
+
+function spawnBottomDecorations(): void {
+  const strip = document.getElementById('decoration-strip');
+  if (!strip || strip.childElementCount > 0) { return; }
+  const kinds = ['flower', 'bush', 'shrub'];
+  const maxLeft = Math.max(window.innerWidth - 48, 0);
+  for (const kind of kinds) {
+    const count = 1 + Math.floor(Math.random() * 5);
+    for (let i = 0; i < count; i++) {
+      const el = document.createElement('div');
+      el.className = `bottom-decoration ${kind}`;
+      el.style.left = `${Math.random() * maxLeft}px`;
+      strip.appendChild(el);
+    }
   }
 }
 
