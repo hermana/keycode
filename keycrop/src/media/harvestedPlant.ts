@@ -3,7 +3,6 @@ import { PLANTS } from './plants';
 
 export class HarvestedPlant extends InventoryItem {
   _species: string;
-  _html_element: HTMLElement;
 
   get species(): string { return this._species; }
 
@@ -26,13 +25,8 @@ export class HarvestedPlant extends InventoryItem {
   }
 
   useOne(): boolean {
-    this._count -= 1;
-    if (this._count <= 0) {
-      this._html_element.remove();
-      return true;
-    }
-    this.updateBadgeDisplay();
-    this._html_element.classList.remove('in-pot');
-    return false;
+    const removed = super.useOne();
+    if (!removed) { this._html_element.classList.remove('in-pot'); }
+    return removed;
   }
 }

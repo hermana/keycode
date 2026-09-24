@@ -2,41 +2,41 @@
 (() => {
   // src/keyMap.ts
   var KEY_MAP = [
-    { key: "ctrl+shift+p", category: "Using VSCode", capital_key: "CTRL+SHIFT+P", command: "command_palette", description: "Show command palette", active: false },
-    { key: "ctrl+shift+k", category: "Editing", capital_key: "CTRL+SHIFT+K", command: "delete_current_line", description: "Delete current line", active: false },
-    { key: "ctrl+shift+\\", category: "Navigating Code", capital_key: "CTRL+SHIFT+\\", command: "jump_to_bracket", description: "Jump to bracket", active: false },
-    { key: "ctrl+t", category: "Navigating Code", capital_key: "CTRL+T", command: "show_all_symbols", description: "Show all symbols", active: false },
-    { key: "ctrl+shift+o", category: "Navigating Code", capital_key: "CTRL+SHIFT+O", command: "go_to_symbol", description: "Go to symbol", active: false },
-    { key: "ctrl+shift+m", category: "Debugging", capital_key: "CTRL+SHIFT+M", command: "view_problems", description: "View problems", active: false },
-    { key: "ctrl+shift+l", category: "Multicursor", capital_key: "CTRL+SHIFT+L", command: "cursor_at_all_occurrences", description: "Add a cursor at all occurrences", active: false },
-    { key: "ctrl+shift+space", category: "IntelliSense", capital_key: "CTRL+SHIFT+SPACE", command: "trigger_parameter_hints", description: "Trigger parameter hints", active: false },
-    { key: "ctrl+\\", category: "Using VSCode", capital_key: "CTRL+\\", command: "split_editor", description: "Split editor", active: false },
-    { key: "ctrl+shift+tab", category: "Using VSCode", capital_key: "CTRL+SHIFT+TAB", command: "open_last_used_editor_in_group", description: "Open last used editor in group", active: false },
-    { key: "ctrl+`", category: "Terminal", capital_key: "CTRL+`", command: "toggle_terminal", description: "Toggle terminal", active: false },
-    { key: "ctrl+shift+`", category: "Terminal", capital_key: "CTRL+SHIFT+`", command: "create_new_terminal", description: "Create new terminal", active: false },
-    { key: "ctrl+g", category: "Navigating Code", capital_key: "CTRL+G", command: "go_to_line", description: "Go to line", active: false },
+    { key: "ctrl+shift+p", category: "Using VSCode", capital_key: "CTRL+SHIFT+P", command: "command_palette", commandId: "keycrop.growCommandPalette", description: "Show command palette", active: false },
+    { key: "ctrl+shift+k", category: "Editing", capital_key: "CTRL+SHIFT+K", command: "delete_current_line", commandId: "keycrop.growDeleteCurrentLine", description: "Delete current line", active: false },
+    { key: "ctrl+shift+\\", category: "Navigating Code", capital_key: "CTRL+SHIFT+\\", command: "jump_to_bracket", commandId: "keycrop.growJumpToBracket", description: "Jump to bracket", active: false },
+    { key: "ctrl+t", category: "Navigating Code", capital_key: "CTRL+T", command: "show_all_symbols", commandId: "keycrop.growShowAllSymbols", description: "Show all symbols", active: false },
+    { key: "ctrl+shift+o", category: "Navigating Code", capital_key: "CTRL+SHIFT+O", command: "go_to_symbol", commandId: "keycrop.growGoToSymbol", description: "Go to symbol", active: false },
+    { key: "ctrl+shift+m", category: "Debugging", capital_key: "CTRL+SHIFT+M", command: "view_problems", commandId: "keycrop.growViewProblems", description: "View problems", active: false },
+    { key: "ctrl+shift+l", category: "Multicursor", capital_key: "CTRL+SHIFT+L", command: "cursor_at_all_occurrences", commandId: "keycrop.growCursorAtAllOccurrences", description: "Add a cursor at all occurrences", active: false },
+    { key: "ctrl+shift+space", category: "IntelliSense", capital_key: "CTRL+SHIFT+SPACE", command: "trigger_parameter_hints", commandId: "keycrop.growTriggerParameterHints", description: "Trigger parameter hints", active: false },
+    { key: "ctrl+\\", category: "Using VSCode", capital_key: "CTRL+\\", command: "split_editor", commandId: "keycrop.growSplitEditor", description: "Split editor", active: false },
+    { key: "ctrl+shift+tab", category: "Using VSCode", capital_key: "CTRL+SHIFT+TAB", command: "open_last_used_editor_in_group", commandId: "keycrop.growOpenLastUsedEditorInGroup", description: "Open last used editor in group", active: false },
+    { key: "ctrl+`", category: "Terminal", capital_key: "CTRL+`", command: "toggle_terminal", commandId: "keycrop.growToggleTerminal", description: "Toggle terminal", active: false },
+    { key: "ctrl+shift+`", category: "Terminal", capital_key: "CTRL+SHIFT+`", command: "create_new_terminal", commandId: "keycrop.growCreateNewTerminal", description: "Create new terminal", active: false },
+    { key: "ctrl+g", category: "Navigating Code", capital_key: "CTRL+G", command: "go_to_line", commandId: "keycrop.growGoToLine", description: "Go to line", active: false },
     // this is where I started adding new stuff
-    { key: "ctrl+.", category: "Navigating Code", capital_key: "CTRL+.", command: "quick_fix", description: "Quick Fix", active: false },
-    { key: "ctrl+shift+s", category: "Using VSCode", capital_key: "CTRL+SHIFT+S", command: "save_file_as", description: "Save File As", active: false },
-    { key: "alt+up", category: "Editing", capital_key: "ALT+UP", command: "move_line_up", description: "Move line up", active: false },
-    { key: "alt+down", category: "Editing", capital_key: "ALT+DOWN", command: "move_line_down", description: "Move line down", active: false },
-    { key: "ctrl+l", category: "Editing", capital_key: "CTRL+L", command: "select_line", description: "Select line", active: false },
-    { key: "shift+alt+i", category: "Multicursor", capital_key: "SHIFT+ALT+I", command: "insert_cursor_at_end_of_each_line_selected", description: "Insert cursor at end of each line selected", active: false },
-    { key: "ctrl+shift+up", category: "Multicursor", capital_key: "CTRL+SHIFT+UP", command: "add_cursor_above", description: "Add cursor above", active: true },
-    { key: "ctrl+shift+down", category: "Multicursor", capital_key: "CTRL+SHIFT+DOWN", command: "add_cursor_below", description: "Add cursor below", active: true },
-    { key: "ctrl+space", category: "IntelliSense", capital_key: "CTRL+SPACE", command: "trigger_suggest", description: "Trigger suggestions", active: false },
-    { key: "ctrl+k ctrl+i", category: "IntelliSense", capital_key: "CTRL+K CTRL+I", command: "show_hover", description: "Show hover with function details", active: false },
-    { key: "ctrl+k v", category: "Markdown", capital_key: "CTRL+K V", command: "open_markdown_side", description: "Open markdown to the side", active: true },
-    { key: "ctrl+shift+v", category: "Markdown", capital_key: "CTRL+SHIFT+V", command: "open_markdown_preview", description: "Open markdown preview", active: true },
-    { key: "ctrl+h", category: "Search", capital_key: "CTRL+H", command: "replace", description: "Replace", active: true },
-    { key: "shift+alt+down", category: "Editing", capital_key: "SHIFT+ALT+DOWN", command: "copy_line_below", description: "Copy line below", active: true },
-    { key: "shift+alt+up", category: "Editing", capital_key: "SHIFT+ALT+UP", command: "copy_line_above", description: "Copy line above", active: true },
-    { key: "ctrl+f", category: "Search", capital_key: "CTRL+F", command: "find", description: "Find", active: true },
-    { key: "shift+alt+right", category: "Editing", capital_key: "SHIFT+ALT+RIGHT", command: "expand_selection", description: "Expand selection", active: true },
-    { key: "shift+alt+left", category: "Editing", capital_key: "SHIFT+ALT+LEFT", command: "reduce_selection", description: "Reduce selection", active: true },
-    { key: "ctrl+shift+a", category: "Editing", capital_key: "CTRL+SHIFT+A", command: "toggle_block_comment", description: "Toggle block comment", active: true },
-    { key: "ctrl+c", category: "Editing", capital_key: "CTRL+C", command: "copy", description: "Copy", active: false },
-    { key: "ctrl+v", category: "Editing", capital_key: "CTRL+V", command: "paste", description: "Paste", active: false }
+    { key: "ctrl+.", category: "Navigating Code", capital_key: "CTRL+.", command: "quick_fix", commandId: "keycrop.growQuickFix", description: "Quick Fix", active: false },
+    { key: "ctrl+shift+s", category: "Using VSCode", capital_key: "CTRL+SHIFT+S", command: "save_file_as", commandId: "keycrop.growSaveFileAs", description: "Save File As", active: false },
+    { key: "alt+up", category: "Editing", capital_key: "ALT+UP", command: "move_line_up", commandId: "keycrop.growMoveLineUp", description: "Move line up", active: false },
+    { key: "alt+down", category: "Editing", capital_key: "ALT+DOWN", command: "move_line_down", commandId: "keycrop.growMoveLineDown", description: "Move line down", active: false },
+    { key: "ctrl+l", category: "Editing", capital_key: "CTRL+L", command: "select_line", commandId: "keycrop.growSelectLine", description: "Select line", active: false },
+    { key: "shift+alt+i", category: "Multicursor", capital_key: "SHIFT+ALT+I", command: "insert_cursor_at_end_of_each_line_selected", commandId: "keycrop.growInsertCursorAtEndOfEachLineSelected", description: "Insert cursor at end of each line selected", active: false },
+    { key: "ctrl+shift+up", category: "Multicursor", capital_key: "CTRL+SHIFT+UP", command: "add_cursor_above", commandId: "keycrop.growInsertCursorAbove", description: "Add cursor above", active: true },
+    { key: "ctrl+shift+down", category: "Multicursor", capital_key: "CTRL+SHIFT+DOWN", command: "add_cursor_below", commandId: "keycrop.growInsertCursorBelow", description: "Add cursor below", active: true },
+    { key: "ctrl+space", category: "IntelliSense", capital_key: "CTRL+SPACE", command: "trigger_suggest", commandId: "keycrop.growTriggerSuggestions", description: "Trigger suggestions", active: false },
+    { key: "ctrl+k ctrl+i", category: "IntelliSense", capital_key: "CTRL+K CTRL+I", command: "show_hover", commandId: "keycrop.growShowHover", description: "Show hover with function details", active: false },
+    { key: "ctrl+k v", category: "Markdown", capital_key: "CTRL+K V", command: "open_markdown_side", commandId: "keycrop.growOpenMarkdownSide", description: "Open markdown to the side", active: true },
+    { key: "ctrl+shift+v", category: "Markdown", capital_key: "CTRL+SHIFT+V", command: "open_markdown_preview", commandId: "keycrop.growOpenMarkdownPreview", description: "Open markdown preview", active: true },
+    { key: "ctrl+h", category: "Search", capital_key: "CTRL+H", command: "replace", commandId: "keycrop.growReplace", description: "Replace", active: true },
+    { key: "shift+alt+down", category: "Editing", capital_key: "SHIFT+ALT+DOWN", command: "copy_line_below", commandId: "keycrop.growCopyLineBelow", description: "Copy line below", active: true },
+    { key: "shift+alt+up", category: "Editing", capital_key: "SHIFT+ALT+UP", command: "copy_line_above", commandId: "keycrop.growCopyLineAbove", description: "Copy line above", active: true },
+    { key: "ctrl+f", category: "Search", capital_key: "CTRL+F", command: "find", commandId: "keycrop.growFind", description: "Find", active: true },
+    { key: "shift+alt+right", category: "Editing", capital_key: "SHIFT+ALT+RIGHT", command: "expand_selection", commandId: "keycrop.growExpandSelection", description: "Expand selection", active: true },
+    { key: "shift+alt+left", category: "Editing", capital_key: "SHIFT+ALT+LEFT", command: "reduce_selection", commandId: "keycrop.growReduceSelection", description: "Reduce selection", active: true },
+    { key: "ctrl+shift+a", category: "Editing", capital_key: "CTRL+SHIFT+A", command: "toggle_block_comment", commandId: "keycrop.growToggleBlockComment", description: "Toggle block comment", active: true },
+    { key: "ctrl+c", category: "Editing", capital_key: "CTRL+C", command: "copy", commandId: "keycrop.growCopy", description: "Copy", active: false },
+    { key: "ctrl+v", category: "Editing", capital_key: "CTRL+V", command: "paste", commandId: "keycrop.growPaste", description: "Paste", active: false }
   ];
 
   // src/media/plant.ts
@@ -178,6 +178,7 @@ Uses: ${this._num_hotkey_uses}`;
     _price;
     _badge_element;
     _price_badge_element;
+    _html_element;
     get count() {
       return this._count;
     }
@@ -206,6 +207,16 @@ Uses: ${this._num_hotkey_uses}`;
       this._count += 1;
       this.updateBadgeDisplay();
     }
+    /** Removes one from the stack. Returns true when the last one is used and the element is removed. */
+    useOne() {
+      this._count -= 1;
+      if (this._count <= 0) {
+        this._html_element.remove();
+        return true;
+      }
+      this.updateBadgeDisplay();
+      return false;
+    }
   };
 
   // src/media/plants.ts
@@ -231,7 +242,6 @@ Uses: ${this._num_hotkey_uses}`;
   // src/media/harvestedPlant.ts
   var HarvestedPlant = class extends InventoryItem {
     _species;
-    _html_element;
     get species() {
       return this._species;
     }
@@ -249,14 +259,11 @@ Uses: ${this._num_hotkey_uses}`;
       this.createBadge(element);
     }
     useOne() {
-      this._count -= 1;
-      if (this._count <= 0) {
-        this._html_element.remove();
-        return true;
+      const removed = super.useOne();
+      if (!removed) {
+        this._html_element.classList.remove("in-pot");
       }
-      this.updateBadgeDisplay();
-      this._html_element.classList.remove("in-pot");
-      return false;
+      return removed;
     }
   };
 
@@ -388,7 +395,6 @@ Uses: ${this._num_hotkey_uses}`;
   var CookedFood = class extends InventoryItem {
     _recipeKey;
     _name;
-    _html_element;
     get recipeKey() {
       return this._recipeKey;
     }
@@ -408,15 +414,6 @@ Uses: ${this._num_hotkey_uses}`;
       img.classList.add("cooked-food-img");
       element.appendChild(img);
       this.createBadge(element);
-    }
-    useOne() {
-      this._count -= 1;
-      if (this._count <= 0) {
-        this._html_element.remove();
-        return true;
-      }
-      this.updateBadgeDisplay();
-      return false;
     }
   };
 
@@ -838,11 +835,6 @@ Uses: ${this._num_hotkey_uses}`;
   var vscode = acquireVsCodeApi();
   var game = {
     div: document.getElementById("keycrop"),
-    width: window.innerWidth,
-    height: window.innerHeight,
-    scale: 2,
-    frames: 0,
-    fps: 30,
     greenhouse: new Greenhouse()
   };
   var playerMoney = 0;
@@ -891,7 +883,6 @@ Uses: ${this._num_hotkey_uses}`;
         break;
       case "grow":
         game.greenhouse.grow(message.key, vscode);
-        checkAcheivements();
         break;
       case "save_plants":
         vscode.postMessage({ type: "save_plants", content: game.greenhouse.serialize() });
@@ -926,26 +917,8 @@ Uses: ${this._num_hotkey_uses}`;
       case "choose_species":
         speciesPicker.show(message.key, message.options);
         break;
-      case "scale":
-        switch (message.value.toLowerCase()) {
-          case "small":
-            game.scale = 1;
-            break;
-          case "medium":
-          default:
-            game.scale = 2;
-            break;
-          case "big":
-            game.scale = 3;
-            break;
-        }
-        document.body.style.setProperty("--scale", String(game.scale));
-        onResize();
-        break;
     }
   });
-  function checkAcheivements() {
-  }
   function launchConfetti() {
     const colors = ["#f44336", "#e91e63", "#9c27b0", "#3f51b5", "#2196f3", "#4caf50", "#ffeb3b", "#ff9800"];
     const count = 80;
@@ -1000,20 +973,16 @@ Uses: ${this._num_hotkey_uses}`;
     }
   }
   function hideGameElements() {
-    document.getElementById("generator-button").hidden = true;
-    document.getElementById("greenhouse-button").hidden = true;
-  }
-  function onResize() {
-    game.width = window.innerWidth;
-    game.height = window.innerHeight;
-    renderShelfRow();
-  }
-  function update() {
-    if (game.width !== window.innerWidth || game.height !== window.innerHeight) {
-      onResize();
+    if (collectionBtn) {
+      collectionBtn.hidden = true;
     }
-    game.frames++;
   }
+  window.addEventListener("resize", renderShelfRow);
+  var collectionBtn = document.getElementById("collection-btn");
+  collectionBtn?.addEventListener("click", () => {
+    const showingCollection = document.body.classList.toggle("collection-view");
+    collectionBtn.textContent = showingCollection ? "Inventory" : "Collection";
+  });
   var potWrapper = document.getElementById("inventory-pot-wrapper");
   if (potWrapper) {
     new PotController(potWrapper, game.div, game.greenhouse, vscode, sellItem);
@@ -1036,7 +1005,6 @@ Uses: ${this._num_hotkey_uses}`;
   document.addEventListener("click", () => {
     plantDetailPanel.hidden = true;
   });
-  setInterval(update, 1e3 / game.fps);
   vscode.postMessage({ type: "init" });
 })();
 //# sourceMappingURL=webview.js.map

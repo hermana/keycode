@@ -54,16 +54,6 @@
           ],
           "description": "The view background"
         }
-      },
-      "keycrop.scale": {
-        "type": "string",
-        "default": "Medium",
-        "enum": [
-          "Small",
-          "Medium",
-          "Big"
-        ],
-        "description": "The scale of the plants."
       }
     }
   },

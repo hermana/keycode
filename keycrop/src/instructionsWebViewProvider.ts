@@ -1,43 +1,26 @@
 import * as vscode from 'vscode';
 import { KEY_MAP } from './keyMap';
+import { BaseWebViewProvider, ViewEvent } from './baseWebViewProvider';
 
-export class InstructionsWebViewProvider implements vscode.WebviewViewProvider {
+export class InstructionsWebViewProvider extends BaseWebViewProvider {
 
   public static readonly viewType = 'instructions';
-  private _view?: vscode.WebviewView;
 
   constructor(
-    private readonly context: vscode.ExtensionContext,
+    context: vscode.ExtensionContext,
     private readonly getHotkeyCounts: () => Record<string, number>,
-    private readonly onViewEvent?: (event: 'opened' | 'closed') => void
-  ) {}
-
-  public postMessage(message: any): void {
-    this._view?.webview.postMessage(message);
+    onViewEvent?: (event: ViewEvent) => void
+  ) {
+    super(context, onViewEvent);
   }
 
-  public resolveWebviewView(webviewView: vscode.WebviewView, _context: vscode.WebviewViewResolveContext, _token: vscode.CancellationToken): Thenable<void> | void {
-    this._view = webviewView;
-    this.onViewEvent?.('opened');
-    webviewView.onDidChangeVisibility(() => this.onViewEvent?.(webviewView.visible ? 'opened' : 'closed'));
-    webviewView.onDidDispose(() => this.onViewEvent?.('closed'));
-
-    const webview = webviewView.webview;
-
-    webview.options = {
-      enableScripts: true
-    };
-
-    webview.html = this.getHtmlContent(webview);
-
-    webview.onDidReceiveMessage((message) => {
-      if (message.type === 'init') {
-        webview.postMessage({ action: 'update_counts', counts: this.getHotkeyCounts() });
-      }
-    });
+  protected onMessage(message: any, webview: vscode.Webview): void {
+    if (message.type === 'init') {
+      webview.postMessage({ action: 'update_counts', counts: this.getHotkeyCounts() });
+    }
   }
 
-  private getHtmlContent(webview: vscode.Webview): string {
+  protected getHtmlContent(webview: vscode.Webview): string {
 
     const style = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'dist/media', 'style.css'));
 

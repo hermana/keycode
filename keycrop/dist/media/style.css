@@ -982,10 +982,25 @@ background: url(./vegetables/watermelon_large.png);
   color: var(--vscode-menu-selectionForeground, #fff);
 }
 
-#money-display {
+body.collection-view .harvested-plant,
+body.collection-view #food-row,
+body.collection-view #empty-inventory-message,
+body.collection-view #inventory-bottom-right,
+body.collection-view #item-context-menu {
+  display: none !important;
+}
+
+#inventory-bottom-left {
   position: fixed;
   bottom: 8px;
   left: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+#money-display {
   font-family: monospace;
   font-size: 1rem;
   font-weight: bold;
@@ -994,6 +1009,20 @@ background: url(./vegetables/watermelon_large.png);
   padding: 4px 8px;
   border-radius: 4px;
   pointer-events: none;
+}
+
+#collection-btn {
+  padding: 6px 12px;
+  background: #4a7c59;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-family: monospace;
+  font-size: 0.85rem;
+}
+
+#collection-btn:hover {
+  background: #3a6145;
 }
 
 #inventory-bottom-right {

@@ -4,7 +4,6 @@ import { RECIPES } from './recipes';
 export class CookedFood extends InventoryItem {
   _recipeKey: string;
   _name: string;
-  _html_element: HTMLElement;
 
   get recipeKey(): string { return this._recipeKey; }
 
@@ -28,15 +27,5 @@ export class CookedFood extends InventoryItem {
     element.appendChild(img);
 
     this.createBadge(element);
-  }
-
-  useOne(): boolean {
-    this._count -= 1;
-    if (this._count <= 0) {
-      this._html_element.remove();
-      return true;
-    }
-    this.updateBadgeDisplay();
-    return false;
   }
 }

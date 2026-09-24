@@ -13,21 +13,11 @@ const vscode: VsCodeApi = acquireVsCodeApi();
 
 interface GameState {
   div: HTMLElement;
-  width: number;
-  height: number;
-  scale: number;
-  frames: number;
-  fps: number;
   greenhouse: Greenhouse;
 }
 
 const game: GameState = {
   div: document.getElementById('keycrop') as HTMLElement,
-  width: window.innerWidth,
-  height: window.innerHeight,
-  scale: 2,
-  frames: 0,
-  fps: 30,
   greenhouse: new Greenhouse(),
 };
 
@@ -80,7 +70,6 @@ window.addEventListener('message', (event: MessageEvent) => {
       break;
     case 'grow':
       game.greenhouse.grow(message.key, vscode);
-      checkAcheivements();
       break;
     case 'save_plants':
       vscode.postMessage({ type: 'save_plants', content: game.greenhouse.serialize() });
@@ -113,29 +102,9 @@ window.addEventListener('message', (event: MessageEvent) => {
     case 'choose_species':
       speciesPicker.show(message.key, message.options);
       break;
-    case 'scale':
-      switch (message.value.toLowerCase()) {
-        case 'small':
-          game.scale = 1;
-          break;
-        case 'medium':
-        default:
-          game.scale = 2;
-          break;
-        case 'big':
-          game.scale = 3;
-          break;
-      }
-      document.body.style.setProperty('--scale', String(game.scale));
-      onResize();
-      break;
   }
 });
 
-
-function checkAcheivements(): void {
-
-}
 
 function launchConfetti(): void {
   const colors = ['#f44336', '#e91e63', '#9c27b0', '#3f51b5', '#2196f3', '#4caf50', '#ffeb3b', '#ff9800'];
@@ -188,33 +157,22 @@ function spawnBottomDecorations(): void {
 }
 
 function hideGameElements(): void {
-  (document.getElementById('generator-button') as HTMLElement).hidden = true;
-  (document.getElementById('greenhouse-button') as HTMLElement).hidden = true;
+  if (collectionBtn) { collectionBtn.hidden = true; }
 }
 
-//TODO: do I need a resize at all
-function onResize(): void {
-  game.width = window.innerWidth;
-  game.height = window.innerHeight;
-  renderShelfRow();
-}
+window.addEventListener('resize', renderShelfRow);
 
-
-
-function update(): void {
-  if (game.width !== window.innerWidth || game.height !== window.innerHeight) {
-    onResize();
-  }
-  game.frames++;
-}
-
+const collectionBtn = document.getElementById('collection-btn');
+collectionBtn?.addEventListener('click', () => {
+  const showingCollection = document.body.classList.toggle('collection-view');
+  collectionBtn.textContent = showingCollection ? 'Inventory' : 'Collection';
+});
 
 const potWrapper = document.getElementById('inventory-pot-wrapper');
 if (potWrapper) {
   new PotController(potWrapper, game.div, game.greenhouse, vscode, sellItem);
 }
 
-//Start loop
 // Plant detail panel — greenhouse only (.plant elements don't exist in inventory)
 const plantDetailPanel = document.createElement('div');
 plantDetailPanel.id = 'plant-detail';
@@ -232,8 +190,6 @@ game.div.addEventListener('click', (e) => {
 });
 
 document.addEventListener('click', () => { plantDetailPanel.hidden = true; });
-
-setInterval(update, 1000 / game.fps);
 
 //Tell vscode game loaded
 //TODO: type or action here?

@@ -3,6 +3,7 @@ export abstract class InventoryItem {
   protected _price: number;
   protected _badge_element!: HTMLElement;
   protected _price_badge_element!: HTMLElement;
+  _html_element!: HTMLElement;
 
   get count(): number { return this._count; }
 
@@ -35,5 +36,16 @@ export abstract class InventoryItem {
   incrementCount(): void {
     this._count += 1;
     this.updateBadgeDisplay();
+  }
+
+  /** Removes one from the stack. Returns true when the last one is used and the element is removed. */
+  useOne(): boolean {
+    this._count -= 1;
+    if (this._count <= 0) {
+      this._html_element.remove();
+      return true;
+    }
+    this.updateBadgeDisplay();
+    return false;
   }
 }
