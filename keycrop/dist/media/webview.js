@@ -738,12 +738,12 @@ Uses: ${this._num_hotkey_uses}`;
       this.potImg.src = this.potImg.dataset.openSrc;
       const recipe = RECIPES[recipeKey];
       if (recipe) {
-        const foodBase = document.getElementById("inventory-bottom-right")?.dataset.foodBase ?? "";
+        const foodBase2 = document.getElementById("inventory-bottom-right")?.dataset.foodBase ?? "";
         const foodRow = document.getElementById("food-row");
         if (foodRow) {
           foodRow.hidden = false;
         }
-        this.greenhouse.addCookedFood(recipeKey, recipe.name, `${foodBase}/${recipe.filename}`);
+        this.greenhouse.addCookedFood(recipeKey, recipe.name, `${foodBase2}/${recipe.filename}`);
         this.vscode.postMessage({ type: "cooked", recipeKey, species: [species1, species2] });
       }
     }
@@ -831,6 +831,32 @@ Uses: ${this._num_hotkey_uses}`;
     }
   };
 
+  // src/media/collection.ts
+  var Collection = class {
+    constructor(container, foodBase2) {
+      this.foodBase = foodBase2;
+      for (const recipeKey of Object.keys(RECIPES)) {
+        const slot = document.createElement("img");
+        slot.className = "collection-slot";
+        slot.src = `${foodBase2}/mystery_item.png`;
+        slot.title = "???";
+        container.appendChild(slot);
+        this.slots.set(recipeKey, slot);
+      }
+    }
+    slots = /* @__PURE__ */ new Map();
+    discover(recipeKey) {
+      const slot = this.slots.get(recipeKey);
+      const recipe = RECIPES[recipeKey];
+      if (!slot || !recipe) {
+        return;
+      }
+      slot.src = `${this.foodBase}/${recipe.filename}`;
+      slot.title = recipe.name;
+      slot.classList.add("discovered");
+    }
+  };
+
   // src/media/webview.ts
   var vscode = acquireVsCodeApi();
   var game = {
@@ -842,6 +868,9 @@ Uses: ${this._num_hotkey_uses}`;
     (key, species) => vscode.postMessage({ type: "select_species", key, species }),
     (species) => vscode.postMessage({ type: "locked_species_click", species })
   );
+  var foodBase = document.getElementById("inventory-bottom-right")?.dataset.foodBase ?? "";
+  var collectionGrid = document.getElementById("collection-grid");
+  var collection = collectionGrid ? new Collection(collectionGrid, foodBase) : void 0;
   function updateMoneyDisplay() {
     const el = document.getElementById("money-display");
     if (el) {
@@ -900,7 +929,6 @@ Uses: ${this._num_hotkey_uses}`;
       case "load_cooked": {
         const recipe = RECIPES[message.recipeKey];
         if (recipe) {
-          const foodBase = document.getElementById("inventory-bottom-right")?.dataset.foodBase ?? "";
           const foodRow = document.getElementById("food-row");
           if (foodRow) {
             foodRow.hidden = false;
@@ -910,6 +938,11 @@ Uses: ${this._num_hotkey_uses}`;
         }
         break;
       }
+      case "load_collection":
+        for (const recipeKey of message.recipeKeys) {
+          collection?.discover(recipeKey);
+        }
+        break;
       case "load_money":
         playerMoney = message.amount ?? 0;
         updateMoneyDisplay();

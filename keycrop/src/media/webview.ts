@@ -2,6 +2,7 @@ import { Greenhouse } from './greenhouse';
 import { RECIPES } from './recipes';
 import { PotController } from './potController';
 import { SpeciesPicker } from './speciesPicker';
+import { Collection } from './collection';
 
 interface VsCodeApi {
   postMessage(msg: unknown): void;
@@ -27,6 +28,10 @@ const speciesPicker = new SpeciesPicker(
   (key, species) => vscode.postMessage({ type: 'select_species', key, species }),
   (species) => vscode.postMessage({ type: 'locked_species_click', species })
 );
+
+const foodBase = document.getElementById('inventory-bottom-right')?.dataset.foodBase ?? '';
+const collectionGrid = document.getElementById('collection-grid');
+const collection = collectionGrid ? new Collection(collectionGrid, foodBase) : undefined;
 
 function updateMoneyDisplay(): void {
   const el = document.getElementById('money-display');
@@ -87,7 +92,6 @@ window.addEventListener('message', (event: MessageEvent) => {
     case 'load_cooked': {
       const recipe = RECIPES[message.recipeKey];
       if (recipe) {
-        const foodBase = document.getElementById('inventory-bottom-right')?.dataset.foodBase ?? '';
         const foodRow = document.getElementById('food-row');
         if (foodRow) { foodRow.hidden = false; }
         game.greenhouse.addCookedFood(message.recipeKey, recipe.name, `${foodBase}/${recipe.filename}`, message.count);
@@ -95,6 +99,11 @@ window.addEventListener('message', (event: MessageEvent) => {
       }
       break;
     }
+    case 'load_collection':
+      for (const recipeKey of message.recipeKeys as string[]) {
+        collection?.discover(recipeKey);
+      }
+      break;
     case 'load_money':
       playerMoney = message.amount ?? 0;
       updateMoneyDisplay();

@@ -242,6 +242,7 @@ function readPlantsFromDisk() {
       const savedCooked = saved.cookedFoodCounts ?? {};
       cookedFoodCounts = new Map(Object.entries(savedCooked));
       playerMoney = saved.playerMoney ?? 0;
+      discoveredRecipes = /* @__PURE__ */ new Set([...saved.discoveredRecipes ?? [], ...cookedFoodCounts.keys()]);
       const seen = /* @__PURE__ */ new Map();
       for (const p of savedPlants) {
         const existing = seen.get(p.key);
@@ -267,6 +268,7 @@ function writePlantsToDisk() {
     plants,
     harvestedCounts: Object.fromEntries(harvestedCounts),
     cookedFoodCounts: Object.fromEntries(cookedFoodCounts),
+    discoveredRecipes: [...discoveredRecipes],
     playerMoney
   }));
 }
@@ -308,6 +310,7 @@ function requestWebviewSave() {
 var plants = new Array();
 var harvestedCounts = /* @__PURE__ */ new Map();
 var cookedFoodCounts = /* @__PURE__ */ new Map();
+var discoveredRecipes = /* @__PURE__ */ new Set();
 var playerMoney = 0;
 function decrementCount(counts, key) {
   const count = counts.get(key) ?? 0;
@@ -573,6 +576,7 @@ var InventoryWebViewProvider = class extends BaseWebViewProvider {
           });
           loadPlantsToInventory();
           loadCookedFoodsToInventory();
+          webview.postMessage({ action: "load_collection", recipeKeys: [...discoveredRecipes] });
           webview.postMessage({ action: "load_money", amount: playerMoney });
         } else {
           webview.postMessage({
@@ -593,6 +597,10 @@ var InventoryWebViewProvider = class extends BaseWebViewProvider {
       case "cooked": {
         const current = cookedFoodCounts.get(message.recipeKey) ?? 0;
         cookedFoodCounts.set(message.recipeKey, current + 1);
+        if (!discoveredRecipes.has(message.recipeKey)) {
+          discoveredRecipes.add(message.recipeKey);
+          webview.postMessage({ action: "load_collection", recipeKeys: [message.recipeKey] });
+        }
         for (const species of message.species) {
           decrementCount(harvestedCounts, species);
         }
@@ -621,6 +629,7 @@ var InventoryWebViewProvider = class extends BaseWebViewProvider {
             <!-- Shelves hidden for now; uncomment to bring them back (renderShelfRow skips when this is missing) -->
             <!-- <div id="shelf-strip"></div> -->
           </div>
+          <div id="collection-grid"></div>
           <div id="inventory-bottom-left">
             <div id="money-display">$0</div>
             <button id="collection-btn">Collection</button>

@@ -43,6 +43,8 @@ function readPlantsFromDisk() {
       const savedCooked: Record<string, number> = saved.cookedFoodCounts ?? {};
       cookedFoodCounts = new Map(Object.entries(savedCooked));
       playerMoney = saved.playerMoney ?? 0;
+      // Older saves have no discoveredRecipes; anything cooked and still held counts as discovered
+      discoveredRecipes = new Set([...(saved.discoveredRecipes ?? []), ...cookedFoodCounts.keys()]);
       // Deduplicate by key — prefer non-harvested if there are conflicting entries
       const seen = new Map<string, Plant>();
       for (const p of savedPlants) {
@@ -70,6 +72,7 @@ function writePlantsToDisk() {
     plants: plants,
     harvestedCounts: Object.fromEntries(harvestedCounts),
     cookedFoodCounts: Object.fromEntries(cookedFoodCounts),
+    discoveredRecipes: [...discoveredRecipes],
     playerMoney
   }));
 }
@@ -116,6 +119,7 @@ function requestWebviewSave() {
 let plants = new Array<Plant>();
 let harvestedCounts = new Map<string, number>();
 let cookedFoodCounts = new Map<string, number>();
+let discoveredRecipes = new Set<string>();
 let playerMoney = 0;
 
 function decrementCount(counts: Map<string, number>, key: string): void {
@@ -427,6 +431,7 @@ export class InventoryWebViewProvider extends BaseWebViewProvider {
           //Load harvested plants into inventory
           loadPlantsToInventory();
           loadCookedFoodsToInventory();
+          webview.postMessage({ action: 'load_collection', recipeKeys: [...discoveredRecipes] });
           webview.postMessage({ action: 'load_money', amount: playerMoney });
         }else{
           webview.postMessage({
@@ -447,6 +452,10 @@ export class InventoryWebViewProvider extends BaseWebViewProvider {
       case 'cooked': {
         const current = cookedFoodCounts.get(message.recipeKey) ?? 0;
         cookedFoodCounts.set(message.recipeKey, current + 1);
+        if (!discoveredRecipes.has(message.recipeKey)) {
+          discoveredRecipes.add(message.recipeKey);
+          webview.postMessage({ action: 'load_collection', recipeKeys: [message.recipeKey] });
+        }
         for (const species of (message.species as string[])) {
           decrementCount(harvestedCounts, species);
         }
@@ -478,6 +487,7 @@ export class InventoryWebViewProvider extends BaseWebViewProvider {
             <!-- Shelves hidden for now; uncomment to bring them back (renderShelfRow skips when this is missing) -->
             <!-- <div id="shelf-strip"></div> -->
           </div>
+          <div id="collection-grid"></div>
           <div id="inventory-bottom-left">
             <div id="money-display">$0</div>
             <button id="collection-btn">Collection</button>

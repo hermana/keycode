@@ -982,12 +982,33 @@ background: url(./vegetables/watermelon_large.png);
   color: var(--vscode-menu-selectionForeground, #fff);
 }
 
-body.collection-view .harvested-plant,
+body.collection-view #keycrop,
 body.collection-view #food-row,
 body.collection-view #empty-inventory-message,
 body.collection-view #inventory-bottom-right,
 body.collection-view #item-context-menu {
   display: none !important;
+}
+
+#collection-grid {
+  display: none;
+}
+
+body.collection-view #collection-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(48px, 1fr));
+  gap: 8px;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 8px 8px 80px 8px; /* bottom room so the money/button corner doesn't cover the last row */
+}
+
+.collection-slot {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: contain;
+  image-rendering: pixelated;
 }
 
 #inventory-bottom-left {
