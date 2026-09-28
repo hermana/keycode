@@ -46,8 +46,20 @@ export class Collection {
     } else {
       this.detailPanel.textContent = '???';
     }
-    this.detailPanel.style.left = `${e.clientX + 8}px`;
-    this.detailPanel.style.top = `${e.clientY + 8}px`;
     this.detailPanel.hidden = false;
+    this.positionDetails(e.clientX, e.clientY);
+  }
+
+  /** Flips the detail panel to the other side if it's going to go offscreen */
+  private positionDetails(x: number, y: number): void {
+    const offset = 8;
+    const margin = 4;
+    const { width, height } = this.detailPanel.getBoundingClientRect();
+    const place = (pos: number, size: number, limit: number) => {
+      const preferred = pos + offset + size <= limit - margin ? pos + offset : pos - offset - size;
+      return Math.max(margin, Math.min(preferred, limit - size - margin));
+    };
+    this.detailPanel.style.left = `${place(x, width, window.innerWidth)}px`;
+    this.detailPanel.style.top = `${place(y, height, window.innerHeight)}px`;
   }
 }

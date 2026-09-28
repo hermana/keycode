@@ -22,7 +22,7 @@ let instructions: InstructionsWebViewProvider;
 let inventory: InventoryWebViewProvider;
 let config = vscode.workspace.getConfiguration('keycrop');
 
-// Newly used hotkeys still waiting for a species; the most recent is last and shown first
+// Used to store stack of hotkeys waiting to be assigned to a plant
 const pendingKeys: string[] = [];
 
 function requestWebviewSave() {

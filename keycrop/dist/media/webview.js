@@ -899,9 +899,20 @@ Sells for $${recipe.price}`;
       } else {
         this.detailPanel.textContent = "???";
       }
-      this.detailPanel.style.left = `${e.clientX + 8}px`;
-      this.detailPanel.style.top = `${e.clientY + 8}px`;
       this.detailPanel.hidden = false;
+      this.positionDetails(e.clientX, e.clientY);
+    }
+    /** Places the panel beside the cursor, flipping to the other side if it would go offscreen. */
+    positionDetails(x, y) {
+      const offset = 8;
+      const margin = 4;
+      const { width, height } = this.detailPanel.getBoundingClientRect();
+      const place = (pos, size, limit) => {
+        const preferred = pos + offset + size <= limit - margin ? pos + offset : pos - offset - size;
+        return Math.max(margin, Math.min(preferred, limit - size - margin));
+      };
+      this.detailPanel.style.left = `${place(x, width, window.innerWidth)}px`;
+      this.detailPanel.style.top = `${place(y, height, window.innerHeight)}px`;
     }
   };
 
