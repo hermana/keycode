@@ -880,7 +880,7 @@ Uses: ${this._num_hotkey_uses}`;
       slot.title = recipe.name;
       slot.classList.add("discovered");
     }
-
+    /** Shows name, ingredients and sell price. Undiscovered recipes stay a mystery. */
     showDetails(e, slot) {
       e.stopPropagation();
       const recipeKey = slot.dataset.recipeKey;

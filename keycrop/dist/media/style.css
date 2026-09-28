@@ -152,6 +152,20 @@ body {
   padding-right: 10px;
 }
 
+.level-badge {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.level-novice      { background: #6e7479; color: #ffffff; } /* lead */
+.level-apprentice  { background: #cd7f32; color: #ffffff; } /* bronze */
+.level-journeyman  { background: #c0c0c0; color: #1e1e1e; } /* silver */
+.level-expert      { background: #ffd700; color: #1e1e1e; } /* gold */
+.level-grandmaster { background: #b9f2ff; color: #1e1e1e; } /* diamond */
+
 .instructions{
   font-size:0.8rem;
   margin:5px;

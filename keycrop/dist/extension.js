@@ -81,6 +81,18 @@ var KEY_MAP = [
   { key: "ctrl+c", category: "Editing", capital_key: "CTRL+C", command: "copy", commandId: "keycrop.growCopy", description: "Copy", active: false },
   { key: "ctrl+v", category: "Editing", capital_key: "CTRL+V", command: "paste", commandId: "keycrop.growPaste", description: "Paste", active: false }
 ];
+var HOTKEY_LEVELS = [
+  { name: "Novice", minUses: 1, className: "level-novice" },
+  // lead
+  { name: "Apprentice", minUses: 15, className: "level-apprentice" },
+  // bronze
+  { name: "Journeyman", minUses: 30, className: "level-journeyman" },
+  // silver
+  { name: "Expert", minUses: 60, className: "level-expert" },
+  // gold
+  { name: "Grandmaster", minUses: 120, className: "level-grandmaster" }
+  // diamond
+];
 
 // src/baseWebViewProvider.ts
 var BaseWebViewProvider = class {
@@ -124,7 +136,7 @@ var InstructionsWebViewProvider = class extends BaseWebViewProvider {
       (cat) => `<button class="category-btn" data-category="${cat}">${cat}</button>`
     ).join("\n        ");
     const tableRows = activeKeys.map(
-      (k) => `<tr data-category="${k.category}" data-command="${k.command}"><td>${k.capital_key}</td><td>${k.description}</td><td class="use-count">0</td></tr>`
+      (k) => `<tr data-category="${k.category}" data-command="${k.command}"><td>${k.capital_key}</td><td>${k.description}</td><td class="use-count">0</td><td class="level-cell"></td></tr>`
     ).join("\n                ");
     return `
       <!DOCTYPE html>
@@ -144,6 +156,7 @@ var InstructionsWebViewProvider = class extends BaseWebViewProvider {
                   <th>Hotkey</th>
                   <th>Description</th>
                   <th>Uses</th>
+                  <th>Level</th>
                 </tr>
               </thead>
               <tbody>
@@ -157,6 +170,15 @@ var InstructionsWebViewProvider = class extends BaseWebViewProvider {
         </div>
         <script>
           const vscode = acquireVsCodeApi();
+          const LEVELS = ${JSON.stringify(HOTKEY_LEVELS)};
+
+          function levelFor(count) {
+            let level = null;
+            for (const l of LEVELS) {
+              if (count >= l.minUses) { level = l; }
+            }
+            return level;
+          }
           vscode.postMessage({ type: 'init' });
 
           window.addEventListener('message', (event) => {
@@ -164,7 +186,17 @@ var InstructionsWebViewProvider = class extends BaseWebViewProvider {
             if (message.action === 'update_counts') {
               Object.entries(message.counts).forEach(([cmd, count]) => {
                 const row = document.querySelector('tr[data-command="' + cmd + '"]');
-                if (row) { row.querySelector('.use-count').textContent = String(count); }
+                if (!row) { return; }
+                row.querySelector('.use-count').textContent = String(count);
+                const level = levelFor(count);
+                const cell = row.querySelector('.level-cell');
+                cell.innerHTML = '';
+                if (level) {
+                  const badge = document.createElement('span');
+                  badge.className = 'level-badge ' + level.className;
+                  badge.textContent = level.name;
+                  cell.appendChild(badge);
+                }
               });
             }
           });

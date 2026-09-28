@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { KEY_MAP } from './keyMap';
+import { KEY_MAP, HOTKEY_LEVELS } from './keyMap';
 import { BaseWebViewProvider, ViewEvent } from './baseWebViewProvider';
 
 export class InstructionsWebViewProvider extends BaseWebViewProvider {
@@ -33,7 +33,7 @@ export class InstructionsWebViewProvider extends BaseWebViewProvider {
     ).join('\n        ');
 
     const tableRows = activeKeys.map(k =>
-      `<tr data-category="${k.category}" data-command="${k.command}"><td>${k.capital_key}</td><td>${k.description}</td><td class="use-count">0</td></tr>`
+      `<tr data-category="${k.category}" data-command="${k.command}"><td>${k.capital_key}</td><td>${k.description}</td><td class="use-count">0</td><td class="level-cell"></td></tr>`
     ).join('\n                ');
 
     return `
@@ -54,6 +54,7 @@ export class InstructionsWebViewProvider extends BaseWebViewProvider {
                   <th>Hotkey</th>
                   <th>Description</th>
                   <th>Uses</th>
+                  <th>Level</th>
                 </tr>
               </thead>
               <tbody>
@@ -67,6 +68,15 @@ export class InstructionsWebViewProvider extends BaseWebViewProvider {
         </div>
         <script>
           const vscode = acquireVsCodeApi();
+          const LEVELS = ${JSON.stringify(HOTKEY_LEVELS)};
+
+          function levelFor(count) {
+            let level = null;
+            for (const l of LEVELS) {
+              if (count >= l.minUses) { level = l; }
+            }
+            return level;
+          }
           vscode.postMessage({ type: 'init' });
 
           window.addEventListener('message', (event) => {
@@ -74,7 +84,17 @@ export class InstructionsWebViewProvider extends BaseWebViewProvider {
             if (message.action === 'update_counts') {
               Object.entries(message.counts).forEach(([cmd, count]) => {
                 const row = document.querySelector('tr[data-command="' + cmd + '"]');
-                if (row) { row.querySelector('.use-count').textContent = String(count); }
+                if (!row) { return; }
+                row.querySelector('.use-count').textContent = String(count);
+                const level = levelFor(count);
+                const cell = row.querySelector('.level-cell');
+                cell.innerHTML = '';
+                if (level) {
+                  const badge = document.createElement('span');
+                  badge.className = 'level-badge ' + level.className;
+                  badge.textContent = level.name;
+                  cell.appendChild(badge);
+                }
               });
             }
           });

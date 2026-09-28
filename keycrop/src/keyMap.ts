@@ -34,3 +34,12 @@ export const KEY_MAP: { key: string; category: string; capital_key: string; comm
   { key: 'ctrl+c', category: 'Editing', capital_key: "CTRL+C", command: 'copy', commandId: 'keycrop.growCopy', description: "Copy", active: false },
   { key: 'ctrl+v', category: 'Editing', capital_key: "CTRL+V", command: 'paste', commandId: 'keycrop.growPaste', description: "Paste", active: false },
 ];
+
+// Hotkey mastery levels. If a key has never been used, no level is assigned.
+export const HOTKEY_LEVELS: { name: string; minUses: number; className: string }[] = [
+  { name: 'Novice',      minUses: 1,   className: 'level-novice' },      // lead
+  { name: 'Apprentice',  minUses: 15,  className: 'level-apprentice' },  // bronze
+  { name: 'Journeyman',  minUses: 30,  className: 'level-journeyman' },  // silver
+  { name: 'Expert',      minUses: 60,  className: 'level-expert' },      // gold
+  { name: 'Grandmaster', minUses: 120, className: 'level-grandmaster' }, // diamond
+];
