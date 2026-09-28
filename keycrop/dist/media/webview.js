@@ -39,6 +39,29 @@
     { key: "ctrl+v", category: "Editing", capital_key: "CTRL+V", command: "paste", commandId: "keycrop.growPaste", description: "Paste", active: false }
   ];
 
+  // src/media/plants.ts
+  var PLANTS = {
+    bean: { price: 2, category: "vegetable", description: "A humble unassuming legume." },
+    tomato: { price: 2, category: "vegetable", description: "This crop has a wide variety of culinary uses." },
+    broccoli: { price: 2, category: "vegetable", description: "Nutritious" },
+    chili: { price: 2, category: "vegetable", description: "Spicy and flavorful." },
+    lettuce: { price: 2, category: "vegetable", description: "Great in salads" },
+    rhubarb: { price: 2, category: "vegetable", description: "The stalks are edible." },
+    ivy: { price: 25, category: "decorative", description: "A decorative ground cover." },
+    jacaranda_tree: { price: 25, category: "decorative", description: "A tree with purple leaves." },
+    raspberry: { price: 4, category: "fruit", description: "A sweet and tart fruit." },
+    strawberry: { price: 4, category: "fruit", description: "A sweet and juicy fruit." },
+    watermelon: { price: 4, category: "fruit", description: "Great with hotkeys in the summer." },
+    glowberry: { price: 50, category: "exotic", description: "Glowberries emit a soft bioluminescent hue." },
+    bulbino: { price: 50, category: "exotic", description: "A mysterious plant." },
+    poison_cabbage: { price: 50, category: "exotic", description: "Closely related to regular cabbage." },
+    neon_mould: { price: 50, category: "exotic", description: "Radioactive mould." }
+  };
+  var ALL_SPECIES = Object.keys(PLANTS);
+  function toLabel(species) {
+    return species.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+  }
+
   // src/media/plant.ts
   var NUM_MILLISECONDS_ALLOWED_BETWEEN_KEY_USES = 0;
   var Plant = class {
@@ -106,9 +129,7 @@
     _updateTooltip() {
       const background = document.getElementById("keycrop")?.getAttribute("background");
       const capitalKey = KEY_MAP.find((k) => k.command === this._key)?.capital_key ?? this._key;
-      const displaySpecies = this.species.replace(/_/g, " ");
-      const capitalSpecies = displaySpecies.charAt(0).toUpperCase() + displaySpecies.slice(1);
-      this._html_element.title = background === "inventory" ? "" : `${capitalSpecies} (${capitalKey})
+      this._html_element.title = background === "inventory" ? "" : `${toLabel(this.species)} (${capitalKey})
 Uses: ${this._num_hotkey_uses}`;
     }
     grow(vscode2) {
@@ -158,8 +179,7 @@ Uses: ${this._num_hotkey_uses}`;
         this._html_element.classList.remove("plant");
         this._html_element.classList.add("harvested-plant");
         this._html_element.hidden = background === "inventory" ? false : true;
-        const displaySpecies = this.species.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
-        this._html_element.title = displaySpecies;
+        this._html_element.title = toLabel(this.species);
       } else {
         this._html_element.classList.remove("harvested-plant");
         this._html_element.classList.add("plant");
@@ -203,8 +223,8 @@ Uses: ${this._num_hotkey_uses}`;
       this._badge_element.textContent = String(this._count);
       this._price_badge_element.textContent = `$${this._price * this._count}`;
     }
-    incrementCount() {
-      this._count += 1;
+    incrementCount(by = 1) {
+      this._count += by;
       this.updateBadgeDisplay();
     }
     /** Removes one from the stack. Returns true when the last one is used and the element is removed. */
@@ -218,29 +238,6 @@ Uses: ${this._num_hotkey_uses}`;
       return false;
     }
   };
-
-  // src/media/plants.ts
-  var PLANTS = {
-    bean: { price: 2, category: "vegetable", description: "A humble unassuming legume." },
-    tomato: { price: 2, category: "vegetable", description: "This crop has a wide variety of culinary uses." },
-    broccoli: { price: 2, category: "vegetable", description: "Nutritious" },
-    chili: { price: 2, category: "vegetable", description: "Spicy and flavorful." },
-    lettuce: { price: 2, category: "vegetable", description: "Great in salads" },
-    rhubarb: { price: 2, category: "vegetable", description: "The stalks are edible." },
-    ivy: { price: 25, category: "decorative", description: "A decorative ground cover." },
-    jacaranda_tree: { price: 25, category: "decorative", description: "A tree with purple leaves." },
-    raspberry: { price: 4, category: "fruit", description: "A sweet and tart fruit." },
-    strawberry: { price: 4, category: "fruit", description: "A sweet and juicy fruit." },
-    watermelon: { price: 4, category: "fruit", description: "Great with hotkeys in the summer." },
-    glowberry: { price: 50, category: "exotic", description: "Glowberries emit a soft bioluminescent hue." },
-    bulbino: { price: 50, category: "exotic", description: "A mysterious plant." },
-    poison_cabbage: { price: 50, category: "exotic", description: "Closely related to regular cabbage." },
-    neon_mould: { price: 50, category: "exotic", description: "Radioactive mould." }
-  };
-  var ALL_SPECIES = Object.keys(PLANTS);
-  function toLabel(species) {
-    return species.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
-  }
 
   // src/media/harvestedPlant.ts
   var HarvestedPlant = class extends InventoryItem {
@@ -257,8 +254,7 @@ Uses: ${this._num_hotkey_uses}`;
       element.classList.add("harvested-plant");
       element.classList.add(species);
       element.dataset.species = species;
-      const displaySpecies = species.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
-      element.title = displaySpecies;
+      element.title = toLabel(species);
       this.createBadge(element);
     }
     useOne() {
@@ -452,12 +448,12 @@ Uses: ${this._num_hotkey_uses}`;
       this.plants.push(p);
     }
     loadHarvestedPlant(species, count) {
-      const existing = this.harvestedPlants.find((p) => p.species === species);
-      if (existing) {
-        existing.incrementCount();
-        return;
-      }
-      this.harvestedPlants.push(new HarvestedPlant(species, count));
+      this.addOrIncrement(
+        this.harvestedPlants,
+        (p) => p.species === species,
+        count,
+        () => new HarvestedPlant(species, count)
+      );
     }
     consumeHarvestedPlant(element) {
       this.consumeItem(this.harvestedPlants, element);
@@ -475,12 +471,21 @@ Uses: ${this._num_hotkey_uses}`;
       }
     }
     addCookedFood(recipeKey, name, imgSrc, count = 1) {
-      const existing = this.cookedFoods.find((f) => f.recipeKey === recipeKey);
+      this.addOrIncrement(
+        this.cookedFoods,
+        (f) => f.recipeKey === recipeKey,
+        count,
+        () => new CookedFood(recipeKey, name, imgSrc, count)
+      );
+    }
+    /** Adds `count` to the matching stack, or creates a new stack if there isn't one. */
+    addOrIncrement(list, isMatch, count, create) {
+      const existing = list.find(isMatch);
       if (existing) {
-        existing.incrementCount();
-        return;
+        existing.incrementCount(count);
+      } else {
+        list.push(create());
       }
-      this.cookedFoods.push(new CookedFood(recipeKey, name, imgSrc, count));
     }
     serialize() {
       return [...new Set(this.plants)].map((plant) => ({
@@ -545,12 +550,13 @@ Uses: ${this._num_hotkey_uses}`;
 
   // src/media/potController.ts
   var PotController = class {
-    constructor(potWrapper2, gameDiv, greenhouse, vscode2, onSell) {
+    constructor(potWrapper2, gameDiv, greenhouse, vscode2, onSell, onCooked) {
       this.potWrapper = potWrapper2;
       this.gameDiv = gameDiv;
       this.greenhouse = greenhouse;
       this.vscode = vscode2;
       this.onSell = onSell;
+      this.onCooked = onCooked;
       this.overlay = potWrapper2.querySelector(".inventory-pot-overlay");
       this.cookBtn = document.getElementById("cook-btn");
       this.progressWrapper = document.getElementById("cook-progress-wrapper");
@@ -748,14 +754,8 @@ Uses: ${this._num_hotkey_uses}`;
         this.cookBtn.disabled = false;
       }
       this.potImg.src = this.potImg.dataset.openSrc;
-      const recipe = RECIPES[recipeKey];
-      if (recipe) {
-        const foodBase2 = document.getElementById("inventory-bottom-right")?.dataset.foodBase ?? "";
-        const foodRow = document.getElementById("food-row");
-        if (foodRow) {
-          foodRow.hidden = false;
-        }
-        this.greenhouse.addCookedFood(recipeKey, recipe.name, `${foodBase2}/${recipe.filename}`);
+      if (RECIPES[recipeKey]) {
+        this.onCooked(recipeKey);
         this.vscode.postMessage({ type: "cooked", recipeKey, species: [species1, species2] });
       }
     }
@@ -926,6 +926,18 @@ Sells for $${recipe.price}`;
     }
     el.hidden = game.greenhouse.harvestedPlants.length > 0 || game.greenhouse.cookedFoods.length > 0;
   }
+  function addCookedFood(recipeKey, count = 1) {
+    const recipe = RECIPES[recipeKey];
+    if (!recipe) {
+      return;
+    }
+    const foodRow = document.getElementById("food-row");
+    if (foodRow) {
+      foodRow.hidden = false;
+    }
+    game.greenhouse.addCookedFood(recipeKey, recipe.name, `${foodBase}/${recipe.filename}`, count);
+    updateEmptyMessage();
+  }
   function sellItem(element, species, recipeKey) {
     const price = parseInt(element.dataset.price ?? "0", 10);
     playerMoney += price;
@@ -968,18 +980,9 @@ Sells for $${recipe.price}`;
         game.greenhouse.loadHarvestedPlant(message.species, message.count);
         updateEmptyMessage();
         break;
-      case "load_cooked": {
-        const recipe = RECIPES[message.recipeKey];
-        if (recipe) {
-          const foodRow = document.getElementById("food-row");
-          if (foodRow) {
-            foodRow.hidden = false;
-          }
-          game.greenhouse.addCookedFood(message.recipeKey, recipe.name, `${foodBase}/${recipe.filename}`, message.count);
-          updateEmptyMessage();
-        }
+      case "load_cooked":
+        addCookedFood(message.recipeKey, message.count);
         break;
-      }
       case "load_collection":
         for (const recipeKey of message.recipeKeys) {
           collection?.discover(recipeKey);
@@ -1060,7 +1063,7 @@ Sells for $${recipe.price}`;
   });
   var potWrapper = document.getElementById("inventory-pot-wrapper");
   if (potWrapper) {
-    new PotController(potWrapper, game.div, game.greenhouse, vscode, sellItem);
+    new PotController(potWrapper, game.div, game.greenhouse, vscode, sellItem, addCookedFood);
   }
   var plantDetailPanel = document.createElement("div");
   plantDetailPanel.id = "plant-detail";

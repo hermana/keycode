@@ -1,11 +1,4 @@
-export type SpeciesOption = {
-  species: string;
-  label: string;
-  description: string;
-  price: number;
-  isFree: boolean;
-  locked: boolean;
-};
+import type { SpeciesOption } from '../messages';
 
 export class SpeciesPicker {
   private readonly overlay: HTMLDivElement;

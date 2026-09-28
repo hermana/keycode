@@ -28,3 +28,14 @@ export const ALL_SPECIES = Object.keys(PLANTS);
 export function toLabel(species: string): string {
   return species.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 }
+
+/** Vegetables (and anything not in PLANTS) cost nothing to plant. */
+export function isFreePlant(species: string): boolean {
+  const data = PLANTS[species];
+  return !data || data.category === 'vegetable';
+}
+
+/** What it costs to plant this species: 0 for free plants, otherwise its price. */
+export function plantingCost(species: string): number {
+  return isFreePlant(species) ? 0 : PLANTS[species].price;
+}

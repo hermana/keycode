@@ -1,10 +1,8 @@
+import type { VsCodeApi } from '../messages';
 import { Greenhouse } from './greenhouse';
 import { RECIPES } from './recipes';
 import { SellMenu } from './sellMenu';
 
-interface VsCodeApi {
-  postMessage(msg: unknown): void;
-}
 
 export class PotController {
   private readonly overlay: HTMLElement;
@@ -23,7 +21,8 @@ export class PotController {
     private readonly gameDiv: HTMLElement,
     private readonly greenhouse: Greenhouse,
     private readonly vscode: VsCodeApi,
-    private readonly onSell: (element: HTMLElement, species?: string, recipeKey?: string) => void
+    private readonly onSell: (element: HTMLElement, species?: string, recipeKey?: string) => void,
+    private readonly onCooked: (recipeKey: string) => void
   ) {
     this.overlay = potWrapper.querySelector('.inventory-pot-overlay') as HTMLElement;
     this.cookBtn = document.getElementById('cook-btn') as HTMLButtonElement | null;
@@ -217,12 +216,8 @@ export class PotController {
     if (this.cookBtn) { this.cookBtn.disabled = false; }
     this.potImg.src = this.potImg.dataset.openSrc!;
 
-    const recipe = RECIPES[recipeKey];
-    if (recipe) {
-      const foodBase = document.getElementById('inventory-bottom-right')?.dataset.foodBase ?? '';
-      const foodRow = document.getElementById('food-row');
-      if (foodRow) { foodRow.hidden = false; }
-      this.greenhouse.addCookedFood(recipeKey, recipe.name, `${foodBase}/${recipe.filename}`);
+    if (RECIPES[recipeKey]) {
+      this.onCooked(recipeKey);
       this.vscode.postMessage({ type: 'cooked', recipeKey, species: [species1, species2] });
     }
   }

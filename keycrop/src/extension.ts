@@ -4,157 +4,27 @@ import * as path from 'path';
 import { MODE } from './mode';
 import { InstructionsWebViewProvider } from './instructionsWebViewProvider';
 import { BaseWebViewProvider } from './baseWebViewProvider';
-import { PLANTS, ALL_SPECIES } from './media/plants';
+import { PLANTS, ALL_SPECIES, toLabel, isFreePlant, plantingCost } from './media/plants';
 import { KEY_MAP } from './keyMap';
+import { GameState } from './gameState';
+import { HotkeyTracker } from './hotkeyTracker';
+import { ActivityLog } from './activityLog';
+import type { FromWebviewMessage, SpeciesOption } from './messages';
 
 const CURRENT_MODE: MODE = MODE.GAME;
 
+// Created in activate(); the providers get the state they need through their constructors
+let game: GameState;
+let hotkeys: HotkeyTracker;
+let activity: ActivityLog;
 let greenhouse: GreenhouseWebViewProvider;
 let instructions: InstructionsWebViewProvider;
 let inventory: InventoryWebViewProvider;
 let config = vscode.workspace.getConfiguration('keycrop');
-let extensionStorageFolder: string = '';
-let plantsPath: string;
-let hotkeysPath: string;
-type HotkeyEntry = { hotkey: string; species: string; timestamp: string; file: string };
-let hotkeyLog: HotkeyEntry[] = [];
-let pluginDataPath: string;
-type PluginDataEntry = { view: string; event: 'opened' | 'closed'; timestamp: string };
-let pluginDataLog: PluginDataEntry[] = [];
-
-type Plant = {
-  key: string;
-  species: string;
-  size: string;
-  harvested: boolean;
-  hotkey_uses: number
-}
-
-function readPlantsFromDisk() {
-  if (!fs.existsSync(extensionStorageFolder)){
-    fs.mkdirSync(extensionStorageFolder, { recursive: true });
-  }
-  if (fs.existsSync(plantsPath)) {
-    try {
-      const saved = JSON.parse(fs.readFileSync(plantsPath, 'utf8'));
-      const savedPlants: any[] = saved.plants ?? saved;
-      const savedHarvested: Record<string, number> = saved.harvestedCounts ?? {};
-      harvestedCounts = new Map(Object.entries(savedHarvested));
-      const savedCooked: Record<string, number> = saved.cookedFoodCounts ?? {};
-      cookedFoodCounts = new Map(Object.entries(savedCooked));
-      playerMoney = saved.playerMoney ?? 0;
-      // Older saves have no discoveredRecipes; anything cooked and still held counts as discovered
-      discoveredRecipes = new Set([...(saved.discoveredRecipes ?? []), ...cookedFoodCounts.keys()]);
-      // Deduplicate by key — prefer non-harvested if there are conflicting entries
-      const seen = new Map<string, Plant>();
-      for (const p of savedPlants) {
-        const existing = seen.get(p.key);
-        if (!existing || (!p.harvested && existing.harvested)) {
-          seen.set(p.key, {key: p.key, species: p.species, size: p.size, harvested: p.harvested, hotkey_uses: p.hotkey_uses});
-        }
-      }
-      plants = Array.from(seen.values());
-    } catch (e) {
-      console.error('Saved plants could not be loaded');
-      console.error(e);
-      plants = new Array<Plant>();
-    }
-  } else {
-    plants = new Array<Plant>();
-  }
-}
-
-function writePlantsToDisk() {
-  if (!fs.existsSync(extensionStorageFolder)){
-    fs.mkdirSync(extensionStorageFolder, { recursive: true });
-  }
-  fs.writeFileSync(plantsPath, JSON.stringify({
-    plants: plants,
-    harvestedCounts: Object.fromEntries(harvestedCounts),
-    cookedFoodCounts: Object.fromEntries(cookedFoodCounts),
-    discoveredRecipes: [...discoveredRecipes],
-    playerMoney
-  }));
-}
-
-function sendPlantsToWebview() {
-  plants.forEach(p => {
-    greenhouse.postMessage({
-      action: 'load',
-      key: p.key,
-      species: p.species,
-      size: p.size,
-      harvested: p.harvested,
-      hotkey_uses: p.hotkey_uses
-    });
-  });
-}
-
-function loadPlantsToInventory() {
-  harvestedCounts.forEach((count, species) => {
-    inventory.postMessage({
-      action: 'load_harvested',
-      species,
-      count
-    });
-  });
-}
-
-function loadCookedFoodsToInventory() {
-  cookedFoodCounts.forEach((count, recipeKey) => {
-    inventory.postMessage({
-      action: 'load_cooked',
-      recipeKey,
-      count
-    });
-  });
-}
 
 function requestWebviewSave() {
   greenhouse.postMessage({
     action: 'save_plants'
-  });
-}
-
-let plants = new Array<Plant>();
-let harvestedCounts = new Map<string, number>();
-let cookedFoodCounts = new Map<string, number>();
-let discoveredRecipes = new Set<string>();
-let playerMoney = 0;
-
-function decrementCount(counts: Map<string, number>, key: string): void {
-  const count = counts.get(key) ?? 0;
-  if (count <= 1) {
-    counts.delete(key);
-  } else {
-    counts.set(key, count - 1);
-  }
-}
-
-// Lifetime uses per hotkey command, shown in the instructions panel. Rebuilt from
-// hotkeys.json on startup, so it survives restarts and new plants never reset it.
-let hotkeyUseCounts: Record<string, number> = {};
-
-function countHotkeyUses(log: HotkeyEntry[]): Record<string, number> {
-  // The log stores the displayed key combo (capital_key); map it back to the command
-  const commandByHotkey = new Map(KEY_MAP.map(k => [k.capital_key, k.command]));
-  const counts: Record<string, number> = {};
-  for (const entry of log) {
-    const command = commandByHotkey.get(entry.hotkey) ?? entry.hotkey;
-    counts[command] = (counts[command] ?? 0) + 1;
-  }
-  return counts;
-}
-
-function getHotkeyCounts(): Record<string, number> {
-  return hotkeyUseCounts;
-}
-
-function addPlant(plant: Plant) {
-  greenhouse.postMessage({
-    action: 'add',
-    species: plant.species, 
-    key: plant.key
   });
 }
 
@@ -170,8 +40,8 @@ function growPlant(key: string) {
     return;
   }
 
-  const existingPlant = plants.find(p => p.key === key);
-  if (existingPlant && !existingPlant.harvested) {
+  const existingPlant = game.growingPlant(key);
+  if (existingPlant) {
     logHotkeyUse(key, existingPlant.species);
     greenhouse.postMessage({
       action: 'grow',
@@ -181,55 +51,29 @@ function growPlant(key: string) {
   } else {
     logHotkeyUse(key, 'None');
     // No plant for this key, or it has been harvested — free the key and let user pick
-    plants = plants.filter(p => p.key !== key);
+    game.clearKey(key);
     greenhouse.postMessage({
       action: 'choose_species',
       key,
-      options: buildSpeciesOptions()
+      options: buildSpeciesOptions(game.playerMoney)
     });
   }
 }
 
-function toLabel(s: string): string {
-  return s.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-}
+function buildSpeciesOptions(playerMoney: number): SpeciesOption[] {
+  const toOption = (s: string, locked: boolean): SpeciesOption => ({
+    species: s,
+    label: toLabel(s),
+    description: PLANTS[s]?.description ?? '',
+    price: PLANTS[s]?.price ?? 0,
+    isFree: isFreePlant(s),
+    locked
+  });
+  const isUnlocked = (s: string) => isFreePlant(s) || playerMoney >= plantingCost(s);
+  const byCost = (a: string, b: string) => plantingCost(a) - plantingCost(b);
 
-function plantingCost(s: string): number {
-  const d = PLANTS[s];
-  return (!d || d.category === 'vegetable') ? 0 : d.price;
-}
-
-type SpeciesOption = {
-  species: string;
-  label: string;
-  description: string;
-  price: number;
-  isFree: boolean;
-  locked: boolean;
-};
-
-function buildSpeciesOptions(): SpeciesOption[] {
-  const toOption = (s: string, locked: boolean): SpeciesOption => {
-    const data = PLANTS[s];
-    const isFree = !data || data.category === 'vegetable';
-    return {
-      species: s,
-      label: toLabel(s),
-      description: data?.description ?? '',
-      price: data?.price ?? 0,
-      isFree,
-      locked
-    };
-  };
-
-  const unlocked = ALL_SPECIES.filter(s => {
-    const data = PLANTS[s];
-    return !data || data.category === 'vegetable' || playerMoney >= data.price;
-  }).sort((a, b) => plantingCost(a) - plantingCost(b));
-  const locked = ALL_SPECIES.filter(s => {
-    const data = PLANTS[s];
-    return data && data.category !== 'vegetable' && playerMoney < data.price;
-  }).sort((a, b) => PLANTS[a].price - PLANTS[b].price);
+  const unlocked = ALL_SPECIES.filter(isUnlocked).sort(byCost);
+  const locked = ALL_SPECIES.filter(s => !isUnlocked(s)).sort(byCost);
 
   return [
     ...unlocked.map(s => toOption(s, false)),
@@ -237,50 +81,30 @@ function buildSpeciesOptions(): SpeciesOption[] {
   ];
 }
 
-function logViewEvent(view: string, event: 'opened' | 'closed'): void {
-  pluginDataLog.push({ view, event, timestamp: new Date().toISOString() });
-  fs.writeFileSync(pluginDataPath, JSON.stringify(pluginDataLog, null, 2));
-}
-
 function logHotkeyUse(key: string, species: string): void {
-  const keyEntry = KEY_MAP.find(k => k.command === key);
-  hotkeyLog.push({
-    hotkey: keyEntry?.capital_key ?? key,
-    species,
-    timestamp: new Date().toISOString(),
-    file: vscode.window.activeTextEditor?.document.fileName ?? ''
-  });
-  fs.writeFileSync(hotkeysPath, JSON.stringify(hotkeyLog, null, 2));
-  hotkeyUseCounts[key] = (hotkeyUseCounts[key] ?? 0) + 1;
-  instructions.postMessage({ action: 'update_counts', counts: getHotkeyCounts() });
+  hotkeys.record(key, species, vscode.window.activeTextEditor?.document.fileName ?? '');
+  instructions.postMessage({ action: 'update_counts', counts: { ...hotkeys.counts } });
 }
 
 export function activate(context: vscode.ExtensionContext) {
 
-  extensionStorageFolder = context.globalStorageUri.fsPath;
-  fs.mkdirSync(extensionStorageFolder, { recursive: true });
-  plantsPath = path.join(extensionStorageFolder, 'plants.json');
-  hotkeysPath = path.join(extensionStorageFolder, 'hotkeys.json');
-  if (fs.existsSync(hotkeysPath)) {
-    try { hotkeyLog = JSON.parse(fs.readFileSync(hotkeysPath, 'utf8')); } catch { hotkeyLog = []; }
-  }
-  hotkeyUseCounts = countHotkeyUses(hotkeyLog);
-  pluginDataPath = path.join(extensionStorageFolder, 'plugin_data.json');
-  if (fs.existsSync(pluginDataPath)) {
-    try { pluginDataLog = JSON.parse(fs.readFileSync(pluginDataPath, 'utf8')); } catch { pluginDataLog = []; }
-  }
-  logViewEvent('vscode', 'opened');
+  const storageFolder = context.globalStorageUri.fsPath;
+  fs.mkdirSync(storageFolder, { recursive: true });
+  hotkeys = new HotkeyTracker(path.join(storageFolder, 'hotkeys.json'));
+  activity = new ActivityLog(path.join(storageFolder, 'plugin_data.json'));
+  activity.record('vscode', 'opened');
 
-  readPlantsFromDisk();
+  game = new GameState(path.join(storageFolder, 'plants.json'));
+  game.load();
 
-  instructions = new InstructionsWebViewProvider(context, getHotkeyCounts, (event) => logViewEvent('instructions', event));
+  instructions = new InstructionsWebViewProvider(context, () => ({ ...hotkeys.counts }), (event) => activity.record('instructions', event));
 	context.subscriptions.push(vscode.window.registerWebviewViewProvider(InstructionsWebViewProvider.viewType, instructions));
 
 	if (CURRENT_MODE === MODE.GAME) {
-		greenhouse = new GreenhouseWebViewProvider(context);
+		greenhouse = new GreenhouseWebViewProvider(context, game);
 		context.subscriptions.push(vscode.window.registerWebviewViewProvider(GreenhouseWebViewProvider.viewType, greenhouse, { webviewOptions: { retainContextWhenHidden: true } }));
 
-		inventory = new InventoryWebViewProvider(context);
+		inventory = new InventoryWebViewProvider(context, game);
 		context.subscriptions.push(vscode.window.registerWebviewViewProvider(InventoryWebViewProvider.viewType, inventory, { webviewOptions: { retainContextWhenHidden: true } }));
 	}
 
@@ -302,69 +126,54 @@ export class GreenhouseWebViewProvider extends BaseWebViewProvider {
 
     public static readonly viewType = 'greenhouse';
 
-    constructor(context: vscode.ExtensionContext) {
-      super(context, (event) => logViewEvent('greenhouse', event));
+    constructor(context: vscode.ExtensionContext, private readonly game: GameState) {
+      super(context, (event) => activity.record('greenhouse', event));
     }
 
-    protected onMessage(message: any, webview: vscode.Webview): void {
+    protected onMessage(message: FromWebviewMessage): void {
       switch (message.type) {
-        //Error message
-        case 'error':
-          vscode.window.showErrorMessage(message.text);
-          break;
-
-        //Info message
-        case 'info':
-          vscode.window.showInformationMessage(message.text);
-          break;
-
         case 'init':
           if(CURRENT_MODE === MODE.GAME){
-            readPlantsFromDisk();
+            this.game.load();
             //Send background
-            webview.postMessage({
+            this.postMessage({
               action: 'background',
               value: 'dirt'
             });
             //Load existing plants array
-            sendPlantsToWebview();
+            for (const p of this.game.allPlants) {
+              this.postMessage({
+                action: 'load',
+                key: p.key,
+                species: p.species,
+                size: p.size,
+                harvested: p.harvested,
+                hotkey_uses: p.hotkey_uses
+              });
+            }
           }else{
-            webview.postMessage({
+            this.postMessage({
               action: 'key-tracking-mode'
             });
           }
           break;
         case 'save_plants': {
-          // Only update growth state from the webview — never remove entries.
-          // The extension is authoritative for which keys are assigned; the webview
-          // can lag behind after a reinit and must not overwrite that state.
-          for (const saved of message.content as any[]) {
-            const existing = plants.find(p => p.key === saved.key);
-            if (existing) {
-              existing.size = saved.size;
-              existing.hotkey_uses = saved.hotkey_uses;
-            }
-          }
-          writePlantsToDisk();
+          this.game.updateGrowth(message.content);
+          this.game.save();
           break;
         }
         case 'harvested': {
-          const harvestedPlant = plants.find(p => p.key === message.key && !p.harvested);
-          if (harvestedPlant) {
-            const alreadyInInventory = harvestedCounts.has(harvestedPlant.species);
-            harvestedPlant.harvested = true;
-            const sizeBefore = harvestedCounts.size;
-            const newCount = (harvestedCounts.get(harvestedPlant.species) ?? 0) + 1;
-            harvestedCounts.set(harvestedPlant.species, newCount);
+          const harvest = this.game.harvest(message.key);
+          if (harvest) {
             inventory.postMessage({
               action: 'load_harvested',
-              species: harvestedPlant.species,
+              species: harvest.species,
               count: 1
             });
-            if (alreadyInInventory) {
+            if (harvest.alreadyOwned) {
               vscode.window.showInformationMessage("Your " + message.text.replace(/_/g, ' ') + " plant has been harvested!");
             }
-            if (sizeBefore < ALL_SPECIES.length && harvestedCounts.size === ALL_SPECIES.length) {
+            if (harvest.completedAllSpecies) {
               vscode.window.showInformationMessage("Achievement unlocked: you've grown one of every plant!");
               inventory.postMessage({ action: 'achievement' });
             }
@@ -372,22 +181,20 @@ export class GreenhouseWebViewProvider extends BaseWebViewProvider {
           break;
         }
         case 'select_species': {
-          const species = message.species as string;
-          const key = message.key as string;
-          const plantData = PLANTS[species];
-          if (plantData && plantData.category !== 'vegetable') {
-            playerMoney -= plantData.price;
-            inventory.postMessage({ action: 'load_money', amount: playerMoney });
+          const { key, species } = message;
+          const moneyBefore = this.game.playerMoney;
+          this.game.plant(key, species);
+          if (this.game.playerMoney !== moneyBefore) {
+            inventory.postMessage({ action: 'load_money', amount: this.game.playerMoney });
           }
           vscode.window.showInformationMessage(`A new ${species.replace(/_/g, ' ')} plant has sprouted in the greenhouse!`);
-          plants.push({ key, species, size: 'start', harvested: false, hotkey_uses: 1 });
-          addPlant({ key, species, size: 'start', harvested: false, hotkey_uses: 1 });
-          writePlantsToDisk();
+          this.postMessage({ action: 'add', species, key });
+          this.game.save();
           requestWebviewSave();
           break;
         }
         case 'locked_species_click': {
-          const species = message.species as string;
+          const species = message.species;
           const data = PLANTS[species];
           if (data) {
             vscode.window.showInformationMessage(`You need $${data.price} to unlock ${toLabel(species)}.`);
@@ -426,51 +233,44 @@ export class InventoryWebViewProvider extends BaseWebViewProvider {
 
   public static readonly viewType = "inventory";
 
-  constructor(context: vscode.ExtensionContext) {
-    super(context, (event) => logViewEvent('inventory', event));
+  constructor(context: vscode.ExtensionContext, private readonly game: GameState) {
+    super(context, (event) => activity.record('inventory', event));
   }
 
-  protected onMessage(message: any, webview: vscode.Webview): void {
+  protected onMessage(message: FromWebviewMessage): void {
     switch (message.type) {
       case 'init':
         if(CURRENT_MODE === MODE.GAME){
           //Send background
-          webview.postMessage({
+          this.postMessage({
             action: 'background',
             value: 'inventory'
           });
-          //Load harvested plants into inventory
-          loadPlantsToInventory();
-          loadCookedFoodsToInventory();
-          webview.postMessage({ action: 'load_collection', recipeKeys: [...discoveredRecipes] });
-          webview.postMessage({ action: 'load_money', amount: playerMoney });
+          //Load harvested plants and cooked food into inventory
+          this.game.harvested.forEach((count, species) => {
+            this.postMessage({ action: 'load_harvested', species, count });
+          });
+          this.game.cooked.forEach((count, recipeKey) => {
+            this.postMessage({ action: 'load_cooked', recipeKey, count });
+          });
+          this.postMessage({ action: 'load_collection', recipeKeys: [...this.game.discovered] });
+          this.postMessage({ action: 'load_money', amount: this.game.playerMoney });
         }else{
-          webview.postMessage({
+          this.postMessage({
             action: 'key-tracking-mode'
           });
         }
         break;
       case 'sell': {
-        playerMoney += message.amount ?? 0;
-        if (message.species) {
-          decrementCount(harvestedCounts, message.species);
-        } else if (message.recipeKey) {
-          decrementCount(cookedFoodCounts, message.recipeKey);
-        }
-        writePlantsToDisk();
+        this.game.sell(message.amount ?? 0, message.species, message.recipeKey);
+        this.game.save();
         break;
       }
       case 'cooked': {
-        const current = cookedFoodCounts.get(message.recipeKey) ?? 0;
-        cookedFoodCounts.set(message.recipeKey, current + 1);
-        if (!discoveredRecipes.has(message.recipeKey)) {
-          discoveredRecipes.add(message.recipeKey);
-          webview.postMessage({ action: 'load_collection', recipeKeys: [message.recipeKey] });
+        if (this.game.cook(message.recipeKey, message.species)) {
+          this.postMessage({ action: 'load_collection', recipeKeys: [message.recipeKey] });
         }
-        for (const species of (message.species as string[])) {
-          decrementCount(harvestedCounts, species);
-        }
-        writePlantsToDisk();
+        this.game.save();
         break;
       }
     }

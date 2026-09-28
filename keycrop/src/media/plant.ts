@@ -1,4 +1,6 @@
 import { KEY_MAP } from '../keyMap';
+import type { VsCodeApi } from '../messages';
+import { toLabel } from './plants';
 
 const NUM_MILLISECONDS_ALLOWED_BETWEEN_KEY_USES: number = 0; //30000; // 30 seconds
 
@@ -63,14 +65,12 @@ export class Plant {
   private _updateTooltip(): void {
     const background = (document.getElementById('keycrop') as HTMLElement)?.getAttribute('background');
     const capitalKey = KEY_MAP.find(k => k.command === this._key)?.capital_key ?? this._key;
-    const displaySpecies = this.species.replace(/_/g, ' ');
-    const capitalSpecies = displaySpecies.charAt(0).toUpperCase() + displaySpecies.slice(1);
     this._html_element.title = background === 'inventory'
       ? ''
-      : `${capitalSpecies} (${capitalKey})\nUses: ${this._num_hotkey_uses}`;
+      : `${toLabel(this.species)} (${capitalKey})\nUses: ${this._num_hotkey_uses}`;
   }
 
-  grow(vscode: { postMessage(msg: unknown): void }): void {
+  grow(vscode: VsCodeApi): void {
     //check for mashing
     const now = Date.now();
     if (now - this._last_key_use > NUM_MILLISECONDS_ALLOWED_BETWEEN_KEY_USES) {
@@ -121,8 +121,7 @@ export class Plant {
       this._html_element.classList.remove('plant');
       this._html_element.classList.add('harvested-plant');
       this._html_element.hidden = background === 'inventory' ? false : true;
-      const displaySpecies = this.species.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-      this._html_element.title = displaySpecies;
+      this._html_element.title = toLabel(this.species);
     } else {
       this._html_element.classList.remove('harvested-plant');
       this._html_element.classList.add('plant');

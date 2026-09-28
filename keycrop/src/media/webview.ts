@@ -3,10 +3,7 @@ import { RECIPES } from './recipes';
 import { PotController } from './potController';
 import { SpeciesPicker } from './speciesPicker';
 import { Collection } from './collection';
-
-interface VsCodeApi {
-  postMessage(msg: unknown): void;
-}
+import type { ToWebviewMessage, VsCodeApi } from '../messages';
 
 declare function acquireVsCodeApi(): VsCodeApi;
 
@@ -44,6 +41,16 @@ function updateEmptyMessage(): void {
   el.hidden = game.greenhouse.harvestedPlants.length > 0 || game.greenhouse.cookedFoods.length > 0;
 }
 
+/** Shows a cooked dish in the inventory's food row. */
+function addCookedFood(recipeKey: string, count = 1): void {
+  const recipe = RECIPES[recipeKey];
+  if (!recipe) { return; }
+  const foodRow = document.getElementById('food-row');
+  if (foodRow) { foodRow.hidden = false; }
+  game.greenhouse.addCookedFood(recipeKey, recipe.name, `${foodBase}/${recipe.filename}`, count);
+  updateEmptyMessage();
+}
+
 function sellItem(element: HTMLElement, species?: string, recipeKey?: string): void {
   const price = parseInt(element.dataset.price ?? '0', 10);
   playerMoney += price;
@@ -55,7 +62,7 @@ function sellItem(element: HTMLElement, species?: string, recipeKey?: string): v
 
 //Messages from VSCode
 window.addEventListener('message', (event: MessageEvent) => {
-  const message = event.data;
+  const message = event.data as ToWebviewMessage;
   switch (message.action) {
     case 'key-tracking-mode':
       hideGameElements();
@@ -89,18 +96,11 @@ window.addEventListener('message', (event: MessageEvent) => {
       game.greenhouse.loadHarvestedPlant(message.species, message.count);
       updateEmptyMessage();
       break;
-    case 'load_cooked': {
-      const recipe = RECIPES[message.recipeKey];
-      if (recipe) {
-        const foodRow = document.getElementById('food-row');
-        if (foodRow) { foodRow.hidden = false; }
-        game.greenhouse.addCookedFood(message.recipeKey, recipe.name, `${foodBase}/${recipe.filename}`, message.count);
-        updateEmptyMessage();
-      }
+    case 'load_cooked':
+      addCookedFood(message.recipeKey, message.count);
       break;
-    }
     case 'load_collection':
-      for (const recipeKey of message.recipeKeys as string[]) {
+      for (const recipeKey of message.recipeKeys) {
         collection?.discover(recipeKey);
       }
       break;
@@ -179,7 +179,7 @@ collectionBtn?.addEventListener('click', () => {
 
 const potWrapper = document.getElementById('inventory-pot-wrapper');
 if (potWrapper) {
-  new PotController(potWrapper, game.div, game.greenhouse, vscode, sellItem);
+  new PotController(potWrapper, game.div, game.greenhouse, vscode, sellItem, addCookedFood);
 }
 
 // Plant detail panel — greenhouse only (.plant elements don't exist in inventory)

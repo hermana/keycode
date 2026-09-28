@@ -1,6 +1,8 @@
 import { Plant } from './plant';
 import { HarvestedPlant } from './harvestedPlant';
 import { CookedFood } from './cookedFood';
+import { InventoryItem } from './inventoryItem';
+import type { PlantSnapshot, ToWebviewMessage, VsCodeApi } from '../messages';
 
 export class Greenhouse {
   plants: Plant[] = [];
@@ -17,7 +19,7 @@ export class Greenhouse {
     this.plants.push(new Plant(key, species));
   }
 
-  grow(key: string, vscode: { postMessage(msg: unknown): void }): void {
+  grow(key: string, vscode: VsCodeApi): void {
     this.plants.forEach(plant => {
       if (plant.key === key && !plant.html_element.classList.contains('harvested-plant')) {
         plant.grow(vscode);
@@ -25,7 +27,7 @@ export class Greenhouse {
     });
   }
 
-  loadPlant(message: any, background: string | null): void {
+  loadPlant(message: Extract<ToWebviewMessage, { action: 'load' }>, background: string | null): void {
     // Remove any existing plant for this key so reloads don't accumulate duplicates
     const existingIndex = this.plants.findIndex(p => p.key === message.key);
     if (existingIndex !== -1) {
@@ -40,12 +42,8 @@ export class Greenhouse {
   }
 
   loadHarvestedPlant(species: string, count: number): void {
-    const existing = this.harvestedPlants.find(p => p.species === species);
-    if (existing) {
-      existing.incrementCount();
-      return;
-    }
-    this.harvestedPlants.push(new HarvestedPlant(species, count));
+    this.addOrIncrement(this.harvestedPlants, p => p.species === species, count,
+      () => new HarvestedPlant(species, count));
   }
 
   consumeHarvestedPlant(element: HTMLElement): void {
@@ -65,15 +63,23 @@ export class Greenhouse {
   }
 
   addCookedFood(recipeKey: string, name: string, imgSrc: string, count = 1): void {
-    const existing = this.cookedFoods.find(f => f.recipeKey === recipeKey);
-    if (existing) {
-      existing.incrementCount();
-      return;
-    }
-    this.cookedFoods.push(new CookedFood(recipeKey, name, imgSrc, count));
+    this.addOrIncrement(this.cookedFoods, f => f.recipeKey === recipeKey, count,
+      () => new CookedFood(recipeKey, name, imgSrc, count));
   }
 
-  serialize(): object[] {
+  /** Adds `count` to the matching stack, or creates a new stack if there isn't one. */
+  private addOrIncrement<T extends InventoryItem>(
+    list: T[], isMatch: (item: T) => boolean, count: number, create: () => T
+  ): void {
+    const existing = list.find(isMatch);
+    if (existing) {
+      existing.incrementCount(count);
+    } else {
+      list.push(create());
+    }
+  }
+
+  serialize(): PlantSnapshot[] {
     // FIXME: de-duplication guard — plants are being double-added somewhere upstream
     return [...new Set(this.plants)].map(plant => ({
       key: plant.key,

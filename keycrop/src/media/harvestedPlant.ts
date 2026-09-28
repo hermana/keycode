@@ -1,5 +1,5 @@
 import { InventoryItem } from './inventoryItem';
-import { PLANTS } from './plants';
+import { PLANTS, toLabel } from './plants';
 
 export class HarvestedPlant extends InventoryItem {
   _species: string;
@@ -18,8 +18,7 @@ export class HarvestedPlant extends InventoryItem {
     element.classList.add(species);
     element.dataset.species = species;
 
-    const displaySpecies = species.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-    element.title = displaySpecies;
+    element.title = toLabel(species);
 
     this.createBadge(element);
   }

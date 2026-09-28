@@ -33,8 +33,8 @@ export abstract class InventoryItem {
     this._price_badge_element.textContent = `$${this._price * this._count}`;
   }
 
-  incrementCount(): void {
-    this._count += 1;
+  incrementCount(by = 1): void {
+    this._count += by;
     this.updateBadgeDisplay();
   }
 

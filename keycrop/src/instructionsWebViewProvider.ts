@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import { KEY_MAP, HOTKEY_LEVELS } from './keyMap';
 import { BaseWebViewProvider, ViewEvent } from './baseWebViewProvider';
+import type { FromWebviewMessage } from './messages';
 
 export class InstructionsWebViewProvider extends BaseWebViewProvider {
 
@@ -14,9 +15,9 @@ export class InstructionsWebViewProvider extends BaseWebViewProvider {
     super(context, onViewEvent);
   }
 
-  protected onMessage(message: any, webview: vscode.Webview): void {
+  protected onMessage(message: FromWebviewMessage): void {
     if (message.type === 'init') {
-      webview.postMessage({ action: 'update_counts', counts: this.getHotkeyCounts() });
+      this.postMessage({ action: 'update_counts', counts: this.getHotkeyCounts() });
     }
   }
 
