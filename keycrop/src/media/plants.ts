@@ -23,3 +23,8 @@ export const PLANTS: Record<string, PlantData> = {
 };
 
 export const ALL_SPECIES = Object.keys(PLANTS);
+
+/** 'jacaranda_tree' → 'Jacaranda Tree' */
+export function toLabel(species: string): string {
+  return species.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+}

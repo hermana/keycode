@@ -131,14 +131,23 @@ function decrementCount(counts: Map<string, number>, key: string): void {
   }
 }
 
-function getHotkeyCounts(): Record<string, number> {
+// Lifetime uses per hotkey command, shown in the instructions panel. Rebuilt from
+// hotkeys.json on startup, so it survives restarts and new plants never reset it.
+let hotkeyUseCounts: Record<string, number> = {};
+
+function countHotkeyUses(log: HotkeyEntry[]): Record<string, number> {
+  // The log stores the displayed key combo (capital_key); map it back to the command
+  const commandByHotkey = new Map(KEY_MAP.map(k => [k.capital_key, k.command]));
   const counts: Record<string, number> = {};
-  for (const plant of plants) {
-    if (plant.key) {
-      counts[plant.key] = (counts[plant.key] ?? 0) + plant.hotkey_uses;
-    }
+  for (const entry of log) {
+    const command = commandByHotkey.get(entry.hotkey) ?? entry.hotkey;
+    counts[command] = (counts[command] ?? 0) + 1;
   }
   return counts;
+}
+
+function getHotkeyCounts(): Record<string, number> {
+  return hotkeyUseCounts;
 }
 
 function addPlant(plant: Plant) {
@@ -242,6 +251,8 @@ function logHotkeyUse(key: string, species: string): void {
     file: vscode.window.activeTextEditor?.document.fileName ?? ''
   });
   fs.writeFileSync(hotkeysPath, JSON.stringify(hotkeyLog, null, 2));
+  hotkeyUseCounts[key] = (hotkeyUseCounts[key] ?? 0) + 1;
+  instructions.postMessage({ action: 'update_counts', counts: getHotkeyCounts() });
 }
 
 export function activate(context: vscode.ExtensionContext) {
@@ -253,6 +264,7 @@ export function activate(context: vscode.ExtensionContext) {
   if (fs.existsSync(hotkeysPath)) {
     try { hotkeyLog = JSON.parse(fs.readFileSync(hotkeysPath, 'utf8')); } catch { hotkeyLog = []; }
   }
+  hotkeyUseCounts = countHotkeyUses(hotkeyLog);
   pluginDataPath = path.join(extensionStorageFolder, 'plugin_data.json');
   if (fs.existsSync(pluginDataPath)) {
     try { pluginDataLog = JSON.parse(fs.readFileSync(pluginDataPath, 'utf8')); } catch { pluginDataLog = []; }
@@ -334,7 +346,6 @@ export class GreenhouseWebViewProvider extends BaseWebViewProvider {
             }
           }
           writePlantsToDisk();
-          instructions.postMessage({ action: 'update_counts', counts: getHotkeyCounts() });
           break;
         }
         case 'harvested': {
@@ -483,6 +494,7 @@ export class InventoryWebViewProvider extends BaseWebViewProvider {
           <title>KeyCrop Inventory</title>
         </head>
         <body>
+          <div id="empty-inventory-message" class="instructions">You currently don't have anything in your inventory.</div>
           <div id="keycrop">
             <!-- Shelves hidden for now; uncomment to bring them back (renderShelfRow skips when this is missing) -->
             <!-- <div id="shelf-strip"></div> -->
@@ -492,7 +504,6 @@ export class InventoryWebViewProvider extends BaseWebViewProvider {
             <div id="money-display">$0</div>
             <button id="collection-btn">Collection</button>
           </div>
-          <div id="empty-inventory-message" class="instructions">You currently don't have anything in your inventory.</div>
           <div id="food-row" hidden></div>
           <div id="inventory-bottom-right" data-food-base="${foodBase}">
             <div id="inventory-pot-wrapper" class="inventory-pot-wrapper">

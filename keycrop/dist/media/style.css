@@ -35,7 +35,7 @@ body {
 
 #keycrop[background="inventory"]{
     width:100%;
-    flex: 1;
+    flex: 0 0 35%; /* plants get the top 35%; cooked food starts below that */
     min-height: 0;
     overflow-y: auto;
     position: relative;
@@ -190,7 +190,8 @@ body {
   font-weight:bold;
 }
 
-#plant-detail {
+#plant-detail,
+#collection-detail {
   position: fixed;
   background: var(--vscode-editor-background, #1e1e1e);
   color: var(--vscode-foreground, #cccccc);
@@ -243,10 +244,18 @@ body {
   clear: both;
   display: flex;
   flex-wrap: wrap;
+  align-content: flex-start;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
   gap: 4px;
   padding: 8px 0 4px 0;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   margin-top: 8px;
+}
+
+#food-row[hidden] {
+  display: none;
 }
 
 .cooked-food {
@@ -977,6 +986,15 @@ background: url(./vegetables/watermelon_large.png);
   color: var(--vscode-menu-foreground, #ccc);
 }
 
+.context-menu-name {
+  padding: 6px 14px;
+  font-family: monospace;
+  font-size: 0.8rem;
+  color: var(--vscode-foreground, #cccccc);
+  border-bottom: 1px solid var(--vscode-menu-border, rgba(255,255,255,0.2));
+  margin-bottom: 4px;
+}
+
 .context-menu-option:hover {
   background: var(--vscode-menu-selectionBackground, rgba(255,255,255,0.1));
   color: var(--vscode-menu-selectionForeground, #fff);
@@ -1005,6 +1023,7 @@ body.collection-view #collection-grid {
 }
 
 .collection-slot {
+  cursor: pointer;
   width: 100%;
   aspect-ratio: 1;
   object-fit: contain;

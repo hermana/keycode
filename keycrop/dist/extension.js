@@ -320,14 +320,18 @@ function decrementCount(counts, key) {
     counts.set(key, count - 1);
   }
 }
-function getHotkeyCounts() {
+var hotkeyUseCounts = {};
+function countHotkeyUses(log) {
+  const commandByHotkey = new Map(KEY_MAP.map((k) => [k.capital_key, k.command]));
   const counts = {};
-  for (const plant of plants) {
-    if (plant.key) {
-      counts[plant.key] = (counts[plant.key] ?? 0) + plant.hotkey_uses;
-    }
+  for (const entry of log) {
+    const command = commandByHotkey.get(entry.hotkey) ?? entry.hotkey;
+    counts[command] = (counts[command] ?? 0) + 1;
   }
   return counts;
+}
+function getHotkeyCounts() {
+  return hotkeyUseCounts;
 }
 function addPlant(plant) {
   greenhouse.postMessage({
@@ -410,6 +414,8 @@ function logHotkeyUse(key, species) {
     file: vscode2.window.activeTextEditor?.document.fileName ?? ""
   });
   fs.writeFileSync(hotkeysPath, JSON.stringify(hotkeyLog, null, 2));
+  hotkeyUseCounts[key] = (hotkeyUseCounts[key] ?? 0) + 1;
+  instructions.postMessage({ action: "update_counts", counts: getHotkeyCounts() });
 }
 function activate(context) {
   extensionStorageFolder = context.globalStorageUri.fsPath;
@@ -423,6 +429,7 @@ function activate(context) {
       hotkeyLog = [];
     }
   }
+  hotkeyUseCounts = countHotkeyUses(hotkeyLog);
   pluginDataPath = path.join(extensionStorageFolder, "plugin_data.json");
   if (fs.existsSync(pluginDataPath)) {
     try {
@@ -488,7 +495,6 @@ var GreenhouseWebViewProvider = class extends BaseWebViewProvider {
           }
         }
         writePlantsToDisk();
-        instructions.postMessage({ action: "update_counts", counts: getHotkeyCounts() });
         break;
       }
       case "harvested": {
@@ -625,6 +631,7 @@ var InventoryWebViewProvider = class extends BaseWebViewProvider {
           <title>KeyCrop Inventory</title>
         </head>
         <body>
+          <div id="empty-inventory-message" class="instructions">You currently don't have anything in your inventory.</div>
           <div id="keycrop">
             <!-- Shelves hidden for now; uncomment to bring them back (renderShelfRow skips when this is missing) -->
             <!-- <div id="shelf-strip"></div> -->
@@ -634,7 +641,6 @@ var InventoryWebViewProvider = class extends BaseWebViewProvider {
             <div id="money-display">$0</div>
             <button id="collection-btn">Collection</button>
           </div>
-          <div id="empty-inventory-message" class="instructions">You currently don't have anything in your inventory.</div>
           <div id="food-row" hidden></div>
           <div id="inventory-bottom-right" data-food-base="${foodBase}">
             <div id="inventory-pot-wrapper" class="inventory-pot-wrapper">

@@ -238,6 +238,9 @@ Uses: ${this._num_hotkey_uses}`;
     neon_mould: { price: 50, category: "exotic", description: "Radioactive mould." }
   };
   var ALL_SPECIES = Object.keys(PLANTS);
+  function toLabel(species) {
+    return species.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+  }
 
   // src/media/harvestedPlant.ts
   var HarvestedPlant = class extends InventoryItem {
@@ -498,6 +501,9 @@ Uses: ${this._num_hotkey_uses}`;
       this.menu = document.createElement("div");
       this.menu.id = "item-context-menu";
       this.menu.hidden = true;
+      this.nameLabel = document.createElement("div");
+      this.nameLabel.className = "context-menu-name";
+      this.menu.appendChild(this.nameLabel);
       this.sellOption = document.createElement("div");
       this.sellOption.className = "context-menu-option";
       this.sellOption.textContent = "Sell";
@@ -505,12 +511,18 @@ Uses: ${this._num_hotkey_uses}`;
       document.body.appendChild(this.menu);
       this.sellOption.addEventListener("click", () => this.onSellClick());
       document.addEventListener("click", () => this.hide());
+      document.addEventListener("scroll", () => this.hide(), true);
     }
     menu;
+    nameLabel;
     sellOption;
     target = null;
     show(x, y, target) {
       this.target = target;
+      const { recipeKey, species } = target.dataset;
+      const name = recipeKey ? RECIPES[recipeKey]?.name : species ? toLabel(species) : void 0;
+      this.nameLabel.textContent = name ?? "";
+      this.nameLabel.hidden = !name;
       const price = parseInt(target.dataset.price ?? "0", 10);
       this.sellOption.textContent = `Sell ($${price})`;
       this.menu.style.left = `${x}px`;
@@ -835,9 +847,21 @@ Uses: ${this._num_hotkey_uses}`;
   var Collection = class {
     constructor(container, foodBase2) {
       this.foodBase = foodBase2;
+      this.detailPanel = document.createElement("div");
+      this.detailPanel.id = "collection-detail";
+      this.detailPanel.hidden = true;
+      document.body.appendChild(this.detailPanel);
+      document.addEventListener("click", () => {
+        this.detailPanel.hidden = true;
+      });
+      document.addEventListener("scroll", () => {
+        this.detailPanel.hidden = true;
+      }, true);
       for (const recipeKey of Object.keys(RECIPES)) {
         const slot = document.createElement("img");
         slot.className = "collection-slot";
+        slot.dataset.recipeKey = recipeKey;
+        slot.addEventListener("click", (e) => this.showDetails(e, slot));
         slot.src = `${foodBase2}/mystery_item.png`;
         slot.title = "???";
         container.appendChild(slot);
@@ -845,6 +869,7 @@ Uses: ${this._num_hotkey_uses}`;
       }
     }
     slots = /* @__PURE__ */ new Map();
+    detailPanel;
     discover(recipeKey) {
       const slot = this.slots.get(recipeKey);
       const recipe = RECIPES[recipeKey];
@@ -854,6 +879,23 @@ Uses: ${this._num_hotkey_uses}`;
       slot.src = `${this.foodBase}/${recipe.filename}`;
       slot.title = recipe.name;
       slot.classList.add("discovered");
+    }
+
+    showDetails(e, slot) {
+      e.stopPropagation();
+      const recipeKey = slot.dataset.recipeKey;
+      const recipe = RECIPES[recipeKey];
+      if (slot.classList.contains("discovered") && recipe) {
+        const ingredients = recipeKey.split("+").map(toLabel).join(" + ");
+        this.detailPanel.textContent = `${recipe.name}
+${ingredients}
+Sells for $${recipe.price}`;
+      } else {
+        this.detailPanel.textContent = "???";
+      }
+      this.detailPanel.style.left = `${e.clientX + 8}px`;
+      this.detailPanel.style.top = `${e.clientY + 8}px`;
+      this.detailPanel.hidden = false;
     }
   };
 
