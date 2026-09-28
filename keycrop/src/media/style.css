@@ -239,7 +239,7 @@ body {
 
 .plant {
     float: left;
-    margin-top:30vh;
+    margin-top:16px;
     margin-left:5vw;
     width:50px;
     height:50px;
@@ -920,6 +920,13 @@ background: url(./vegetables/watermelon_large.png);
   padding: 10px 12px;
   font-weight: bold;
   font-size: 0.85rem;
+  border-bottom: 1px solid rgba(255,255,255,0.15);
+}
+
+#species-picker-subtitle {
+  padding: 6px 12px;
+  font-size: 0.75rem;
+  opacity: 0.8;
   border-bottom: 1px solid rgba(255,255,255,0.15);
 }
 

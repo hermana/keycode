@@ -22,6 +22,9 @@ let instructions: InstructionsWebViewProvider;
 let inventory: InventoryWebViewProvider;
 let config = vscode.workspace.getConfiguration('keycrop');
 
+// Newly used hotkeys still waiting for a species; the most recent is last and shown first
+const pendingKeys: string[] = [];
+
 function requestWebviewSave() {
   greenhouse.postMessage({
     action: 'save_plants'
@@ -52,11 +55,34 @@ function growPlant(key: string) {
     logHotkeyUse(key, 'None');
     // No plant for this key, or it has been harvested — free the key and let user pick
     game.clearKey(key);
-    greenhouse.postMessage({
-      action: 'choose_species',
-      key,
-      options: buildSpeciesOptions(game.playerMoney)
-    });
+    removePendingKey(key);
+    pendingKeys.push(key);
+    showSpeciesPicker(key);
+  }
+}
+
+function removePendingKey(key: string): void {
+  const index = pendingKeys.indexOf(key);
+  if (index !== -1) { pendingKeys.splice(index, 1); }
+}
+
+function showSpeciesPicker(key: string): void {
+  greenhouse.postMessage({
+    action: 'choose_species',
+    key,
+    options: buildSpeciesOptions(game.playerMoney)
+  });
+}
+
+/** After a species is chosen, reopens the picker for the next most recent key that still has no plant. */
+function showNextPendingKey(): void {
+  while (pendingKeys.length > 0) {
+    const key = pendingKeys[pendingKeys.length - 1];
+    if (!game.growingPlant(key)) {
+      showSpeciesPicker(key);
+      return;
+    }
+    pendingKeys.pop();
   }
 }
 
@@ -191,6 +217,8 @@ export class GreenhouseWebViewProvider extends BaseWebViewProvider {
           this.postMessage({ action: 'add', species, key });
           this.game.save();
           requestWebviewSave();
+          removePendingKey(key);
+          showNextPendingKey();
           break;
         }
         case 'locked_species_click': {

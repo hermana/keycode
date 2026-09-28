@@ -463,6 +463,7 @@ var greenhouse;
 var instructions;
 var inventory;
 var config = vscode2.workspace.getConfiguration("keycrop");
+var pendingKeys = [];
 function requestWebviewSave() {
   greenhouse.postMessage({
     action: "save_plants"
@@ -489,11 +490,32 @@ function growPlant(key) {
   } else {
     logHotkeyUse(key, "None");
     game.clearKey(key);
-    greenhouse.postMessage({
-      action: "choose_species",
-      key,
-      options: buildSpeciesOptions(game.playerMoney)
-    });
+    removePendingKey(key);
+    pendingKeys.push(key);
+    showSpeciesPicker(key);
+  }
+}
+function removePendingKey(key) {
+  const index = pendingKeys.indexOf(key);
+  if (index !== -1) {
+    pendingKeys.splice(index, 1);
+  }
+}
+function showSpeciesPicker(key) {
+  greenhouse.postMessage({
+    action: "choose_species",
+    key,
+    options: buildSpeciesOptions(game.playerMoney)
+  });
+}
+function showNextPendingKey() {
+  while (pendingKeys.length > 0) {
+    const key = pendingKeys[pendingKeys.length - 1];
+    if (!game.growingPlant(key)) {
+      showSpeciesPicker(key);
+      return;
+    }
+    pendingKeys.pop();
   }
 }
 function buildSpeciesOptions(playerMoney) {
@@ -608,6 +630,8 @@ var GreenhouseWebViewProvider = class extends BaseWebViewProvider {
         this.postMessage({ action: "add", species, key });
         this.game.save();
         requestWebviewSave();
+        removePendingKey(key);
+        showNextPendingKey();
         break;
       }
       case "locked_species_click": {

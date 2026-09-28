@@ -1,8 +1,10 @@
+import { KEY_MAP } from '../keyMap';
 import type { SpeciesOption } from '../messages';
 
 export class SpeciesPicker {
   private readonly overlay: HTMLDivElement;
   private readonly list: HTMLDivElement;
+  private readonly title: HTMLDivElement;
   private key = '';
 
   constructor(
@@ -16,10 +18,14 @@ export class SpeciesPicker {
     const panel = document.createElement('div');
     panel.id = 'species-picker';
 
-    const title = document.createElement('div');
-    title.id = 'species-picker-title';
-    title.textContent = 'Choose a species for your new plant';
-    panel.appendChild(title);
+    this.title = document.createElement('div');
+    this.title.id = 'species-picker-title';
+    panel.appendChild(this.title);
+
+    const subtitle = document.createElement('div');
+    subtitle.id = 'species-picker-subtitle';
+    subtitle.textContent = 'Choose a species for your new plant';
+    panel.appendChild(subtitle);
 
     this.list = document.createElement('div');
     this.list.id = 'species-picker-list';
@@ -35,6 +41,8 @@ export class SpeciesPicker {
 
   show(key: string, options: SpeciesOption[]): void {
     this.key = key;
+    const capitalKey = KEY_MAP.find(k => k.command === key)?.capital_key ?? key;
+    this.title.textContent = `You used a new hotkey: ${capitalKey}`;
     this.list.innerHTML = '';
 
     let sawLocked = false;

@@ -2,7 +2,7 @@
 
 Each day of the study, you will make the same set of changes to a Markdown file.
 
-To start the study, open the Markdown file corresponding to the day of the study. On the first day, you will open `study-task-day-one.md`. You will do the same set of actions each day of the study, as outlined below. 
+To start the study, open the Markdown file corresponding to the day of the study. For example, on the first day you will open `study-task-day-one.md`. You will do the same set of actions each day of the study, as outlined below. 
 
 Before beginning the tasks, open the Markdown preview so you can check your work as you go. You can open the preview in the current tab with `Ctrl+Shift+V` (Windows/Linux) or `Cmd+Shift+V` (Mac), or open it side by side with the editor using `Ctrl+K V` (Windows/Linux) or `Cmd+K V` (Mac). The side-by-side view is recommended.
 

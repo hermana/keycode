@@ -771,10 +771,13 @@ Uses: ${this._num_hotkey_uses}`;
       this.overlay.hidden = true;
       const panel = document.createElement("div");
       panel.id = "species-picker";
-      const title = document.createElement("div");
-      title.id = "species-picker-title";
-      title.textContent = "Choose a species for your new plant";
-      panel.appendChild(title);
+      this.title = document.createElement("div");
+      this.title.id = "species-picker-title";
+      panel.appendChild(this.title);
+      const subtitle = document.createElement("div");
+      subtitle.id = "species-picker-subtitle";
+      subtitle.textContent = "Choose a species for your new plant";
+      panel.appendChild(subtitle);
       this.list = document.createElement("div");
       this.list.id = "species-picker-list";
       panel.appendChild(this.list);
@@ -788,9 +791,12 @@ Uses: ${this._num_hotkey_uses}`;
     }
     overlay;
     list;
+    title;
     key = "";
     show(key, options) {
       this.key = key;
+      const capitalKey = KEY_MAP.find((k) => k.command === key)?.capital_key ?? key;
+      this.title.textContent = `You used a new hotkey: ${capitalKey}`;
       this.list.innerHTML = "";
       let sawLocked = false;
       for (const opt of options) {
