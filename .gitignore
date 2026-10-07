@@ -2,4 +2,6 @@ node_modules/
 .history
 /home/*
 /output/*
+todos.txtkeycrop/dist/
+*.vsix
 todos.txt
