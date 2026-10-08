@@ -721,6 +721,32 @@
                 "keycrop.growPaste"
             ]
         }
+    },
+    {
+        "key": "cmd+]",
+        "command": "runCommands",
+        "args": {
+            "commands": [
+                {
+                    "command": "editor.action.indentLines",
+                    "when": "editorTextFocus && !editorReadonly"
+                },
+                "keycrop.growIndentLine"
+            ]
+        }
+    },
+    {
+        "key": "cmd+[",
+        "command": "runCommands",
+        "args": {
+            "commands": [
+                {
+                    "command": "editor.action.outdentLines",
+                    "when": "editorTextFocus && !editorReadonly"
+                },
+                "keycrop.growOutdentLine"
+            ]
+        }
     }
 ]
 

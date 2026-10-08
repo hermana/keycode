@@ -1,1 +1,0 @@
-- add a note on requirements to do the study (basic Python, which yarn version)

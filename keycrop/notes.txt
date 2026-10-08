@@ -3,7 +3,7 @@
 - Demographics: before and after? ask them their years of experience with VSCode + coding in general 
 - You need someone to test everything on Mac
 - Are participants going to need someone to help them with just running a game in the terminal? 
-- 
+- Acknowledge where you got the scripts from somewhere, the book. 
 
 
 - View Markdown will be introduced in the video and is active in the game, but not specified by the task files.
