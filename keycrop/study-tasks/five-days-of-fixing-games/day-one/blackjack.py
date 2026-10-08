@@ -42,7 +42,7 @@ def main():
 
         # Let the player enter their bet for this round:
         print('Money:', money)
-        bet = getBet(money)
+        bet = getBet()
 
         # Give the dealer and player two cards from the deck each:
         deck = getDeck()
@@ -123,18 +123,20 @@ def main():
 def getBet(maxBet):
     """Ask the player how much they want to bet for this round."""
     while True:  # Keep asking until they enter a valid amount.
-        print('How much do you bet? (1-{}, or QUIT)'.format(maxBet))
-        bet = input('> ').upper().strip()
-        if bet == 'QUIT':
-            print('Thanks for playing!')
-            sys.exit()
+# Start of the whilte loop
+print('How much do you bet? (1-{}, or QUIT)'.format(maxBet))
+bet = input('> ').upper().strip()
+if bet == 'QUIT':
+    print('Thanks for playing!')
+    sys.exit()
 
-        if not bet.isdecimal():
-            continue  # If the player didn't enter a number, ask again.
+if not bet.isdecimal():
+    continue  # If the player didn't enter a number, ask again.
 
-        bet = int(bet)
-        if 1 <= bet <= maxBet:
-            return bet  # Player entered a valid bet.
+bet = int(bet)
+if 1 <= bet <= maxBet:
+    return bet  # Player entered a valid bet.
+# End of the while loop
 
 
 def getDeck():

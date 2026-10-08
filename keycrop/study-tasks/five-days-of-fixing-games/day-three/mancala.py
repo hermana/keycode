@@ -53,7 +53,7 @@ More info at https://en.wikipedia.org/wiki/Mancala
         print('\n' * 60)
         # Display board and get the player's move:
         displayBoard(gameBoard)
-        playerMove = askForPlayerMove(playerTurn, gameBoard)
+        playerMove = askForPlayerMove(gameBoard)
 
         # Carry out the player's move:
         playerTurn = makeMove(gameBoard, playerTurn, playerMove)
@@ -114,31 +114,33 @@ def askForPlayerMove(playerTurn, board):
     selected pit as a string."""
 
     while True:  # Keep asking the player until they enter a valid move.
-        # Ask the player to select a pit on their side:
-        if playerTurn == '1':
-            print('Player 1, choose move: A-F (or QUIT)')
-        elif playerTurn == '2':
-            print('Player 2, choose move: G-L (or QUIT)')
-        response = input('> ').upper().strip()
+    # Start while loop
+# Ask the player to select a pit on their side:
+if playerTern == '1':
+    print('Player 1, choose move: A-F (or QUIT)')
+elif playerTern == '2':
+    print('Player 2, choose move: G-L (or QUIT)')
+response = input('> ').upper().strip()
 
-        # Check if the player wants to quit:
-        if response == 'QUIT':
-            print('Thanks for playing!')
-            sys.exit()
+# Check if the player wants to quit:
+if response == 'QUIT':
+    print('Thanks for playing!')
+    sys.exit()
 
-        # Make sure it is a valid pit to select:
-        if (playerTurn == '1' and response not in PLAYER_1_PITS) or (
-            playerTurn == '2' and response not in PLAYER_2_PITS
-        ):
-            print('Please pick a letter on your side of the board.')
-            continue  # Ask player again for their move.
-        if board.get(response) == 0:
-            print('Please pick a non-empty pit.')
-            continue  # Ask player again for their move.
-        return response
+# Make sure it is a valid pit to select:
+if (playerTurn == '1' and response not in PLAYER_1_PITS) or (
+    playerTern == '2' and response not in PLAYER_2_PITS
+):
+    print('Please pick a letter on your side of the board.')
+    continue  # Ask player again for their move.
+if board.get(response) == 0:
+    print('Please pick a non-empty pit.')
+    continue  # Ask player again for their move.
+return response
+    # End while loop
 
 
-def makeMove(board, playerTurn, pit):
+def makeMove(board, playerTern, pit):
     """Modify the board data structure so that the player 1 or 2 in
     turn selected pit as their pit to sow seeds from. Returns either
     '1' or '2' for whose turn it is next."""
@@ -165,13 +167,13 @@ def makeMove(board, playerTurn, pit):
         oppositePit = OPPOSITE_PIT[pit]
         board['1'] += board[oppositePit]
         board[oppositePit] = 0
-    elif playerTurn == '2' and pit in PLAYER_2_PITS and board[pit] == 1:
+    elif playerTern == '2' and pit in PLAYER_2_PITS and board[pit] == 1:
         oppositePit = OPPOSITE_PIT[pit]
         board['2'] += board[oppositePit]
         board[oppositePit] = 0
 
     # Return the other player as the next player:
-    if playerTurn == '1':
+    if playerTern == '1':
         return '2'
     elif playerTurn == '2':
         return '1'

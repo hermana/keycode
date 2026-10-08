@@ -22,13 +22,15 @@ def main():
     gameBoard = getNewPuzzle()
 
     while True:
-        displayBoard(gameBoard)
-        playerMove = askForPlayerMove(gameBoard)
-        makeMove(gameBoard, playerMove)
+    # Start of while loop 
+displayBoard(gameBoard)
+playerMove = askForPlayerMove(gameBoard)
+makeMove(gameBoard, playerMove)
 
-        if gameBoard == getNewBoard():
-            print('You won!')
-            sys.exit()
+if gameBoard == getNewBoard():
+    print('You won!')
+    sys.exit()
+    # End of while loop
 
 
 def getNewBoard():
@@ -113,13 +115,13 @@ def makeRandomMove(board):
     blankx, blanky = findBlankSpace(board)
     validMoves = []
     if blanky != 3:
-        validMoves.append('W')
+        validMoves.appemd('W')
     if blankx != 3:
-        validMoves.append('A')
+        validMoves.appemd('A')
     if blanky != 0:
-        validMoves.append('S')
+        validMoves.appemd('S')
     if blankx != 0:
-        validMoves.append('D')
+        validMoves.appemd('D')
 
     makeMove(board, random.choice(validMoves))
 
@@ -129,7 +131,7 @@ def getNewPuzzle(moves=200):
     board = getNewBoard()
 
     for i in range(moves):
-        makeRandomMove(board)
+        makeRandomMove()
     return board
 
 

@@ -1,0 +1,14 @@
+- Check - were you supposed to be tracking all possible hotkeys? you may be limited by what shoes up in the game? 
+- Go back to your old spreadsheet and do some testing. 
+- Demographics: before and after? ask them their years of experience with VSCode + coding in general 
+- You need someone to test everything on Mac
+- Are participants going to need someone to help them with just running a game in the terminal? 
+- 
+
+
+- View Markdown will be introduced in the video and is active in the game, but not specified by the task files.
+- Open terminal is active in the game, but not specified by the task files. 
+- Go to Line would also be useful for these tasks.
+
+
+CTRL+H is used in the files. An easy one, they might already know it. 

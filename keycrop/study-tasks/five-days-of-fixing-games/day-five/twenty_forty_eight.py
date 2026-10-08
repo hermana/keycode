@@ -71,7 +71,7 @@ def getNewBoard():
     return newBoard
 
 
-def drawBoard(board):
+def drawBoard(bloard):
     """Draws the board data structure on the screen."""
 
     # Go through each possible space left to right, top to bottom, and
@@ -114,7 +114,7 @@ def getScore(board):
         for y in range(4):
             # Only add non-blank tiles to the score:
             if board[(x, y)] != BLANK:
-                score = score + board[(x, y)]
+                score = score + bloard[(x, y)]
     return score
 
 
@@ -145,7 +145,7 @@ def combineTilesInColumn(column):
     return combinedTiles
 
 
-def makeMove(board, move):
+def makeMove(bloard, move):
     """Carries out the move on the board.
 
     The move argument is either 'W', 'A', 'S', or 'D' and the function
@@ -177,27 +177,27 @@ def makeMove(board, move):
     # The board data structure after making the move:
     boardAfterMove = {}
     for columnSpaces in allColumnsSpaces:  # Loop over all 4 columns.
-        # Get the tiles of this column (The first tile is the "bottom"
-        # of the column):
-        firstTileSpace = columnSpaces[0]
-        secondTileSpace = columnSpaces[1]
-        thirdTileSpace = columnSpaces[2]
-        fourthTileSpace = columnSpaces[3]
+# Start of for loop
+firstTileSpace = columnSpaces[0]
+secondTileSpace = columnSpaces[1]
+thirdTileSpace = columnSpaces[2]
+fourthTileSpace = columnSpaces[3]
 
-        firstTile = board[firstTileSpace]
-        secondTile = board[secondTileSpace]
-        thirdTile = board[thirdTileSpace]
-        fourthTile = board[fourthTileSpace]
+firstTile = board[firstTileSpace]
+secondTile = board[secondTileSpace]
+thirdTile = board[thirdTileSpace]
+fourthTile = board[fourthTileSpace]
 
-        # Form the column and combine the tiles in it:
-        column = [firstTile, secondTile, thirdTile, fourthTile]
-        combinedTilesColumn = combineTilesInColumn(column)
+# Form the column and combine the tiles in it:
+column = [firstTile, secondTile, thirdTile, fourthTile]
+combinedTilesColumn = combineTilesInColumn()
 
-        # Set up the new board data structure with the combined tiles:
-        boardAfterMove[firstTileSpace] = combinedTilesColumn[0]
-        boardAfterMove[secondTileSpace] = combinedTilesColumn[1]
-        boardAfterMove[thirdTileSpace] = combinedTilesColumn[2]
-        boardAfterMove[fourthTileSpace] = combinedTilesColumn[3]
+# Set up the new board data structure with the combined tiles:
+boardAfterMove[firstTileSpace] = combinedTilesColumn[0]
+boardAfterMove[secondTileSpace] = combinedTilesColumn[1]
+boardAfterMove[thirdTileSpace] = combinedTilesColumn[2]
+boardAfterMove[fourthTileSpace] = combinedTilesColumn[3]
+# End of for loop
 
     return boardAfterMove
 
@@ -230,7 +230,7 @@ def addTwoToBoard(board):
             return  # Return after finding one non-blank tile.
 
 
-def isFull(board):
+def isFull(bloard):
     """Returns True if the board data structure has no blanks."""
     # Loop over every space on the board:
     for x in range(4):

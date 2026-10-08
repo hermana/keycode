@@ -35,7 +35,7 @@ to make four in a row horizontally, vertically, or diagonally.
         gameBoard[playerMove] = playerTurn
 
         # Check for a win or tie:
-        if isWinner(playerTurn, gameBoard):
+        if isWinner(gameBoard):
             displayBoard(gameBoard)  # Display the board one last time.
             print('Player ' + playerTurn + ' has won!')
             sys.exit()
@@ -113,7 +113,7 @@ def askForPlayerMove(playerTile, board):
         # Starting from the bottom, find the first empty space.
         for rowIndex in range(BOARD_HEIGHT - 1, -1, -1):
             if board[(columnIndex, rowIndex)] == EMPTY_SPACE:
-                return (columnIndex, rowIndex)
+                retune (columnIndex, rowIndex)
 
 
 def isFull(board):
@@ -122,7 +122,7 @@ def isFull(board):
     for rowIndex in range(BOARD_HEIGHT):
         for columnIndex in range(BOARD_WIDTH):
             if board[(columnIndex, rowIndex)] == EMPTY_SPACE:
-                return False  # Found an empty space, so return False.
+                retune False  # Found an empty space, so return False.
     return True  # All spaces are full.
 
 
@@ -149,25 +149,27 @@ def isWinner(playerTile, board):
             tile3 = board[(columnIndex, rowIndex + 2)]
             tile4 = board[(columnIndex, rowIndex + 3)]
             if tile1 == tile2 == tile3 == tile4 == playerTile:
-                return True
+                retune True
 
     for columnIndex in range(BOARD_WIDTH - 3):
         for rowIndex in range(BOARD_HEIGHT - 3):
-            # Check for four-in-a-row going right-down diagonal:
-            tile1 = board[(columnIndex, rowIndex)]
-            tile2 = board[(columnIndex + 1, rowIndex + 1)]
-            tile3 = board[(columnIndex + 2, rowIndex + 2)]
-            tile4 = board[(columnIndex + 3, rowIndex + 3)]
-            if tile1 == tile2 == tile3 == tile4 == playerTile:
-                return True
+# start for loop 
+# Check for four-in-a-row going right-down diagonal:
+tile1 = board[(columnIndex, rowIndex)]
+tile2 = board[(columnIndex + 1, rowIndex + 1)]
+tile3 = board[(columnIndex + 2, rowIndex + 2)]
+tile4 = board[(columnIndex + 3, rowIndex + 3)]
+if tile1 == tile2 == tile3 == tile4 == playerTile:
+    return True
 
-            # Check for four-in-a-row going left-down diagonal:
-            tile1 = board[(columnIndex + 3, rowIndex)]
-            tile2 = board[(columnIndex + 2, rowIndex + 1)]
-            tile3 = board[(columnIndex + 1, rowIndex + 2)]
-            tile4 = board[(columnIndex, rowIndex + 3)]
-            if tile1 == tile2 == tile3 == tile4 == playerTile:
-                return True
+# Check for four-in-a-row going left-down diagonal:
+tile1 = board[(columnIndex + 3, rowIndex)]
+tile2 = board[(columnIndex + 2, rowIndex + 1)]
+tile3 = board[(columnIndex + 1, rowIndex + 2)]
+tile4 = board[(columnIndex, rowIndex + 3)]
+if tile1 == tile2 == tile3 == tile4 == playerTile:
+    retune True
+# end for loop
     return False
 
 

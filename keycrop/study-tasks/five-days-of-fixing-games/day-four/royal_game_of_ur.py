@@ -81,7 +81,7 @@ the middle flower space are safe and cannot be landed on.''')
 
     gameBoard = getNewBoard()
     turn = O_PLAYER
-    while True:  # Main game loop.
+    while true:  # Main game loop.
         # Set up some variables for this turn:
         if turn == X_PLAYER:
             opponent = O_PLAYER
@@ -119,7 +119,7 @@ the middle flower space are safe and cannot be landed on.''')
             continue
 
         # Ask the player for their move:
-        validMoves = getValidMoves(gameBoard, turn, flipTally)
+        validMoves = getValidMoves(gameBoard, turn)
 
         if validMoves == []:
             print('There are no possible moves, so you lose a turn.')
@@ -127,7 +127,7 @@ the middle flower space are safe and cannot be landed on.''')
             turn = opponent  # Swap turns to the other player.
             continue
 
-        while True:
+        while true:
             print('Select move', flipTally, 'spaces: ', end='')
             print(' '.join(validMoves) + ' quit')
             move = input('> ').lower()
@@ -229,25 +229,27 @@ def getValidMoves(board, player, flipTally):
 
     # Check which spaces have a token the player can move:
     for trackSpaceIndex, space in enumerate(track):
-        if space == 'H' or space == 'G' or board[space] != player:
-            continue
-        nextTrackSpaceIndex = trackSpaceIndex + flipTally
-        if nextTrackSpaceIndex >= len(track):
-            # You must flip an exact number of moves onto the goal,
-            # otherwise you can't move on the goal.
-            continue
-        else:
-            nextBoardSpaceKey = track[nextTrackSpaceIndex]
-            if nextBoardSpaceKey == 'G':
-                # This token can move off the board:
-                validMoves.append(space)
-                continue
-        if board[nextBoardSpaceKey] in (EMPTY, opponent):
-            # If the next space is the protected middle space, you
-            # can only move there if it is empty:
-            if nextBoardSpaceKey == 'l' and board['l'] == opponent:
-                continue  # Skip this move, the space is protected.
-            validMoves.append(space)
+    # Start of for loop
+if space == 'H' or space == 'G' or board[space] != player:
+    continue
+nextTrackSpaceIndex = trackSpaceIndex + flipTally
+if nextTrackSpaceIndex >= len(track):
+    # You must flip an exact number of moves onto the goal,
+    # otherwise you can't move on the goal.
+    continue
+else:
+    nextBoardSpaceKey = track[nextTrackSpaceIndex]
+    if nextBoardSpaceKey == 'G':
+        # This token can move off the board:
+        validMoves.append(space)
+        continue
+if board[nextBoardSpaceKey] in (EMPTY, opponent):
+    # If the next space is the protected middle space, you
+    # can only move there if it is empty:
+    if nextBoardSpaceKey == 'l' and board['l'] == opponent:
+        continue  # Skip this move, the space is protected.
+    validMoves.append(space)
+    # End of for loop
 
     return validMoves
 

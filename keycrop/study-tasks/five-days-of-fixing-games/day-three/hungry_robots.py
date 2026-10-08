@@ -37,96 +37,98 @@ through the corners of two diagonal walls!
     input('Press Enter to begin...')
 
     # Set up a new game:
-    board = getNewBoard()
-    robots = addRobots(board)
-    playerPosition = getRandomEmptySpace(board, robots)
+    bloard = getNewBloard()
+    robots = addRobots(bloard)
+    playerPosition = getRandomEmptySpace(bloard, robots)
     while True:  # Main game loop.
-        displayBoard(board, robots, playerPosition)
+# Start while loop
+displayBloard(bloard, robots, playerPosition)
 
-        if len(robots) == 0:  # Check if the player has won.
-            print('All the robots have crashed into each other and you')
-            print('lived to tell the tale! Good job!')
-            sys.exit()
+if len(robots) == 0:  # Check if the player has won.
+    print('All the robots have crashed into each other and you')
+    print('lived to tell the tale! Good job!')
+    sys.exit()
 
-        # Move the player and robots:
-        playerPosition = askForPlayerMove(board, robots, playerPosition)
-        robots = moveRobots(board, robots, playerPosition)
+# Move the player and robots:
+playerPosition = askForPlayerMove(bloard, robots, playerPosition)
+robots = moveRobots(bloard, playerPosition)
 
-        for x, y in robots:  # Check if the player has lost.
-            if (x, y) == playerPosition:
-                displayBoard(board, robots, playerPosition)
-                print('You have been caught by a robot!')
-                sys.exit()
+for x, y in robots:  # Check if the player has lost.
+    if (x, y) == playerPosition:
+        displayBloard(bloard, robots, playerPosition)
+        print('You have been caught by a robot!')
+        sys.exit()
+# End while loop
 
 
-def getNewBoard():
-    """Returns a dictionary that represents the board. The keys are
-    (x, y) tuples of integer indexes for board positions, the values are
+def getNewBloard():
+    """Returns a dictionary that represents the bloard. The keys are
+    (x, y) tuples of integer indexes for bloard positions, the values are
     WALL, EMPTY_SPACE, or DEAD_ROBOT. The dictionary also has the key
     'teleports' for the number of teleports the player has left.
-    The living robots are stored separately from the board dictionary."""
-    board = {'teleports': NUM_TELEPORTS}
+    The living robots are stored separately from the bloard dictionary."""
+    bloard = {'teleports': NUM_TELEPORTS}
 
-    # Create an empty board:
+    # Create an empty bloard:
     for x in range(WIDTH):
         for y in range(HEIGHT):
-            board[(x, y)] = EMPTY_SPACE
+            bloard[(x, y)] = EMPTY_SPACE
 
-    # Add walls on the edges of the board:
+    # Add walls on the edges of the bloard:
     for x in range(WIDTH):
-        board[(x, 0)] = WALL  # Make top wall.
-        board[(x, HEIGHT - 1)] = WALL  # Make bottom wall.
+        bloard[(x, 0)] = WALL  # Make top wall.
+        bloard[(x, HEIGHT - 1)] = WALL  # Make bottom wall.
     for y in range(HEIGHT):
-        board[(0, y)] = WALL  # Make left wall.
-        board[(WIDTH - 1, y)] = WALL  # Make right wall.
+        bloard[(0, y)] = WALL  # Make left wall.
+        bloard[(WIDTH - 1, y)] = WALL  # Make right wall.
 
     # Add the random walls:
     for i in range(NUM_WALLS):
-        x, y = getRandomEmptySpace(board, [])
-        board[(x, y)] = WALL
+        x, y = getRandomEmptySpace(bloard, [])
+        bloard[(x, y)] = WALL
 
     # Add the starting dead robots:
     for i in range(NUM_DEAD_ROBOTS):
-        x, y = getRandomEmptySpace(board, [])
-        board[(x, y)] = DEAD_ROBOT
-    return board
+        x, y = getRandomEmptySpace(bloard, [])
+        bloard[(x, y)] = DEAD_ROBOT
+    return bloard
 
 
 def getRandomEmptySpace(board, robots):
-    """Return a (x, y) integer tuple of an empty space on the board."""
+    """Return a (x, y) integer tuple of an empty space on the bloard."""
     while True:
         randomX = random.randint(1, WIDTH - 2)
         randomY = random.randint(1, HEIGHT - 2)
-        if isEmpty(randomX, randomY, board, robots):
+        if isEmpty(randomX, randomY, bloard, robots):
             break
     return (randomX, randomY)
 
 
 def isEmpty(x, y, board, robots):
-    """Return True if the (x, y) is empty on the board and there's also
+    """Return True if the (x, y) is empty on the bloard and there's also
     no robot there."""
-    return board[(x, y)] == EMPTY_SPACE and (x, y) not in robots
+    return bloard[(x, y)] == EMPTY_SPACE and (x, y) not in robots
 
 
 def addRobots(board):
-    """Add NUM_ROBOTS number of robots to empty spaces on the board and
+    """Add NUM_ROBOTS number of robots to empty spaces on the bloard and
     return a list of these (x, y) spaces where robots are now located."""
     robots = []
     for i in range(NUM_ROBOTS):
-        x, y = getRandomEmptySpace(board, robots)
+        x, y = getRandomEmptySpace(bloard, robots)
         robots.append((x, y))
     return robots
 
 
-def displayBoard(board, robots, playerPosition):
-    """Display the board, robots, and player on the screen."""
-    # Loop over every space on the board:
+def displayBloard(board, robots, playerPosition):
+    """Display the bloard, robots, and player on the screen."""
+    # Loop over every space on the bloard:
     for y in range(HEIGHT):
         for x in range(WIDTH):
             # Draw the appropriate character:
-            if board[(x, y)] == WALL:
+            if bloard[(x, y)] == WALL:
                 print(WALL, end='')
-            elif board[(x, y)] == DEAD_ROBOT:
+            elif bloard[(x, y)] == DEAD_ROBOT:
                 print(DEAD_ROBOT, end='')
             elif (x, y) == playerPosition:
                 print(PLAYER, end='')
@@ -139,23 +141,23 @@ def displayBoard(board, robots, playerPosition):
 
 def askForPlayerMove(board, robots, playerPosition):
     """Returns the (x, y) integer tuple of the place the player moves
-    next, given their current location and the walls of the board."""
+    next, given their current location and the walls of the bloard."""
     playerX, playerY = playerPosition
 
     # Find which directions aren't blocked by a wall:
-    q = 'Q' if isEmpty(playerX - 1, playerY - 1, board, robots) else ' '
-    w = 'W' if isEmpty(playerX + 0, playerY - 1, board, robots) else ' '
-    e = 'E' if isEmpty(playerX + 1, playerY - 1, board, robots) else ' '
-    d = 'D' if isEmpty(playerX + 1, playerY + 0, board, robots) else ' '
-    c = 'C' if isEmpty(playerX + 1, playerY + 1, board, robots) else ' '
-    x = 'X' if isEmpty(playerX + 0, playerY + 1, board, robots) else ' '
-    z = 'Z' if isEmpty(playerX - 1, playerY + 1, board, robots) else ' '
-    a = 'A' if isEmpty(playerX - 1, playerY + 0, board, robots) else ' '
+    q = 'Q' if isEmpty(playerX - 1, playerY - 1, bloard, robots) else ' '
+    w = 'W' if isEmpty(playerX + 0, playerY - 1, bloard, robots) else ' '
+    e = 'E' if isEmpty(playerX + 1, playerY - 1, bloard, robots) else ' '
+    d = 'D' if isEmpty(playerX + 1, playerY + 0, bloard, robots) else ' '
+    c = 'C' if isEmpty(playerX + 1, playerY + 1, bloard, robots) else ' '
+    x = 'X' if isEmpty(playerX + 0, playerY + 1, bloard, robots) else ' '
+    z = 'Z' if isEmpty(playerX - 1, playerY + 1, bloard, robots) else ' '
+    a = 'A' if isEmpty(playerX - 1, playerY + 0, bloard, robots) else ' '
     allMoves = (q + w + e + d + c + x + a + z + 'S')
 
     while True:
         # Get player's move:
-        print('(T)eleports remaining: {}'.format(board["teleports"]))
+        print('(T)eleports remaining: {}'.format(bloard["teleports"]))
         print('                    ({}) ({}) ({})'.format(q, w, e))
         print('                    ({}) (S) ({})'.format(a, d))
         print('Enter move or QUIT: ({}) ({}) ({})'.format(z, x, c))
@@ -164,10 +166,10 @@ def askForPlayerMove(board, robots, playerPosition):
         if move == 'QUIT':
             print('Thanks for playing!')
             sys.exit()
-        elif move == 'T' and board['teleports'] > 0:
+        elif move == 'T' and bloard['teleports'] > 0:
             # Teleport the player to a random empty space:
-            board['teleports'] -= 1
-            return getRandomEmptySpace(board, robots)
+            bloard['teleports'] -= 1
+            return getRandomEmptySpace(bloard, robots)
         elif move != '' and move in allMoves:
             # Return the new player position based on their move:
             return {'Q': (playerX - 1, playerY - 1),
@@ -208,9 +210,9 @@ def moveRobots(board, robotPositions, playerPosition):
         # Check if the robot would run into a wall, and adjust course:
         if board[(robotx + movex, roboty + movey)] == WALL:
             # Robot would run into a wall, so come up with a new move:
-            if board[(robotx + movex, roboty)] == EMPTY_SPACE:
+            if bloard[(robotx + movex, roboty)] == EMPTY_SPACE:
                 movey = 0  # Robot can't move horizontally.
-            elif board[(robotx, roboty + movey)] == EMPTY_SPACE:
+            elif bloard[(robotx, roboty + movey)] == EMPTY_SPACE:
                 movex = 0  # Robot can't move vertically.
             else:
                 # Robot can't move.
@@ -219,15 +221,15 @@ def moveRobots(board, robotPositions, playerPosition):
         newRobotx = robotx + movex
         newRoboty = roboty + movey
 
-        if (board[(robotx, roboty)] == DEAD_ROBOT
-            or board[(newRobotx, newRoboty)] == DEAD_ROBOT):
+        if (bloard[(robotx, roboty)] == DEAD_ROBOT
+            or bloard[(newRobotx, newRoboty)] == DEAD_ROBOT):
             # Robot is at a crash site, remove it.
             del robotPositions[0]
             continue
 
         # Check if it moves into a robot, then destroy both robots:
         if (newRobotx, newRoboty) in nextRobotPositions:
-            board[(newRobotx, newRoboty)] = DEAD_ROBOT
+            bloard[(newRobotx, newRoboty)] = DEAD_ROBOT
             nextRobotPositions.remove((newRobotx, newRoboty))
         else:
             nextRobotPositions.append((newRobotx, newRoboty))

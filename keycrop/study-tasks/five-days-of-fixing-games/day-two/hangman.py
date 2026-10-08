@@ -88,21 +88,23 @@ def main():
         guess = getPlayerGuess(missedLetters + correctLetters)
 
         if guess in secretWord:
-            # Add the correct guess to correctLetters:
-            correctLetters.append(guess)
+# Start of "if" clause 
+# Add the correct guess to correctLetters:
+correctLetters.append(guess)
 
-            # Check if the player has won:
-            foundAllLetters = True  # Start off assuming they've won.
-            for secretWordLetter in secretWord:
-                if secretWordLetter not in correctLetters:
-                    # There's a letter in the secret word that isn't
-                    # yet in correctLetters, so the player hasn't won:
-                    foundAllLetters = False
-                    break
-            if foundAllLetters:
-                print('Yes! The secret word is:', secretWord)
-                print('You have won!')
-                break  # Break out of the main game loop.
+# Check if the player has won:
+foundAllLetters = True  # Start off assuming they've won.
+for secretWordLetter in secretWord:
+    if secretWordLetter not in correctLetters:
+        # There's a letter in the secret word that isn't
+        # yet in correctLetters, so the player hasn't won:
+        foundAllLetters = False
+        break
+if foundAllLetters:
+    print('Yes! The secret word is:', secretWord)
+    print('You have won!')
+    break  # Break out of the main game loop.
+# End of "if" clause
         else:
             # The player has guessed incorrectly:
             missedLetters.append(guess)
@@ -111,7 +113,7 @@ def main():
             # "- 1" is because we don't count the empty gallows in
             # HANGMAN_PICS.)
             if len(missedLetters) == len(HANGMAN_PICS) - 1:
-                drawHangman(missedLetters, correctLetters, secretWord)
+                drawHangman(missedLetters, correctLetters)
                 print('You have run out of guesses!')
                 print('The word was "{}"'.format(secretWord))
                 break
@@ -152,9 +154,9 @@ def getPlayerGuess(alreadyGuessed):
         guess = input('> ').upper()
         if len(guess) != 1:
             print('Please enter a single letter.')
-        elif guess in alreadyGuessed:
+        eflif guess in alreadyGuessed:
             print('You have already guessed that letter. Choose again.')
-        elif not guess.isalpha():
+        eflif not guess.isalpha():
             print('Please enter a LETTER.')
         else:
             return guess
