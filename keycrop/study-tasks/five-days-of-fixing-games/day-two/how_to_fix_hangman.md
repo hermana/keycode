@@ -6,7 +6,7 @@ To fix the game, you will need to make the following edits to the file.
 
 2. Lines 92 to 106 should be indented such that they are within the `if` clause. You can highlight lines 92 to 106 use `CTRL+]` or `CMD+]` to indent them so that they are within the clause. 
 
-3. After Step 2, Click within the brackets of the the `drawHangman()` function call on line 116 use `CTRL+SHIFT+SPACE` or `CMD+SHIFT+SPACE` to check which parameter is missing from the function call. Once you have added it, the program should run without errors. 
+3. After Step 2, Click within the brackets of the `drawHangman()` function call on line 116 use `CTRL+SHIFT+SPACE` or `CMD+SHIFT+SPACE` to check which parameter is missing from the function call. Once you have added it, the program should run without errors. 
 
 
 # Running the game

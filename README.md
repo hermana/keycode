@@ -24,13 +24,23 @@ code --install-extension keycrop-0.0.1.vsix
 The game needs custom keybindings to detect which hotkeys you use. Without them, the plugin installs but your plants will not grow.
 
 1. In VSCode, press `CTRL+SHIFT+P` (`CMD+SHIFT+P` on Mac) and search for "keyboard shortcuts".
-2. Select **Preferences: Open Keyboard Shortcuts (JSON)**. This opens your personal `keybindings.json` file.
+2. Select **Preferences: Open Keyboard Shortcuts (JSON)** (*not* "Preferences: Open Default Keyboard Shortcuts (JSON)"). This opens your personal `keybindings.json` file.
 3. If the file contains any custom keybindings of your own, save a copy of them in another file so you can put them back when you are done.
 4. Copy the keybindings for your operating system from this repository:
    - Windows or Linux: [player_resources/keybindings.json](keycrop/player_resources/keybindings.json)
    - Mac: [player_resources/mac-keybindings.json](keycrop/player_resources/mac-keybindings.json)
 5. Replace the entire contents of your personal `keybindings.json` with the contents you copied, and save the file.
 
+
+## The Keycrop Plugin
+
+INTRODUCTORY MATERIALS ON THE PLUGIN HERE. 
+
+You may need to adjust the size of the view in order to see your garden. SCREENSHOT?  
+
+When you have harvested two or more plants, you can start making recipes. Click on the frying pan in the bottom right corner of the `Inventory` panel and select two plants to combine into a recipe. You may then sell the resulting food for profit. SCREENSHOT
+
+Click on "Collection" to see which a log of which recipes you have already made. SCREENSHOT
 
 ## Study tasks: five days of fixing games
 
@@ -46,16 +56,17 @@ The study tasks are in [study-tasks/five-days-of-fixing-games](keycrop/study-tas
 
 ### Before you start
 
-You need [Python 3](https://www.python.org/downloads/) installed to run the games. To check, run `python --version` or `python3 --version` in your terminal.
+You need [Python 3](https://www.python.org/downloads/) installed to run the games. Open a terminal (you can do this using CTRL+\` or by selecting Terminal->New Terminal) and check whether python is installed with `python --version` or `python3 --version`.
 
 ### Completing a day's tasks
 
 1. After the plugin is installed and you have updated your keybindings file, make a copy of the `five-days-of-fixing-games` folder. 
 2. In VSCode, select **File > Open Folder...** and open the folder for the current day, for example `five-days-of-fixing-games/day-one`.
-3. Open one of the `how_to_fix_<game>.md` files. To read it formatted, open the Markdown preview with `CTRL+SHIFT+V` (`CMD+SHIFT+V`).
+3. Each day, you will fix two games written in python that can be played in the terminal. Open either one of the `how_to_fix_<game>.md` files and view the file in Preview mode with `CTRL+SHIFT+V` (`CMD+SHIFT+V`). 
 4. Open the matching `<game>.py` file and make the edits described in the instructions for fixing the script. You are not being evaluated on whether or not you are able to debug the game.
+5. Repeat steps 3 and 4 for the other script. 
 
-Please do one day's folder per day, in order.
+Please complete one folder per day in numerical order (i.e. edit the game scripts in `day_one` on day one of the study, edit `day_two` on day two of the study, and so on).
 
 ### Completing the study
 

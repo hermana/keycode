@@ -6,7 +6,7 @@ To fix the game, you will need to make the following edits to the file.
 
 2. Lines 51 to 79 should be indented such that they are within the `while` loop. You can highlight lines 51 to 79 use `CTRL+]` or `CMD+]` to indent them so that they are within the loop. 
 
-3. Click within the brackets of the the `displayTowers()` function call on line 41 use `CTRL+SHIFT+SPACE` or `CMD+SHIFT+SPACE` to check which parameter is missing from the function call. Once you have added it, the program should run without errors.
+3. Click within the brackets of the `displayTowers()` function call on line 41 use `CTRL+SHIFT+SPACE` or `CMD+SHIFT+SPACE` to check which parameter is missing from the function call. Once you have added it, the program should run without errors.
 
 
 # Running the game

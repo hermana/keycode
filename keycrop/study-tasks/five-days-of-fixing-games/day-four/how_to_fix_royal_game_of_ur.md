@@ -6,7 +6,7 @@ To fix the game, you will need to make the following edits to the file.
 
 2. Lines 233 to 254 should be indented such that they are within the `for` loop. You can highlight lines 233 to 254 use `CTRL+]` or `CMD+]` to indent them so that they are within the loop. 
 
-3. Click within the brackets of the the `getValidMoves()` function call on line 122 use `CTRL+SHIFT+SPACE` or `CMD+SHIFT+SPACE` to check which parameter is missing from the function call. Once you have added it, the program should run without errors.
+3. Click within the brackets of the `getValidMoves()` function call on line 122 use `CTRL+SHIFT+SPACE` or `CMD+SHIFT+SPACE` to check which parameter is missing from the function call. Once you have added it, the program should run without errors.
 
 
 # Running the game
