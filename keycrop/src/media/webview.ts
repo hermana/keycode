@@ -1,0 +1,205 @@
+import { Greenhouse } from './greenhouse';
+import { RECIPES } from './recipes';
+import { PotController } from './potController';
+import { SpeciesPicker } from './speciesPicker';
+import { Collection } from './collection';
+import type { ToWebviewMessage, VsCodeApi } from '../messages';
+
+declare function acquireVsCodeApi(): VsCodeApi;
+
+const vscode: VsCodeApi = acquireVsCodeApi();
+
+interface GameState {
+  div: HTMLElement;
+  greenhouse: Greenhouse;
+}
+
+const game: GameState = {
+  div: document.getElementById('keycrop') as HTMLElement,
+  greenhouse: new Greenhouse(),
+};
+
+let playerMoney = 0;
+
+const speciesPicker = new SpeciesPicker(
+  (key, species) => vscode.postMessage({ type: 'select_species', key, species }),
+  (species) => vscode.postMessage({ type: 'locked_species_click', species })
+);
+
+const foodBase = document.getElementById('inventory-bottom-right')?.dataset.foodBase ?? '';
+const collectionGrid = document.getElementById('collection-grid');
+const collection = collectionGrid ? new Collection(collectionGrid, foodBase) : undefined;
+
+function updateMoneyDisplay(): void {
+  const el = document.getElementById('money-display');
+  if (el) { el.textContent = `$${playerMoney}`; }
+}
+
+function updateEmptyMessage(): void {
+  const el = document.getElementById('empty-inventory-message');
+  if (!el) { return; }
+  el.hidden = game.greenhouse.harvestedPlants.length > 0 || game.greenhouse.cookedFoods.length > 0;
+}
+
+/** Shows a cooked dish in the inventory's food row. */
+function addCookedFood(recipeKey: string, count = 1): void {
+  const recipe = RECIPES[recipeKey];
+  if (!recipe) { return; }
+  const foodRow = document.getElementById('food-row');
+  if (foodRow) { foodRow.hidden = false; }
+  game.greenhouse.addCookedFood(recipeKey, recipe.name, `${foodBase}/${recipe.filename}`, count);
+  updateEmptyMessage();
+}
+
+function sellItem(element: HTMLElement, species?: string, recipeKey?: string): void {
+  const price = parseInt(element.dataset.price ?? '0', 10);
+  playerMoney += price;
+  updateMoneyDisplay();
+  vscode.postMessage({ type: 'sell', amount: price, species, recipeKey });
+  updateEmptyMessage();
+}
+
+
+//Messages from VSCode
+window.addEventListener('message', (event: MessageEvent) => {
+  const message = event.data as ToWebviewMessage;
+  switch (message.action) {
+    case 'key-tracking-mode':
+      hideGameElements();
+      break;
+    case 'background':
+      game.div.setAttribute('background', message.value);
+      if (message.value === 'blackout') {
+        hideGameElements();
+      } else if (message.value === 'dirt') {
+        spawnBottomDecorations();
+      } else if (message.value === 'inventory') {
+        renderShelfRow();
+      }
+      break;
+    case 'add':
+      game.greenhouse.addPlant(message.key,message.species);
+      break;
+    case 'grow':
+      game.greenhouse.grow(message.key, vscode);
+      break;
+    case 'save_plants':
+      vscode.postMessage({ type: 'save_plants', content: game.greenhouse.serialize() });
+      break;
+    case 'load':
+      game.greenhouse.loadPlant(message, game.div.getAttribute('background'));
+      break;
+    case 'achievement':
+      launchConfetti();
+      break;
+    case 'load_harvested':
+      game.greenhouse.loadHarvestedPlant(message.species, message.count);
+      updateEmptyMessage();
+      break;
+    case 'load_cooked':
+      addCookedFood(message.recipeKey, message.count);
+      break;
+    case 'load_collection':
+      for (const recipeKey of message.recipeKeys) {
+        collection?.discover(recipeKey);
+      }
+      break;
+    case 'load_money':
+      playerMoney = message.amount ?? 0;
+      updateMoneyDisplay();
+      break;
+    case 'choose_species':
+      speciesPicker.show(message.key, message.options);
+      break;
+  }
+});
+
+
+function launchConfetti(): void {
+  const colors = ['#f44336', '#e91e63', '#9c27b0', '#3f51b5', '#2196f3', '#4caf50', '#ffeb3b', '#ff9800'];
+  const count = 80;
+  for (let i = 0; i < count; i++) {
+    const piece = document.createElement('div');
+    piece.classList.add('confetti-piece');
+    piece.style.left = Math.random() * 100 + 'vw';
+    piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+    piece.style.animationDuration = (1.5 + Math.random() * 2) + 's';
+    piece.style.animationDelay = (Math.random() * 1.5) + 's';
+    piece.style.width = (6 + Math.random() * 6) + 'px';
+    piece.style.height = (6 + Math.random() * 6) + 'px';
+    document.body.appendChild(piece);
+    piece.addEventListener('animationend', () => piece.remove());
+  }
+}
+
+function renderShelfRow(): void {
+  const strip = document.getElementById('shelf-strip');
+  if (!strip) { return; }
+  strip.innerHTML = '';
+  const TILE_WIDTH = 64;
+  const OVERLAP = 10;
+  const step = TILE_WIDTH - OVERLAP;
+  const count = Math.ceil(window.innerWidth / step) + 1;
+  for (let i = 0; i < count; i++) {
+    const tile = document.createElement('div');
+    tile.className = 'shelf-tile';
+    if (i > 0) { tile.style.marginLeft = `-${OVERLAP}px`; }
+    strip.appendChild(tile);
+  }
+}
+
+function spawnBottomDecorations(): void {
+  const strip = document.getElementById('decoration-strip');
+  if (!strip || strip.childElementCount > 0) { return; }
+  const kinds = ['flower', 'bush', 'shrub'];
+  const DECORATION_WIDTH = 48;
+  const maxLeft = Math.max(window.innerWidth - DECORATION_WIDTH, 0);
+  for (const kind of kinds) {
+    const count = 1 + Math.floor(Math.random() * 5);
+    for (let i = 0; i < count; i++) {
+      const el = document.createElement('div');
+      el.className = `bottom-decoration ${kind}`;
+      el.style.left = `${Math.random() * maxLeft}px`;
+      strip.appendChild(el);
+    }
+  }
+}
+
+function hideGameElements(): void {
+  if (collectionBtn) { collectionBtn.hidden = true; }
+}
+
+window.addEventListener('resize', renderShelfRow);
+
+const collectionBtn = document.getElementById('collection-btn');
+collectionBtn?.addEventListener('click', () => {
+  const showingCollection = document.body.classList.toggle('collection-view');
+  collectionBtn.textContent = showingCollection ? 'Inventory' : 'Collection';
+});
+
+const potWrapper = document.getElementById('inventory-pot-wrapper');
+if (potWrapper) {
+  new PotController(potWrapper, game.div, game.greenhouse, vscode, sellItem, addCookedFood);
+}
+
+// Plant detail panel — greenhouse only (.plant elements don't exist in inventory)
+const plantDetailPanel = document.createElement('div');
+plantDetailPanel.id = 'plant-detail';
+plantDetailPanel.hidden = true;
+document.body.appendChild(plantDetailPanel);
+
+game.div.addEventListener('click', (e) => {
+  const plant = (e.target as HTMLElement).closest('.plant:not(.harvested-plant)') as HTMLElement | null;
+  if (!plant || !plant.title) { return; }
+  e.stopPropagation();
+  plantDetailPanel.textContent = plant.title;
+  plantDetailPanel.style.left = `${e.clientX + 8}px`;
+  plantDetailPanel.style.top = `${e.clientY + 8}px`;
+  plantDetailPanel.hidden = false;
+});
+
+document.addEventListener('click', () => { plantDetailPanel.hidden = true; });
+
+//Tell vscode game loaded
+//TODO: type or action here?
+vscode.postMessage({ type: 'init' });

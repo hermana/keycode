@@ -1,45 +1,69 @@
-# Keycrop
+# Study Instructions
 
-## Study Instructions
 
-### Day One:
-1. Fill out the [consent form](https://www.surveymonkey.ca/r/QYYXZXZ), followed by the [Pre-Survey](https://www.surveymonkey.ca/r/QYY7RZG).
-2. Follow the setup instructions in the below "Setting Up" section below to start up Keycrop in VSCode. 
-2. Switch your branch of Keycrop to `866-study` using `git checkout 866-study` or your preferred Git GUI.
-3. Check that your personal `keybindings.json` file, which you edited as part of the setup, matches the one in `player-resources/keybindings.json`.  
-4. Re-run `yarn run compile`. 
-5. Repeat Steps 4&5 of the "Setting up" instructions, that is, run the development version of VSCode. 
-6. In the development version of VSCode, with Keycrop running, open the folder called `study-tasks`.
-7. In the study-tasks folder, run `pip install pygame`. 
-8. You will see five tasks. Each is a simple game written in python, but none of them are in a working state. Try to use the hotkeys suggested by Keycrop to debug the games. You can search each file for the word "HINT" for additional clues. 
-9. While it is theoretically possible to complete Level One of Keycrop by debugging the games, please keep in mind that you are under no pressure to do so as a study participant. Also, you are encouraged to attempt to debug each script, but it is fine if you do not get all the games working.
-10. The game will create a file called `output/plants.json`. Please email this file to `ashley.herman@usask.ca`.
+## Installing the plugin
 
-### Day Two:
-1. At some point on the second day, fill out this [Memory Test](https://www.surveymonkey.ca/r/JZSBPYC). 
+### 1. Install the .vsix file
 
-### Day Three:
-1. Switch your branch of Keycrop to `866-study-nongame-mode` using `git checkout 866-study-nongame-mode` or your preferred Git GUI. 
-2. Re-run `yarn run compile`. 
-3. Repeat Steps 4&5 of the Setup Instructions, that is, run the development version of VSCode. You will still see the VSCode Panel, but it should be blacked out and the game should not be visible. 
-4. Repeat the study tasks in the Development version of VSCode. Debug each of the five games. The games, and their bugs, will be the same as the first day.
-5. Keycrop will create a file called `output/keytracking.json` in the background. Please email this file to `ashley.herman@usask.ca`. I will reply to schedule your Playtesting Interview.
+You need VSCode version 1.97.0 or newer.
 
-### Playtesting Interview
-1. This interview will take place over Zoom. You will be asked open-ended questions about Keycrop and have an opportunity to provide suggestions as well as discuss any thoughts you have that were not covered by the surveys. 
+1. Download `keycrop-0.0.1.vsix` from the [Releases page](https://github.com/hermana/keycode/releases).
+2. In VSCode, open the Extensions view (`CTRL+SHIFT+X` or `CMD+SHIFT+X`).
+3. Click the `...` menu at the top of the Extensions view and select **Install from VSIX...**.
+4. Select the `keycrop-0.0.1.vsix` file you downloaded.
 
-## Setting up
+Alternatively, you can install it from your terminal:
 
-1. Before playing the game, you will need to customize your VSCode `keybindings.json` file. You can find this file in VSCode using **cmd+shift+p** and searching for "Preferences: Open Keyboard Shortcuts (JSON)". You can also go to the file directly: on mac, you can find the file at `~/Library/Application Support/Code/User/keybindings.json`, and on Linux, you can find it at `~/.config/Code/User/keybindings.json`. 
+```
+code --install-extension keycrop-0.0.1.vsix
+```
 
-2. Replace the contents of the file with the contents of the `player_resources/keybindings.json` file in this repo.  
 
-### Setting up in the VSCode Extension Development Environment ##
+### 2. Set up the keybindings file
 
-3. Clone this repository and open it in VSCode. In the `keycrop/` directory, run `yarn install` (The project was developed using yarn, but `npm install` may also work).
+The game needs custom keybindings to detect which hotkeys you use. Without them, the plugin installs but your plants will not grow.
 
-4. Run `yarn run compile`.
+1. In VSCode, press `CTRL+SHIFT+P` (`CMD+SHIFT+P` on Mac) and search for "keyboard shortcuts".
+2. Select **Preferences: Open Keyboard Shortcuts (JSON)**. This opens your personal `keybindings.json` file.
+3. If the file contains any custom keybindings of your own, save a copy of them in another file so you can put them back when you are done.
+4. Copy the keybindings for your operating system from this repository:
+   - Windows or Linux: [player_resources/keybindings.json](keycrop/player_resources/keybindings.json)
+   - Mac: [player_resources/mac-keybindings.json](keycrop/player_resources/mac-keybindings.json)
+5. Replace the entire contents of your personal `keybindings.json` with the contents you copied, and save the file.
 
-5. Open `src/extension.ts`. Select the debugger arrow from the side panel and then clicking the "Run and Debug" button, or use **cmd+shift+p** and search for "Debug: Start debugging". The first time you do this, you will be prompted to select a debugging environment - choose "VSCode Extension Development (preview)". 
 
-6. A new, development-version of VSCode should now pop-up. Keycrop should appear as a collapsable view in the side panel. 
+## Study tasks: five days of fixing games
+
+The study tasks are in [study-tasks/five-days-of-fixing-games](keycrop/study-tasks/five-days-of-fixing-games). Each day, you will debug two Python scripts. You may choose to interact with the plugin while doing the study tasks.
+
+| Day | Folder | Games |
+| --- | --- | --- |
+| 1 | `day-one` | Bagels, Blackjack |
+| 2 | `day-two` | Four in a Row, Hangman |
+| 3 | `day-three` | Hungry Robots, Mancala |
+| 4 | `day-four` | Royal Game of Ur, Sliding Tile |
+| 5 | `day-five` | Tower of Hanoi, 2048 |
+
+### Before you start
+
+You need [Python 3](https://www.python.org/downloads/) installed to run the games. To check, run `python --version` or `python3 --version` in your terminal.
+
+### Completing a day's tasks
+
+1. After the plugin is installed and you have updated your keybindings file, make a copy of the `five-days-of-fixing-games` folder. 
+2. In VSCode, select **File > Open Folder...** and open the folder for the current day, for example `five-days-of-fixing-games/day-one`.
+3. Open one of the `how_to_fix_<game>.md` files. To read it formatted, open the Markdown preview with `CTRL+SHIFT+V` (`CMD+SHIFT+V`).
+4. Open the matching `<game>.py` file and make the edits described in the instructions for fixing the script. You are not being evaluated on whether or not you are able to debug the game.
+
+Please do one day's folder per day, in order.
+
+### Completing the study
+
+At the end of the study, please sendd the researchers an email along with all the .json files generated by the plugin <TODO: locations based on operating system, which email to give them>
+
+
+### Uninstalling the plugin
+
+When you are finished with the study, replace the contents of your `keybindings.json` with the copy you saved in step 3, and uninstall the plugin from the Extensions view.
+
+

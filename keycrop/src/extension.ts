@@ -2,283 +2,242 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 import { MODE } from './mode';
+import { InstructionsWebViewProvider } from './instructionsWebViewProvider';
+import { BaseWebViewProvider } from './baseWebViewProvider';
+import { PLANTS, ALL_SPECIES, toLabel, isFreePlant, plantingCost } from './media/plants';
+import { KEY_MAP } from './keyMap';
+import { GameState } from './gameState';
+import { HotkeyTracker } from './hotkeyTracker';
+import { ActivityLog } from './activityLog';
+import type { FromWebviewMessage, SpeciesOption } from './messages';
 
 const CURRENT_MODE: MODE = MODE.GAME;
 
-let webview: WebViewProvider;
+// Created in activate(); the providers get the state they need through their constructors
+let game: GameState;
+let hotkeys: HotkeyTracker;
+let activity: ActivityLog;
+let greenhouse: GreenhouseWebViewProvider;
+let instructions: InstructionsWebViewProvider;
+let inventory: InventoryWebViewProvider;
 let config = vscode.workspace.getConfiguration('keycrop');
-let extensionStorageFolder: string = '';
-let plantsPath: string;
-let keyTrackingPath: string;
-let keyTrackingString: { key: string; time: number; }[] = [];
-let studyOutputPath: string = './output';
-let plantsStudyOutputPath: string;
-let keytrackingStudyOutputPath: string;
 
-type Plant = { 
-  species: string; 
-  size: string;
-  harvested: boolean;
-  hotkey_uses: number
-}
+// Used to store stack of hotkeys waiting to be assigned to a plant
+const pendingKeys: string[] = [];
 
-function loadPlantsFile() {
-  //Storage folder does not exist
-  if (!fs.existsSync(extensionStorageFolder)){
-    fs.mkdirSync(extensionStorageFolder, { recursive: true });
-  } 
-
-  //Read plants file
-  if (fs.existsSync(plantsPath)) {
-    try {
-      //Try to read plants file
-      let savedPlants = JSON.parse(fs.readFileSync(plantsPath, 'utf8'));
-      Object.entries(savedPlants).forEach((p: any) => {
-        webview.postMessage({
-          action: 'load',
-          species: p[1].species,
-          size: p[1].size,
-          harvested: p[1].harvested, 
-          hotkey_uses: p[1].hotkey_uses
-        });
-        plants.push({species: p[1].species, size: p[1].size, harvested: p[1].harvested, hotkey_uses: p[1].hotkey_uses});
-      });
-    } catch (e) {
-      //Failed -> Reset plants
-      console.error('Saved plants could not be loaded');
-      console.error(e);
-      plants = new Array<Plant>();
-    }
-  } else {
-    plants = new Array<Plant>();
-  }
-}
-
-function savePlants() {
-  webview.postMessage({
+function requestWebviewSave() {
+  greenhouse.postMessage({
     action: 'save_plants'
   });
 }
 
-let plants = new Array<Plant>();
-
-function addPlant(plant: Plant) {
-  webview.postMessage({
-    action: 'add',
-    species: plant.species
-  });
-}
-
-function growPlant(plant: Plant) {
-  if(plants.some(p => p.species === plant.species)){
-    let patch = plants.filter(p =>p.species === plant.species);
-    patch.forEach( p => 
-    {
-      webview.postMessage({
-        action: 'grow',
-        species: plant.species
-      });
-    }
-    );
-  }else{
-    vscode.window.showInformationMessage("A new " +plant.species +" plant has sprouted in the greenhouse!");
-    plants.push(plant);
-    addPlant(plant);    
+function growPlant(key: string) {
+  if (CURRENT_MODE !== MODE.GAME) {
+    logHotkeyUse(key, 'None');
+    return;
   }
-  savePlants();
+
+  const keyEntry = KEY_MAP.find(k => k.command === key);
+  if (keyEntry && !keyEntry.active) {
+    logHotkeyUse(key, 'None');
+    return;
+  }
+
+  const existingPlant = game.growingPlant(key);
+  if (existingPlant) {
+    logHotkeyUse(key, existingPlant.species);
+    greenhouse.postMessage({
+      action: 'grow',
+      key: existingPlant.key
+    });
+    requestWebviewSave();
+  } else {
+    logHotkeyUse(key, 'None');
+    // No plant for this key, or it has been harvested — free the key and let user pick
+    game.clearKey(key);
+    removePendingKey(key);
+    pendingKeys.push(key);
+    showSpeciesPicker(key);
+  }
 }
 
-function logKeyPress(plant: string) {
-  keyTrackingString.push({
-    key: plant,
-    time: Date.now()
+function removePendingKey(key: string): void {
+  const index = pendingKeys.indexOf(key);
+  if (index !== -1) { pendingKeys.splice(index, 1); }
+}
+
+function showSpeciesPicker(key: string): void {
+  greenhouse.postMessage({
+    action: 'choose_species',
+    key,
+    options: buildSpeciesOptions(game.playerMoney)
   });
-  // fs.writeFileSync(keytrackingStudyOutputPath, JSON.stringify(keyTrackingString))
-  fs.writeFileSync(keyTrackingPath, JSON.stringify(keyTrackingString));
+}
+
+/** After a species is chosen, reopens the picker for the next most recent key that still has no plant. */
+function showNextPendingKey(): void {
+  while (pendingKeys.length > 0) {
+    const key = pendingKeys[pendingKeys.length - 1];
+    if (!game.growingPlant(key)) {
+      showSpeciesPicker(key);
+      return;
+    }
+    pendingKeys.pop();
+  }
+}
+
+function buildSpeciesOptions(playerMoney: number): SpeciesOption[] {
+  const toOption = (s: string, locked: boolean): SpeciesOption => ({
+    species: s,
+    label: toLabel(s),
+    description: PLANTS[s]?.description ?? '',
+    price: PLANTS[s]?.price ?? 0,
+    isFree: isFreePlant(s),
+    locked
+  });
+  const isUnlocked = (s: string) => isFreePlant(s) || playerMoney >= plantingCost(s);
+  const byCost = (a: string, b: string) => plantingCost(a) - plantingCost(b);
+
+  const unlocked = ALL_SPECIES.filter(isUnlocked).sort(byCost);
+  const locked = ALL_SPECIES.filter(s => !isUnlocked(s)).sort(byCost);
+
+  return [
+    ...unlocked.map(s => toOption(s, false)),
+    ...locked.map(s => toOption(s, true))
+  ];
+}
+
+function logHotkeyUse(key: string, species: string): void {
+  hotkeys.record(key, species, vscode.window.activeTextEditor?.document.fileName ?? '');
+  instructions.postMessage({ action: 'update_counts', counts: { ...hotkeys.counts } });
 }
 
 export function activate(context: vscode.ExtensionContext) {
-  
-  //TODO GAMEMODE: do not initialize this in nongame mode
-  extensionStorageFolder = context.globalStorageUri.path.substring(1);
-  plantsPath = path.join(extensionStorageFolder, 'plants.json');
-  // plantsStudyOutputPath = path.join(studyOutputPath, 'plants.json');
-  keyTrackingPath = path.join(extensionStorageFolder, 'keytracking.json');
-  // keytrackingStudyOutputPath = path.join(studyOutputPath, 'keytracking.json');
 
-  // if (!fs.existsSync(studyOutputPath)){
-  //   fs.mkdirSync(studyOutputPath, { recursive: true });
-  // } 
+  const storageFolder = context.globalStorageUri.fsPath;
+  fs.mkdirSync(storageFolder, { recursive: true });
+  hotkeys = new HotkeyTracker(path.join(storageFolder, 'hotkeys.json'));
+  activity = new ActivityLog(path.join(storageFolder, 'plugin_data.json'));
+  activity.record('vscode', 'opened');
 
-	webview = new WebViewProvider(context);
-	context.subscriptions.push(vscode.window.registerWebviewViewProvider(WebViewProvider.viewType, webview));
+  game = new GameState(path.join(storageFolder, 'plants.json'));
+  game.load();
 
-	vscode.workspace.onDidChangeConfiguration(event => {
-	
+  instructions = new InstructionsWebViewProvider(context, () => ({ ...hotkeys.counts }), (event) => activity.record('instructions', event));
+	context.subscriptions.push(vscode.window.registerWebviewViewProvider(InstructionsWebViewProvider.viewType, instructions));
+
+	if (CURRENT_MODE === MODE.GAME) {
+		greenhouse = new GreenhouseWebViewProvider(context, game);
+		context.subscriptions.push(vscode.window.registerWebviewViewProvider(GreenhouseWebViewProvider.viewType, greenhouse, { webviewOptions: { retainContextWhenHidden: true } }));
+
+		inventory = new InventoryWebViewProvider(context, game);
+		context.subscriptions.push(vscode.window.registerWebviewViewProvider(InventoryWebViewProvider.viewType, inventory, { webviewOptions: { retainContextWhenHidden: true } }));
+	}
+
+	vscode.workspace.onDidChangeConfiguration(() => {
 	  //Update config
 	  config = vscode.workspace.getConfiguration('keycrop');
-
-      //TODO: fix this or delete
-      if (event.affectsConfiguration("keycrop-view.scale")) {
-        webview.postMessage({
-          action: 'scale',
-          value: config.get('scale')
-        });
-      }
-  });
-
-	const growBean = vscode.commands.registerCommand('keycrop.growBean', () => {
-    if(CURRENT_MODE === MODE.GAME){
-      growPlant({
-        species: "bean",
-        size: "small", //TODO: left off here
-        harvested: false, 
-        hotkey_uses: 1
-      });
-    }else{
-      logKeyPress('bean');
-    }
 	});
 
-  const growChili = vscode.commands.registerCommand('keycrop.growChili', () => {
-    if(CURRENT_MODE === MODE.GAME){
-      growPlant({
-        species: "chili",
-        size: "small",
-        harvested: false,
-        hotkey_uses: 1
-      });
-    }else{
-      logKeyPress('chili');
-    }
-  });
-
-  const growBroccoli = vscode.commands.registerCommand('keycrop.growBroccoli', () => {
-    if(CURRENT_MODE === MODE.GAME){
-      growPlant({
-        species: "broccoli",
-        size: "small",
-        harvested: false,
-        hotkey_uses: 1
-      }); 
-    }else{
-      logKeyPress('broccoli');
-    }
-  });
-
-  const growLettuce = vscode.commands.registerCommand('keycrop.growLettuce', () => {
-    if(CURRENT_MODE === MODE.GAME){
-      growPlant({
-        species: "lettuce",
-        size: "small",
-        harvested: false,
-        hotkey_uses: 1
-      });
-    }else{
-      logKeyPress('lettuce');
-    }
-  });
-
-  const growTomato = vscode.commands.registerCommand('keycrop.growTomato', () => {
-    if(CURRENT_MODE === MODE.GAME){
-      growPlant({
-        species: "tomato",
-        size: "small",
-        harvested: false, 
-        hotkey_uses: 1
-      });
-    }else{
-      logKeyPress('tomato');
-    }
-  });
-
-	context.subscriptions.push(growBean, growChili, growBroccoli, growLettuce, growTomato);
+  for (const { command, commandId } of KEY_MAP) {
+    context.subscriptions.push(vscode.commands.registerCommand(commandId, () => growPlant(command)));
+  }
 
 }
 
 // This method is called when your extension is deactivated
 export function deactivate() {}
 
+export class GreenhouseWebViewProvider extends BaseWebViewProvider {
 
-export class WebViewProvider implements vscode.WebviewViewProvider {
+    public static readonly viewType = 'greenhouse';
 
-    public static readonly viewType = 'keycrop'; 
-  
-    private view ?: vscode.WebviewView;
-  
-    constructor(private readonly context: vscode.ExtensionContext) {}
-  
-    public postMessage(message: any) {
-      this.view?.webview.postMessage(message);
+    constructor(context: vscode.ExtensionContext, private readonly game: GameState) {
+      super(context, (event) => activity.record('greenhouse', event));
     }
-  
-    public resolveWebviewView(webviewView: vscode.WebviewView, context: vscode.WebviewViewResolveContext, _token: vscode.CancellationToken) {
-      this.view = webviewView; //Needed so we can use it in postMessageToWebview
-  
-      const webview = webviewView.webview;
-  
-      //Allow scripts in the webview
-      webview.options = {
-        enableScripts: true 
-      };
-  
-      //Set the HTML content for the webview
-      webview.html = this.getHtmlContent(
-        webviewView.webview,
-      );
-  
-      //Handle messages
-      webview.onDidReceiveMessage((message) => {
-        switch (message.type) {
-          //Error message
-          case 'error':
-            vscode.window.showErrorMessage(message.text);
-            break;
-  
-          //Info message
-          case 'info':
-            vscode.window.showInformationMessage(message.text);
-            break;
-  
-          case 'init':
-            if(CURRENT_MODE === MODE.GAME){
-              //Send background
-              webview.postMessage({
-                action: 'background',
-                value: 'dirt'
-              });
-              //Load existing plants array
-              loadPlantsFile();
-            }else{
-              webview.postMessage({
-                action: 'key-tracking-mode'
+
+    protected onMessage(message: FromWebviewMessage): void {
+      switch (message.type) {
+        case 'init':
+          if(CURRENT_MODE === MODE.GAME){
+            this.game.load();
+            //Send background
+            this.postMessage({
+              action: 'background',
+              value: 'dirt'
+            });
+            //Load existing plants array
+            for (const p of this.game.allPlants) {
+              this.postMessage({
+                action: 'load',
+                key: p.key,
+                species: p.species,
+                size: p.size,
+                harvested: p.harvested,
+                hotkey_uses: p.hotkey_uses
               });
             }
-            break;
-          case 'save_plants':
-            // fs.writeFileSync(plantsStudyOutputPath, JSON.stringify(message.content));
-            fs.writeFileSync(plantsPath, JSON.stringify(message.content));
-            break;
-          case 'harvested':
-            vscode.window.showInformationMessage("Your "+message.text+" plant has been harvested!");
-            break;
-          case 'level_one':
-            vscode.window.showInformationMessage("Congratulations! You have finished the game!");
-            break;
+          }else{
+            this.postMessage({
+              action: 'key-tracking-mode'
+            });
+          }
+          break;
+        case 'save_plants': {
+          this.game.updateGrowth(message.content);
+          this.game.save();
+          break;
         }
-      });
+        case 'harvested': {
+          const harvest = this.game.harvest(message.key);
+          if (harvest) {
+            inventory.postMessage({
+              action: 'load_harvested',
+              species: harvest.species,
+              count: 1
+            });
+            if (harvest.alreadyOwned) {
+              vscode.window.showInformationMessage("Your " + message.text.replace(/_/g, ' ') + " plant has been harvested!");
+            }
+            if (harvest.completedAllSpecies) {
+              vscode.window.showInformationMessage("Achievement unlocked: you've grown one of every plant!");
+              inventory.postMessage({ action: 'achievement' });
+            }
+          }
+          break;
+        }
+        case 'select_species': {
+          const { key, species } = message;
+          const moneyBefore = this.game.playerMoney;
+          this.game.plant(key, species);
+          if (this.game.playerMoney !== moneyBefore) {
+            inventory.postMessage({ action: 'load_money', amount: this.game.playerMoney });
+          }
+          vscode.window.showInformationMessage(`A new ${species.replace(/_/g, ' ')} plant has sprouted in the greenhouse!`);
+          this.postMessage({ action: 'add', species, key });
+          this.game.save();
+          requestWebviewSave();
+          removePendingKey(key);
+          showNextPendingKey();
+          break;
+        }
+        case 'locked_species_click': {
+          const species = message.species;
+          const data = PLANTS[species];
+          if (data) {
+            vscode.window.showInformationMessage(`You need $${data.price} to unlock ${toLabel(species)}.`);
+          }
+          break;
+        }
+      }
     }
 
-    private getHtmlContent(webview: vscode.Webview): string {
+    protected getHtmlContent(webview: vscode.Webview): string {
 
-      const style = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'src/media', 'style.css'));
-      const mainJS = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'src/media', 'main.js'));
-      const plantsJS = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'src/media', 'plants.js'));
-      const levelsJS = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'src/media', 'levels.js'));
+      const style = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'dist/media', 'style.css'));
+      const webviewJS = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'dist/media', 'webview.js'));
 
-      const iconsPath = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'src/media/vegetables'));
-
-      return ` 
+      return `
         <!DOCTYPE html>
         <html lang="en">
         <head>
@@ -289,27 +248,106 @@ export class WebViewProvider implements vscode.WebviewViewProvider {
         </head>
         <body>
           <div id="keycrop" background="${CURRENT_MODE === MODE.GAME ? config.get('background') : 'blackout'}">
-          <div id="generator-instructions" hidden>
-            <p class="instructions">Congratulations, you've managed to power up the KeyCrop Greenhouse! To unlock more seeds, all of the following plants must be harvested. </p>
-            <!-- how many plants to make it to the next level -->
-            <p class="key-instruction"><img src="${iconsPath+'/chilli_harvested.png'}" alt="Chili" width="20" height="20"> <span class="instruction-bold"> CTRL+SHIFT+SPACE</span>: See function parameter hints.</p>
-            <p class="key-instruction"><img src="${iconsPath+'/bean_harvested.png'}" alt="Bean" width="20" height="20"> <span class="instruction-bold"> CTRL+SHIFT+M</span>: See warnings and errors in the Problems view.</p>
-            <p class="key-instruction"><img src="${iconsPath+'/tomato_harvested.png'}" alt="Tomato" width="20" height="20"> <span class="instruction-bold"> CTRL+SHIFT+L</span>: Multicursor-select all instances of a specific word.</p>
-            <p class="key-instruction"><img src="${iconsPath+'/lettuce_harvested.png'}" alt="Lettuce" width="20" height="20"> <span class="instruction-bold"> CTRL+/</span>: Comment or un-comment code.</p>
-            <p class="key-instruction"><img src="${iconsPath+'/broccoli_harvested.png'}" alt="Broccoli" width="20" height="20"> <span class="instruction-bold"> CTRL+[</span>: Outdent a line.</p>
           </div>
-          <div class="btn-wrapper">
-            <button class="btn" id="inventory-button">Inventory</button>
-            <button class="selected btn" id="greenhouse-button">Greenhouse</button>
-            <button class="btn" id="generator-button">Generator</button>
-          </div>
-          </div>
-          <script src="${mainJS}"></script>
-          <script src="${plantsJS}"></script>
-          <script src="${levelsJS}"></script>
+          ${CURRENT_MODE === MODE.GAME ? '<div id="fence-strip"></div><div id="decoration-strip"></div>' : ''}
+          <script src="${webviewJS}"></script>
         </body>
         </html>
       `;
     }
   }
 
+export class InventoryWebViewProvider extends BaseWebViewProvider {
+
+  public static readonly viewType = "inventory";
+
+  constructor(context: vscode.ExtensionContext, private readonly game: GameState) {
+    super(context, (event) => activity.record('inventory', event));
+  }
+
+  protected onMessage(message: FromWebviewMessage): void {
+    switch (message.type) {
+      case 'init':
+        if(CURRENT_MODE === MODE.GAME){
+          //Send background
+          this.postMessage({
+            action: 'background',
+            value: 'inventory'
+          });
+          //Load harvested plants and cooked food into inventory
+          this.game.harvested.forEach((count, species) => {
+            this.postMessage({ action: 'load_harvested', species, count });
+          });
+          this.game.cooked.forEach((count, recipeKey) => {
+            this.postMessage({ action: 'load_cooked', recipeKey, count });
+          });
+          this.postMessage({ action: 'load_collection', recipeKeys: [...this.game.discovered] });
+          this.postMessage({ action: 'load_money', amount: this.game.playerMoney });
+        }else{
+          this.postMessage({
+            action: 'key-tracking-mode'
+          });
+        }
+        break;
+      case 'sell': {
+        this.game.sell(message.amount ?? 0, message.species, message.recipeKey);
+        this.game.save();
+        break;
+      }
+      case 'cooked': {
+        if (this.game.cook(message.recipeKey, message.species)) {
+          this.postMessage({ action: 'load_collection', recipeKeys: [message.recipeKey] });
+        }
+        this.game.save();
+        break;
+      }
+    }
+  }
+
+  protected getHtmlContent(webview: vscode.Webview): string {
+
+      const style = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'dist/media', 'style.css'));
+      const webviewJS = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'dist/media', 'webview.js'));
+      const openPot = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'dist/media/pot', 'closed.png'));
+      const closedPot = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'dist/media/pot', 'open.png'));
+      const foodBase = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'dist/media/recipes/food'));
+
+      return `
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <link href="${style}" rel="stylesheet">
+          <title>KeyCrop Inventory</title>
+        </head>
+        <body>
+          <div id="empty-inventory-message" class="instructions">You currently don't have anything in your inventory.</div>
+          <div id="keycrop">
+            <!-- Shelves hidden for now; uncomment to bring them back (renderShelfRow skips when this is missing) -->
+            <!-- <div id="shelf-strip"></div> -->
+          </div>
+          <div id="collection-grid"></div>
+          <div id="inventory-bottom-left">
+            <div id="money-display">$0</div>
+            <button id="collection-btn">Collection</button>
+          </div>
+          <div id="food-row" hidden></div>
+          <div id="inventory-bottom-right" data-food-base="${foodBase}">
+            <div id="inventory-pot-wrapper" class="inventory-pot-wrapper">
+              <img src="${openPot}" data-open-src="${openPot}" data-closed-src="${closedPot}" class="inventory-pot" />
+              <span class="inventory-pot-overlay" hidden></span>
+            </div>
+            <button id="cook-btn" hidden>Cook</button>
+            <div id="cook-progress-wrapper" hidden>
+              <div id="cook-progress-bar"></div>
+            </div>
+          </div>
+          <script src="${webviewJS}"></script>
+        </body>
+        </html>
+      `;
+  
+  
+    }
+}

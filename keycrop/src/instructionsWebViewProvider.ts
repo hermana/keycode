@@ -1,0 +1,129 @@
+import * as vscode from 'vscode';
+import { KEY_MAP, HOTKEY_LEVELS } from './keyMap';
+import { BaseWebViewProvider, ViewEvent } from './baseWebViewProvider';
+import type { FromWebviewMessage } from './messages';
+
+export class InstructionsWebViewProvider extends BaseWebViewProvider {
+
+  public static readonly viewType = 'instructions';
+
+  constructor(
+    context: vscode.ExtensionContext,
+    private readonly getHotkeyCounts: () => Record<string, number>,
+    onViewEvent?: (event: ViewEvent) => void
+  ) {
+    super(context, onViewEvent);
+  }
+
+  protected onMessage(message: FromWebviewMessage): void {
+    if (message.type === 'init') {
+      this.postMessage({ action: 'update_counts', counts: this.getHotkeyCounts() });
+    }
+  }
+
+  protected getHtmlContent(webview: vscode.Webview): string {
+
+    const style = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'dist/media', 'style.css'));
+
+    const activeKeys = KEY_MAP.filter(k => k.active);
+
+    const categories = [...new Set(activeKeys.map(k => k.category))];
+
+    const categoryButtons = categories.map(cat =>
+      `<button class="category-btn" data-category="${cat}">${cat}</button>`
+    ).join('\n        ');
+
+    const tableRows = activeKeys.map(k =>
+      `<tr data-category="${k.category}" data-command="${k.command}"><td>${k.capital_key}</td><td>${k.description}</td><td class="use-count">0</td><td class="level-cell"></td></tr>`
+    ).join('\n                ');
+
+    return `
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="${style}" rel="stylesheet">
+        <title>KeyCrop Instructions</title>
+      </head>
+      <body>
+        <div id="generator-instructions">
+          <div class="table-scroll">
+            <table class="key-table">
+              <thead>
+                <tr>
+                  <th>Hotkey</th>
+                  <th>Description</th>
+                  <th>Uses</th>
+                  <th>Level</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${tableRows}
+              </tbody>
+            </table>
+          </div>
+          <div class="category-btn-row">
+            ${categoryButtons}
+          </div>
+        </div>
+        <script>
+          const vscode = acquireVsCodeApi();
+          const LEVELS = ${JSON.stringify(HOTKEY_LEVELS)};
+
+          function levelFor(count) {
+            let level = null;
+            for (const l of LEVELS) {
+              if (count >= l.minUses) { level = l; }
+            }
+            return level;
+          }
+          vscode.postMessage({ type: 'init' });
+
+          window.addEventListener('message', (event) => {
+            const message = event.data;
+            if (message.action === 'update_counts') {
+              Object.entries(message.counts).forEach(([cmd, count]) => {
+                const row = document.querySelector('tr[data-command="' + cmd + '"]');
+                if (!row) { return; }
+                row.querySelector('.use-count').textContent = String(count);
+                const level = levelFor(count);
+                const cell = row.querySelector('.level-cell');
+                cell.innerHTML = '';
+                if (level) {
+                  const badge = document.createElement('span');
+                  badge.className = 'level-badge ' + level.className;
+                  badge.textContent = level.name;
+                  cell.appendChild(badge);
+                }
+              });
+            }
+          });
+
+          const buttons = document.querySelectorAll('.category-btn');
+          const rows = document.querySelectorAll('tbody tr');
+
+          let activeCategory = null;
+
+          buttons.forEach(btn => {
+            btn.addEventListener('click', () => {
+              const cat = btn.dataset.category;
+              if (activeCategory === cat) {
+                activeCategory = null;
+                buttons.forEach(b => b.classList.remove('selected'));
+                rows.forEach(r => r.style.display = '');
+              } else {
+                activeCategory = cat;
+                buttons.forEach(b => b.classList.toggle('selected', b.dataset.category === cat));
+                rows.forEach(r => {
+                  r.style.display = r.dataset.category === cat ? '' : 'none';
+                });
+              }
+            });
+          });
+        </script>
+      </body>
+      </html>
+    `;
+  }
+}

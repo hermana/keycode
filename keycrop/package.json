@@ -1,5 +1,6 @@
 {
   "name": "keycrop",
+  "publisher": "hermana",
   "displayName": "keycrop",
   "description": "A virtual greenhouse game for learning VSCode hotkeys",
   "version": "0.0.1",
@@ -22,9 +23,21 @@
     "views": {
       "explorer": [
         {
-          "id": "keycrop",
-          "name": "keycrop",
+          "id": "instructions",
+          "name": "keycrop instructions",
+          "contextualTitle": "See instructions on how to grow plants!",
+          "type": "webview"
+        },
+        {
+          "id": "greenhouse",
+          "name": "keycrop greenhouse",
           "contextualTitle": "Use hotkeys to grow your crop!",
+          "type": "webview"
+        },
+        {
+          "id": "inventory",
+          "name": "keycrop inventory",
+          "contextualTitle": "Collect all the plants to complete the game!",
           "type": "webview"
         }
       ]
@@ -41,16 +54,6 @@
           ],
           "description": "The view background"
         }
-      },
-      "keycrop.scale": {
-        "type": "string",
-        "default": "Medium",
-        "enum": [
-          "Small",
-          "Medium",
-          "Big"
-        ],
-        "description": "The scale of the plants."
       }
     }
   },
