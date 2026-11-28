@@ -6,7 +6,7 @@ To fix the game, you will need to make the following edits to the file. Please u
 
 1. The keyword `return` is sometimes misspelled as `retune` in the file. You can use `CTRL+H` (Windows/Linux) or `CMD+H` (Mac) to correct the spelling.
 
-2. Lines 157 to 171 should be indented such that they are within the `for` loop. You can highlight lines 157 to 171  use `CTRL+]` (Windows/Linux) or `CMD+]` (Mac) to indent them so that they are within the loop. 
+2. Lines 156 to 172 should be indented such that they are within the `for` loop. You can highlight lines 156 to 172 and use `CTRL+]` (Windows/Linux) or `CMD+]` (Mac) three times to indent them so that they are within the loop. 
 
 3. Click within the brackets of the call to the `isWinner()` function on line 38 use `CTRL+SHIFT+SPACE` (Windows/Linux) or `CMD+SHIFT+SPACE` (Mac) to check which parameter is missing from the function call. Once you have added it, the program should run without errors.
 

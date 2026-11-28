@@ -6,7 +6,7 @@ To fix the game, you will need to make the following edits to the file. Please u
 
 1. The variable `playerTurn` is sometimes misspelled as `playerTern` throughout the file. You can use `CTRL+H` (Windows/Linux) or `CMD+H` (Mac) to replace all occurences where the spelling is not consistent.
 
-2. Lines 119 to 139 should be indented such that they are within the `while` loop. You can highlight lines 119 to 139 use `CTRL+]` (Windows/Linux) or `CMD+]` (Mac) to indent them so that they are within the loop. 
+2. Lines 117 to 140 should be indented such that they are within the `while` loop. You can highlight lines 117 to 140 and use `CTRL+]` (Windows/Linux) or `CMD+]` (Mac) twice to indent them so that they are within the loop. 
 
 3. Click within the brackets of the call to the `askForPlayerMove()` function on line 56 use `CTRL+SHIFT+SPACE` (Windows/Linux) or `CMD+SHIFT+SPACE` (Mac) to check which parameter is missing from the function call. Once you have added it, the program should run without errors.
 
