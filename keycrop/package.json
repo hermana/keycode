@@ -24,7 +24,7 @@
       "explorer": [
         {
           "id": "instructions",
-          "name": "keycrop instructions",
+          "name": "keycrop mappings",
           "contextualTitle": "See instructions on how to grow plants!",
           "type": "webview"
         },

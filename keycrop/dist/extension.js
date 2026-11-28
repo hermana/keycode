@@ -147,7 +147,7 @@ var InstructionsWebViewProvider = class extends BaseWebViewProvider {
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link href="${style}" rel="stylesheet">
-        <title>KeyCrop Instructions</title>
+        <title>KeyCrop Mappings</title>
       </head>
       <body>
         <div id="generator-instructions">
