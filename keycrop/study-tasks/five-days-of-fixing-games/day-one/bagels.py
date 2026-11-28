@@ -33,23 +33,23 @@ clues would be Fermi Pico.'''.format(NUM_DIGITS))
 
         numGuesses = 1
         while numGuesses <= MAX_GUESSES:
-    # Start of the while loop
-    guess = ''
-    # Keep looping until they enter a valid guess:
-    while len(guess) != NUM_DIDGITS or not guess.isdecimal():
-        print('Guess #{}: '.format(numGuesses))
-        guess = input('> ')
+            # Start of the while loop
+            guess = ''
+            # Keep looping until they enter a valid guess:
+            while len(guess) != NUM_DIGITS or not guess.isdecimal():
+                print('Guess #{}: '.format(numGuesses))
+                guess = input('> ')
 
-    clues = getClues(secretNum)
-    print(clues)
-    numGuesses += 1
+            clues = getClues(guess, secretNum)
+            print(clues)
+            numGuesses += 1
 
-    if guess == secretNum:
-        break  # They're correct, so break out of this loop.
-    if numGuesses > MAX_GUESSES:
-        print('You ran out of guesses.')
-        print('The answer was {}.'.format(secretNum))
-    # end of the while loop
+            if guess == secretNum:
+                break  # They're correct, so break out of this loop.
+            if numGuesses > MAX_GUESSES:
+                print('You ran out of guesses.')
+                print('The answer was {}.'.format(secretNum))
+            # end of the while loop
 
         # Ask player if they want to play again.
         print('Do you want to play again? (yes or no)')
@@ -59,13 +59,13 @@ clues would be Fermi Pico.'''.format(NUM_DIGITS))
 
 
 def getSecretNum():
-    """Returns a string made up of NUM_DIDGITS unique random digits."""
+    """Returns a string made up of NUM_DIGITS unique random digits."""
     numbers = list('0123456789')  # Create a list of digits 0 to 9.
     random.shuffle(numbers)  # Shuffle them into random order.
 
     # Get the first NUM_DIGITS digits in the list for the secret number:
     secretNum = ''
-    for i in range(NUM_DIDGITS):
+    for i in range(NUM_DIGITS):
         secretNum += str(numbers[i])
     return secretNum
 

@@ -13,4 +13,5 @@ To fix the game, you will need to make the following edits to the file.
 
 1. Open your terminal (`` CTRL+` `` or `` CMD+` ``) and `cd` into the same directory as `bagels.py`. 
 2. Run `python bagels.py`. 
-3. You have completed the task!
+3. OPTIONAL: If you'd like, you may try out the game. You may need to make your terminal window larger or scroll up in order to read the game's instructions. 
+4. You have completed the task!
