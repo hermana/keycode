@@ -1,6 +1,8 @@
 # How to fix the Four in a Row game
 
-To fix the game, you will need to make the following edits to the file. 
+If you have not installed the experiment plugin or reviewed the README.md file which describes the plugin, please do so before fixing the Four in a Row game. 
+
+To fix the game, you will need to make the following edits to the file. Please use hotkeys to edit the file as indicated in the instructions below.
 
 1. The keyword `return` is sometimes misspelled as `retune` in the file. You can use `CTRL+H` (Windows/Linux) or `CMD+H` (Mac) to correct the spelling.
 

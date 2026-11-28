@@ -1,6 +1,8 @@
 # How to fix the Bagels game
 
-To fix the game, you will need to make the following edits to the file. 
+If you have not installed the experiment plugin or reviewed the README.md file which describes the plugin, please do so before fixing the Bagels game. 
+
+To fix the game, you will need to make the following edits to the file. Please use hotkeys to edit the file as indicated in the instructions below.
 
 1. The constant variable `NUM_DIGITS` is not spelled consistently throughout the file. Sometimes, it appears as `NUM_DIDGITS`. You can use `CTRL+H` (Windows/Linux) or `CMD+H` (Mac) to replace all occurences where the spelling is not consistent.
 
